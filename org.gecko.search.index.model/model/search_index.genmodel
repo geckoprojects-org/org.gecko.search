@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.gecko.search.index.model/src" modelPluginID="org.gecko.search.index.model"
+    modelName="Search_index" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="8.0" copyrightFields="false"
+    usedGenPackages="../../org.gecko.emf.utilities.model/model/utilities.genmodel#//utilities"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>search_index.ecore</foreignModel>
+  <genPackages prefix="SearchIndex" basePackage="org.gecko" resource="XMI" disposableProviderFactory="true"
+      contentTypeIdentifier="search" ecorePackage="search_index.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search_index.ecore#//StoreType">
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//StoreType/NO"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//StoreType/YES"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search_index.ecore#//TermVectorType">
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//TermVectorType/YES"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//TermVectorType/WITH_POSITIONS"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//TermVectorType/WITH_OFFSETS"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//TermVectorType/WITH_POSTION_OFFSETS"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//TermVectorType/NO"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search_index.ecore#//IndexType">
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexType/ANALYZED"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexType/NOT_ANALYZED"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexType/ANALYZED_NO_NORMS"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexType/NOT_ANALYZED_NO_NORMS"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexType/NO"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search_index.ecore#//IndexFieldType">
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/STRING"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/TEXT"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/DOUBLE"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/FLOAT"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/INT"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/LONG"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/SHORT"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/BOOST"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/ENUM"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/WHITESPACE"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/STANDARD"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/SHINGLE"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/SORTED_DOC_VALUE"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/SORTED_NUMERIC_DOC_VALUE"/>
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//IndexFieldType/BINARY_DOC_VALUE"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search_index.ecore#//FacetIndexWriterType">
+      <genEnumLiterals ecoreEnumLiteral="search_index.ecore#//FacetIndexWriterType/TaxonomyWriter"/>
+    </genEnums>
+    <genClasses ecoreClass="search_index.ecore#//IndexDescriptor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexDescriptor/id"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexDescriptor/fields"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexDescriptor/boost"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexDescriptor/referencedDescriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexDescriptor/classes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexDescriptor/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexDescriptor/active"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexDescriptor/facetContext"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexDescriptor/useDynamicPerFieldAnalyizer"/>
+      <genOperations ecoreOperation="search_index.ecore#//IndexDescriptor/getIndexField">
+        <genParameters ecoreParameter="search_index.ecore#//IndexDescriptor/getIndexField/feature"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//IndexDescriptorContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexDescriptorContainer/descriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexDescriptorContainer/activeDescriptors"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//IndexField">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/termVector"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/store"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/boost"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/key"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexField/feature"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexField/converter"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/omitNorms"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/idField"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/index"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexField/pkField"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//IndexObject">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexObject/object"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexObject/descriptor"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexObject/fieldObjects"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference search_index.ecore#//IndexObject/idField"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexObject/facetObjects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexObject/searchableFacetDocumentObjects"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//IndexFieldObject">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//IndexFieldObject/value"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//IndexFieldObject/field"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//SpatialField">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//SpatialField/longitude"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//SpatialField/latitude"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//AggregatedMultiIndexField">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//AggregatedMultiIndexField/features"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//AggregatedMultiIndexField/indexFields"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//FacetField">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//FacetField/key"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//FacetField/feature"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//FacetField/multiValued"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//FacetField/hirachical"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//FacetField/requireCount"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//FacetField/referencedIndexField"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference search_index.ecore#//FacetField/facetContext"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//FacetContext">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//FacetContext/facetWriter"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search_index.ecore#//FacetContext/facetFields"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//FacetFieldObject">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//FacetFieldObject/value"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search_index.ecore#//FacetFieldObject/field"/>
+    </genClasses>
+    <genClasses ecoreClass="search_index.ecore#//SearchableFacetDocumentObject">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//SearchableFacetDocumentObject/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//SearchableFacetDocumentObject/systemName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//SearchableFacetDocumentObject/language"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//SearchableFacetDocumentObject/translation"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//SearchableFacetDocumentObject/facet"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search_index.ecore#//SearchableFacetDocumentObject/translationFieldKey"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

@@ -1,0 +1,74 @@
+-include: ${.}/gecko/gecko.bnd
+
+# Configure Repositories
+-plugin.1.Central: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		releaseUrl=https://repo.maven.apache.org/maven2/; \
+		index=${.}/central.maven; \
+		name="Central"
+
+-plugin.2.Local: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Local; \
+		pretty = true; \
+		local = ${build}/local
+
+-plugin.3.Templates: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Templates; \
+		pretty = true; \
+		local = ${build}/templates
+
+-plugin.4.Release: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Release; \
+		pretty = true; \
+		local = ${build}/release
+
+-releaserepo: Release
+-baselinerepo: Release
+
+# JUnit
+junit: org.apache.servicemix.bundles.junit; version=4.12
+
+-plugin: \
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM OCL-3.8;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/ocl-3.8/plugins/index.xml;\
+		cache=${build}/dim-ocl-3.8,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM QVT-3.8;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/qvt-3.8/plugins/index.xml;\
+		cache=${build}/dim-qvt-3.8,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM EMF-2.13;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
+		cache=${build}/dim-emf-3.8,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=https://repo.eclipse.org/content/repositories/orbit-approved-artifacts/;\
+		index=${.}/eclipse.orbit.maven;name=Eclipse Orbit,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=https://oss.sonatype.org/content/repositories/osgi/;\
+		snapshotUrl=https://oss.sonatype.org/content/repositories/osgi/;\
+		index=${.}/osgi.maven;name=OSGi Nexus,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM Eclipse Runtime;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/dim-core-runtime/index.xml;\
+		cache=${build}/dim-core-runtime,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/bnd-templates/index.xml;\
+		name=BNDtemplates;\
+		cache=${build}/bndtemplates,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=/https://repo.eclipse.org/;\
+		index=${.}/eclipse.maven;\
+		name=Eclipse Nexus,\
+	aQute.bnd.repository.p2.provider.P2Repository; \
+ 		url = http://devel.data-in-motion.biz/public/update/repository/p2/releases/de.dim.orbit/; \
+ 		cache = ${build}/DIMOrbit;\
+ 		name = DIMOrbit,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl="https://repository.apache.org/content/repositories/snapshots/";\
+		index=${.}/apache-snapshots.maven;\
+		name='Apache Snapshots';\
+		readOnly=true

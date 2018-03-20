@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="searchindex" nsURI="http://data-in-motion.biz/search/index/1.0"
+    nsPrefix="searchindex">
+  <eClassifiers xsi:type="ecore:EClass" name="IndexDescriptor">
+    <eOperations name="getIndexField" eType="#//IndexField">
+      <eParameters name="feature" lowerBound="1" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EStructuralFeature"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fields" upperBound="-1"
+        eType="#//IndexField" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="boost" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"
+        defaultValueLiteral="1.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referencedDescriptors"
+        upperBound="-1" eType="#//IndexDescriptor" eKeys="#//IndexDescriptor/id"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="classes" upperBound="-1"
+        eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetContext" eType="#//FacetContext"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="useDynamicPerFieldAnalyizer"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IndexDescriptorContainer">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="descriptors" upperBound="-1"
+        eType="#//IndexDescriptor" containment="true" eKeys="#//IndexDescriptor/id"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="activeDescriptors" upperBound="-1"
+        eType="#//IndexDescriptor" volatile="true" transient="true" derived="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IndexField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="termVector" lowerBound="1"
+        eType="#//TermVectorType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="store" lowerBound="1" eType="#//StoreType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="boost" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"
+        defaultValueLiteral="1.0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="#//IndexFieldType"
+        defaultValueLiteral="STRING"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="feature" lowerBound="1"
+        eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//FeaturePath"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="converter" eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//Converter"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="omitNorms" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="idField" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="index" eType="#//IndexType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pkField" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="StoreType">
+    <eLiterals name="NO"/>
+    <eLiterals name="YES" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TermVectorType">
+    <eLiterals name="YES"/>
+    <eLiterals name="WITH_POSITIONS" value="1"/>
+    <eLiterals name="WITH_OFFSETS" value="2"/>
+    <eLiterals name="WITH_POSTION_OFFSETS" value="3"/>
+    <eLiterals name="NO" value="4"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="IndexType">
+    <eLiterals name="ANALYZED"/>
+    <eLiterals name="NOT_ANALYZED" value="1"/>
+    <eLiterals name="ANALYZED_NO_NORMS" value="2"/>
+    <eLiterals name="NOT_ANALYZED_NO_NORMS" value="3"/>
+    <eLiterals name="NO" value="4"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IndexObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="object" lowerBound="1"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="descriptor" lowerBound="1"
+        eType="#//IndexDescriptor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fieldObjects" upperBound="-1"
+        eType="#//IndexFieldObject" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="idField" lowerBound="1"
+        eType="#//IndexFieldObject" changeable="false" volatile="true" transient="true"
+        derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetObjects" upperBound="-1"
+        eType="#//FacetFieldObject" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="searchableFacetDocumentObjects"
+        upperBound="-1" eType="#//SearchableFacetDocumentObject" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IndexFieldObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="field" lowerBound="1" eType="#//IndexField"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="IndexFieldType">
+    <eLiterals name="STRING"/>
+    <eLiterals name="TEXT" value="1"/>
+    <eLiterals name="DOUBLE" value="2"/>
+    <eLiterals name="FLOAT" value="3"/>
+    <eLiterals name="INT" value="4"/>
+    <eLiterals name="LONG" value="5"/>
+    <eLiterals name="SHORT" value="6"/>
+    <eLiterals name="BOOST" value="7"/>
+    <eLiterals name="ENUM" value="8" literal="ENUM"/>
+    <eLiterals name="WHITESPACE" value="9" literal="WHITESPACE"/>
+    <eLiterals name="STANDARD" value="10"/>
+    <eLiterals name="SHINGLE" value="11"/>
+    <eLiterals name="SORTED_DOC_VALUE" value="12"/>
+    <eLiterals name="SORTED_NUMERIC_DOC_VALUE" value="13"/>
+    <eLiterals name="BINARY_DOC_VALUE" value="14"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpatialField" eSuperTypes="#//IndexField">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="longitude" lowerBound="1"
+        eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//FeaturePath"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="latitude" lowerBound="1"
+        eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//FeaturePath"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AggregatedMultiIndexField" eSuperTypes="#//IndexField">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="features" upperBound="-1"
+        eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//FeaturePath"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="indexFields" upperBound="-1"
+        eType="#//IndexField"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FacetField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="feature" lowerBound="1"
+        eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//FeaturePath"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiValued" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hirachical" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requireCount" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referencedIndexField" eType="#//IndexField"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetContext" eType="#//FacetContext"
+        eOpposite="#//FacetContext/facetFields"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FacetContext">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="facetWriter" eType="#//FacetIndexWriterType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetFields" upperBound="-1"
+        eType="#//FacetField" containment="true" eOpposite="#//FacetField/facetContext"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="FacetIndexWriterType">
+    <eLiterals name="TaxonomyWriter" literal=""/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FacetFieldObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="field" lowerBound="1" eType="#//FacetField"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SearchableFacetDocumentObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="systemName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="language" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="translation" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="facet" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="translationFieldKey" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>

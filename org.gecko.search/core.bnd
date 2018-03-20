@@ -1,0 +1,8 @@
+Private-Package: \
+	org.gecko.search.core.provider.impl,\
+	org.gecko.search.core.registry.impl
+Export-Package: \
+	org.gecko.search.core,\
+	org.gecko.search.core.exceptions,\
+	org.gecko.search.core.registry,\
+	org.gecko.search.core.provider

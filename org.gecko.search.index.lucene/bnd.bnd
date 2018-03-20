@@ -1,0 +1,47 @@
+-buildpath: \
+	osgi.annotation;version=7.0,\
+	osgi.core;version=6.0,\
+	osgi.cmpn;version=6.0,\
+	org.osgi.util.pushstream;version=1.0,\
+	org.eclipse.emf.ecore,\
+	org.eclipse.emf.common,\
+	org.eclipse.emf.ecore.xmi,\
+	org.gecko.search.index.model;version=latest,\
+	org.gecko.emf.utilities.model;version=latest,\
+	org.gecko.runtime.logging,\
+	org.gecko.search.converter.api;version=latest,\
+	de.dim.orbit:lucene-core,\
+	de.dim.orbit:lucene-facet,\
+	de.dim.orbit:lucene-spatial,\
+	de.dim.orbit:lucene-sandbox,\
+	org.gecko.search.core;version=latest
+
+-testpath: \
+	${junit}
+
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Version: 1.0.0.${tstamp}
+Private-Package: \
+	org.gecko.search.index.lucene.analyzer.impl,\
+	org.gecko.search.index.lucene.documents,\
+	org.gecko.search.index.lucene.indexer,\
+	org.gecko.search.index.lucene.writer.impl,\
+	org.gecko.search.index.core.registry.impl,\
+	org.gecko.search.index.core.provider.impl,\
+	org.gecko.search.index.core.builder.impl
+
+Bundle-Copyright: Data In Motion Consulting GmbH
+Bundle-License: Eclipse Public License v1.0
+Bundle-Vendor: Data In Motion Consulting GmbH
+Export-Package: \
+	org.gecko.search.index.lucene,\
+	org.gecko.search.index.lucene.analyzer,\
+	org.gecko.search.index.lucene.provider,\
+	org.gecko.search.index.lucene.writer,\
+	org.gecko.search.index.core.registry,\
+	org.gecko.search.index.core,\
+	org.gecko.search.index.core.provider,\
+	org.gecko.search.index.core.builder,\
+	org.gecko.search.index.core.maintenance

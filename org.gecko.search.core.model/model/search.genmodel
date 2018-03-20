@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="Copyright (c) 2014 Data In Motion and others.&#xD;&#xA;All rights reserved. &#xD;&#xA;&#xD;&#xA;This program and the accompanying materials are made available under the terms of the &#xD;&#xA;Eclipse Public License v1.0 which accompanies this distribution, and is available at&#xD;&#xA;http://www.eclipse.org/legal/epl-v10.html&#xD;&#xA;&#xD;&#xA;Contributors:&#xD;&#xA;    Data In Motion - initial API and implementation"
+    modelDirectory="/org.gecko.search.core.model/src/" editDirectory="/org.gecko.search.core.model.edit/src/"
+    editorDirectory="/org.gecko.search.core.model.editor/src/" modelPluginID="de.dim.search.core.model"
+    modelName="Search" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    testSuiteClass="org.gecko.search.core.model.tests.SearchAllTests" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="8.0" copyrightFields="false" testsPluginID="org.gecko.search.core.model.tests"
+    operationReflection="true" runtimePlatform="RCP" importOrganizing="true">
+  <foreignModel>search.ecore</foreignModel>
+  <genPackages prefix="Search" basePackage="de.dim" resource="XMI" disposableProviderFactory="true"
+      contentTypeIdentifier="search#1.0" ecorePackage="search.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search.ecore#//IndexDataType">
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//IndexDataType/FileSystem"/>
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//IndexDataType/MMap"/>
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//IndexDataType/RAM"/>
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//IndexDataType/MongoDB"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="search.ecore#//DescriptorType">
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//DescriptorType/INDEX"/>
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//DescriptorType/RESULT"/>
+      <genEnumLiterals ecoreEnumLiteral="search.ecore#//DescriptorType/QUERY"/>
+    </genEnums>
+    <genClasses ecoreClass="search.ecore#//IndexDataContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference search.ecore#//IndexDataContainer/indexData"/>
+    </genClasses>
+    <genClasses ecoreClass="search.ecore#//IndexData">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexData/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexData/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexData/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexData/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexData/uri"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexData/workspaceProviderId"/>
+    </genClasses>
+    <genClasses ecoreClass="search.ecore#//Descriptor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//Descriptor/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//Descriptor/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//Descriptor/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//Descriptor/active"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//Descriptor/type"/>
+    </genClasses>
+    <genClasses ecoreClass="search.ecore#//DescriptorContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute search.ecore#//DescriptorContainer/descriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//DescriptorContainer/queryDescriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//DescriptorContainer/indexDescriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//DescriptorContainer/resultDescriptors"/>
+    </genClasses>
+    <genClasses ecoreClass="search.ecore#//IndexConfiguration">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexConfiguration/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexConfiguration/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexConfiguration/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute search.ecore#//IndexConfiguration/active"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//IndexConfiguration/indexData"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//IndexConfiguration/indexDescriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//IndexConfiguration/queryDescriptors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference search.ecore#//IndexConfiguration/resultDescriptors"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

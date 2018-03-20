@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="searchresult" nsURI="http://data-in-motion.biz/search/result/1.0"
+    nsPrefix="searchresult">
+  <eClassifiers xsi:type="ecore:EClass" name="SearchResult">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="categories" upperBound="-1"
+        eType="#//Category" containment="true" eKeys="#//Category/id"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="categorySize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        changeable="false" volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allMatchResultSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        changeable="false" volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeResult" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetResults" upperBound="-1"
+        eType="#//FacetResult" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeCollectorResults"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeJoinCollectorResults"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numberPages" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pageSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Category">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="results" upperBound="-1"
+        eType="#//MatchResult" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="matchResultSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MatchResult">
+    <eOperations name="getMatchFieldById" eType="#//MatchField">
+      <eParameters name="key" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="highlights" upperBound="-1"
+        eType="#//MatchHighlight" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fields" upperBound="-1"
+        eType="#//MatchField" containment="true" eKeys="#//MatchField/id"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="score" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="explanation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MatchHighlight">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startOffset" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endOffset" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="text" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="highlightedText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MatchField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="feature" eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//FeaturePath"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="converter" eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//Converter"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiValue" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="highlighting" upperBound="-1"
+        eType="#//MatchHighlight" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="QueryObject" eSuperTypes="../../org.gecko.emf.utilities.query.model/model/query_1.0.ecore#//Query">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeQuery" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="indexPath" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxResults" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="filterFields" upperBound="-1"
+        eType="#//FilterField" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sortFields" upperBound="-1"
+        eType="#//SortField" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeObject" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"
+        transient="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="spatialFilterField" eType="#//SpatialFilterField"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="highlightFields" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="likeThisObject" eType="#//LikeThisObject"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="analyzerId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="default"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetQueryContext" eType="#//FacetQueryContext"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeCollectors" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="runCollectorExclusive"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinQuery" eType="#//JoinQuery"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="groupingContext" eType="#//GroupingContext"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nativeQueryOccur" eType="#//Occur"
+        defaultValueLiteral="MUST"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="explain" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pageIndex" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pageResultSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"
+        defaultValueLiteral="-1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MultiTokenFuzzyField" eSuperTypes="#//MultiTokenTermQuery">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uppercase" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxEdits" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FilterField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tokens" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="#//FilteringType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="prefix" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="occur" eType="#//Occur"
+        defaultValueLiteral="MUST"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tokensOccur" eType="#//Occur"
+        defaultValueLiteral="SHOULD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="FilteringType">
+    <eLiterals name="OR"/>
+    <eLiterals name="AND" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MultiTokenTermQuery" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tokens" lowerBound="1"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="prefix" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tokensOccur" eType="#//Occur"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="QueryObjectContainer">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="queries" upperBound="-1"
+        eType="#//QueryObject" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="activeQueries" upperBound="-1"
+        eType="#//QueryObject" changeable="false" volatile="true" transient="true"
+        derived="true" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SortField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tokens" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="#//SortType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="direction" lowerBound="1"
+        eType="#//SortDirectionType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="occur" eType="#//Occur"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="SortType">
+    <eLiterals name="SCORE"/>
+    <eLiterals name="DOC" value="1"/>
+    <eLiterals name="STRING" value="2"/>
+    <eLiterals name="INT" value="3"/>
+    <eLiterals name="FLOAT" value="4"/>
+    <eLiterals name="LONG" value="5"/>
+    <eLiterals name="DOUBLE" value="6"/>
+    <eLiterals name="CUSTOM" value="8"/>
+    <eLiterals name="STRING_VAL" value="10"/>
+    <eLiterals name="BYTES" value="11"/>
+    <eLiterals name="REWRITABLE" value="12"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="SortDirectionType">
+    <eLiterals name="ASCENDING"/>
+    <eLiterals name="DESCENDING" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpatialFilterField" eSuperTypes="#//SpatialField"/>
+  <eClassifiers xsi:type="ecore:EClass" name="WildcardField" eSuperTypes="#//MultiTokenTermQuery">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startWithWildcard" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endWithWildcard" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="includeUpperCase" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Occur">
+    <eLiterals name="SHOULD"/>
+    <eLiterals name="MUST" value="1"/>
+    <eLiterals name="MUST_NOT" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ResultDescriptor">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="active" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="indexId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fields" upperBound="-1"
+        eType="#//ResultField" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ResultField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="highlight" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ResultDescriptorContainer">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="descriptors" upperBound="-1"
+        eType="#//ResultDescriptor" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="activeDescriptors" upperBound="-1"
+        eType="#//ResultDescriptor" changeable="false" volatile="true" transient="true"
+        derived="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LikeThisObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="likeThisFields" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="filterFields" upperBound="-1"
+        eType="#//FilterField" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sortFields" upperBound="-1"
+        eType="#//SortField" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="filterSourceObject" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="filterSourceField" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxResults" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FacetFilter">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="facetKey" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FacetQueryContext">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="facetFields" upperBound="-1"
+        eType="#//FacetFilter"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="countFacets" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fillInCategories" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowDuplicatesInCategories"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxFacets" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="10"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dimensions" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxResultPerCategory" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FacetResult">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="count" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="children" upperBound="-1"
+        eType="#//FacetResult" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="JoinQuery">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="indexPath" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fromField" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="toField" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="scoreMode" eType="#//JoinScoreMode"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="queryObject" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="joinAftermathCollectors"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="occur" eType="#//Occur"
+        defaultValueLiteral="SHOULD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="JoinScoreMode">
+    <eLiterals name="NONE" literal="NONE"/>
+    <eLiterals name="AVERAGE" value="1"/>
+    <eLiterals name="MAX" value="2"/>
+    <eLiterals name="TOTAL" value="3"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpatialSortField" eSuperTypes="#//SortField">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="latLng" eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//LatLng"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GroupingContext">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxGroups" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="offSet" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="groupFieldName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultsPerGroup" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cachSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="4.0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="groupSort" upperBound="-1"
+        eType="#//SortField"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpatialField" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="latLng" eType="ecore:EClass ../../org.gecko.emf.utilities.model/model/utilities.ecore#//LatLng"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="distance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
+        defaultValueLiteral="100"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpanTermField" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tokens" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="span" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BooleanQuery" eSuperTypes="#//BoostableField">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="clauses" lowerBound="1"
+        upperBound="-1" eType="#//BooleanClause" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LuceneQueryField" eSuperTypes="#//BoostableField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="analyzed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BoostableField" eSuperTypes="../../org.gecko.emf.utilities.query.model/model/query_1.0.ecore#//QueryCondition">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="boost" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"
+        defaultValueLiteral="0.4"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BooleanClause">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="occur" eType="#//Occur"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="query" eType="#//BoostableField"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NumericRangeQuery" abstract="true" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="precisionStep" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="4"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="minInclusive" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxInclusive" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DoubleRangeQuery" eSuperTypes="#//NumericRangeQuery">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="minValue" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxValue" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SingleTokenTermQuery" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="token" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="prefix" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SingleTokenFuzzyField" eSuperTypes="#//SingleTokenTermQuery">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uppercase" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxEdits" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpanQueryField" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="span" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="1"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="queryFields" lowerBound="1"
+        upperBound="-1" eType="#//LuceneQueryField" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PhraseQuery" eSuperTypes="#//LuceneQueryField">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="slop" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="terms" lowerBound="1" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MultiPhraseQuery" eSuperTypes="#//PhraseQuery"/>
+</ecore:EPackage>
