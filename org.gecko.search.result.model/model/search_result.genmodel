@@ -8,7 +8,7 @@
     operationReflection="true" importOrganizing="true">
   <foreignModel>search_result.ecore</foreignModel>
   <genPackages prefix="SearchResult" basePackage="org.gecko" resource="XMI" disposableProviderFactory="true"
-      ecorePackage="search_result.ecore#/">
+      dataTypeConverters="true" contentTypeIdentifier="searchresult#1.0" ecorePackage="search_result.ecore#/">
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="search_result.ecore#//FilteringType">
       <genEnumLiterals ecoreEnumLiteral="search_result.ecore#//FilteringType/OR"/>
       <genEnumLiterals ecoreEnumLiteral="search_result.ecore#//FilteringType/AND"/>

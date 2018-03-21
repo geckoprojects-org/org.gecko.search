@@ -14,7 +14,17 @@
 	de.dim.orbit:lucene-facet,\
 	de.dim.orbit:lucene-spatial,\
 	de.dim.orbit:lucene-sandbox,\
-	org.gecko.search.core;version=latest
+	org.gecko.search.core;version=latest,\
+	org.gecko.search.result.model;version=latest,\
+	org.gecko.emf.utilities.query.model;version=latest,\
+	org.apache.lucene.grouping,\
+	org.apache.lucene.highlighter;version=6.6,\
+	org.apache.lucene.queryparser,\
+	org.apache.lucene.spatial,\
+	org.locationtech.spatial4j,\
+	org.apache.lucene.queries;version=6.6,\
+	org.apache.lucene.spatial.extras;version=6.6,\
+	org.apache.lucene.join;version=6.6
 
 -testpath: \
 	${junit}
@@ -30,7 +40,10 @@ Private-Package: \
 	org.gecko.search.index.lucene.writer.impl,\
 	org.gecko.search.index.core.registry.impl,\
 	org.gecko.search.index.core.provider.impl,\
-	org.gecko.search.index.core.builder.impl
+	org.gecko.search.index.core.builder.impl,\
+	org.gecko.search.result.core.registry.impl,\
+	org.gecko.search.result.lucene.mapper.impl,\
+	org.gecko.search.result.lucene.query.impl
 
 Bundle-Copyright: Data In Motion Consulting GmbH
 Bundle-License: Eclipse Public License v1.0
@@ -44,4 +57,13 @@ Export-Package: \
 	org.gecko.search.index.core,\
 	org.gecko.search.index.core.provider,\
 	org.gecko.search.index.core.builder,\
-	org.gecko.search.index.core.maintenance
+	org.gecko.search.index.core.maintenance,\
+	org.gecko.search.result.core,\
+	org.gecko.search.result.core.queries,\
+	org.gecko.search.result.core.registry,\
+	org.gecko.search.result.lucene,\
+	org.gecko.search.result.lucene.helper,\
+	org.gecko.search.result.lucene.highlight,\
+	org.gecko.search.result.lucene.mapper,\
+	org.gecko.search.result.lucene.query,\
+	org.gecko.search.result.lucene.query.switches

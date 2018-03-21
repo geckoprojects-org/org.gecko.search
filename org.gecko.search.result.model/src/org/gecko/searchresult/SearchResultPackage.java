@@ -62,6 +62,14 @@ public interface SearchResultPackage extends EPackage {
 	String eNS_PREFIX = "searchresult";
 
 	/**
+	 * The package content type ID.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	String eCONTENT_TYPE = "searchresult#1.0";
+
+	/**
 	 * The singleton instance of the package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
