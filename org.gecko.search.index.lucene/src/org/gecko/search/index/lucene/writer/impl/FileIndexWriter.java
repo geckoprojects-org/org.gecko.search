@@ -18,16 +18,32 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.gecko.search.core.provider.ISearchWorkspaceProvider;
 import org.gecko.search.index.core.SearchIndexException;
+import org.gecko.search.index.lucene.analyzer.LuceneAnalyzerRegistry;
+import org.gecko.search.index.lucene.writer.IIndexWriterProvider;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Index writer that uses the file system
  * @author Mark Hoffmann
  * @since 07.08.2014
  */
+@Component(service = IIndexWriterProvider.class, property = {
+		"type=FILE",
+		"ws=WS"
+})
 public class FileIndexWriter extends AbstractIndexWriterProvider {
 	
 	private ISearchWorkspaceProvider workspaceProvider;
 
+	@Deactivate
+	public void deactivate() {
+		dispose();
+	}
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see de.dim.search.index.lucene.writer.IIndexWriterProvider#getWriterProviderId()
@@ -63,6 +79,7 @@ public class FileIndexWriter extends AbstractIndexWriterProvider {
 	 * Sets the workspace provider.
 	 * @param workspaceProvider the workspace provider to set
 	 */
+	@Reference(cardinality = ReferenceCardinality.MANDATORY, target = "(type=workspace)")
 	public void setWorkspaceProvider(ISearchWorkspaceProvider workspaceProvider) {
 		this.workspaceProvider = workspaceProvider;
 	}
@@ -73,6 +90,16 @@ public class FileIndexWriter extends AbstractIndexWriterProvider {
 	 */
 	public void unsetWorkspaceProvider(ISearchWorkspaceProvider workspaceProvider) {
 		this.workspaceProvider = workspaceProvider;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.index.lucene.writer.impl.AbstractIndexWriterProvider#setAnalyzerRegistry(org.gecko.search.index.lucene.analyzer.LuceneAnalyzerRegistry)
+	 */
+	@Override
+	@Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC)
+	public void setAnalyzerRegistry(LuceneAnalyzerRegistry analyzerRegistry) {
+		super.setAnalyzerRegistry(analyzerRegistry);
 	}
 
 }

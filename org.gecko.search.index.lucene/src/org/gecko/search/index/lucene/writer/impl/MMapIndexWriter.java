@@ -18,12 +18,23 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
 import org.gecko.search.core.provider.ISearchWorkspaceProvider;
 import org.gecko.search.index.core.SearchIndexException;
+import org.gecko.search.index.lucene.analyzer.LuceneAnalyzerRegistry;
+import org.gecko.search.index.lucene.writer.IIndexWriterProvider;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * MMap index writer provider
  * @author Mark Hoffmann
  * @since 07.08.2014
  */
+@Component(service = IIndexWriterProvider.class, property = {
+		"type=MMAP",
+		"ws=WS"
+})
 public class MMapIndexWriter extends AbstractIndexWriterProvider {
 
 	private ISearchWorkspaceProvider workspaceProvider;
@@ -50,6 +61,11 @@ public class MMapIndexWriter extends AbstractIndexWriterProvider {
 			throw new SearchIndexException("Error opening file directory for index at location: " + file.getAbsolutePath(), e);
 		}
 	}
+	
+	@Deactivate
+	public void deactivate() {
+		dispose();
+	}
 
 	/**
 	 * Returns the workspaceProvider.
@@ -63,6 +79,7 @@ public class MMapIndexWriter extends AbstractIndexWriterProvider {
 	 * Sets the workspace provider.
 	 * @param workspaceProvider the workspace provider to set
 	 */
+	@Reference(cardinality = ReferenceCardinality.MANDATORY, target = "(type=workspace)")
 	public void setWorkspaceProvider(ISearchWorkspaceProvider workspaceProvider) {
 		this.workspaceProvider = workspaceProvider;
 	}
@@ -75,4 +92,13 @@ public class MMapIndexWriter extends AbstractIndexWriterProvider {
 		this.workspaceProvider = workspaceProvider;
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.index.lucene.writer.impl.AbstractIndexWriterProvider#setAnalyzerRegistry(org.gecko.search.index.lucene.analyzer.LuceneAnalyzerRegistry)
+	 */
+	@Override
+	@Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC)
+	public void setAnalyzerRegistry(LuceneAnalyzerRegistry analyzerRegistry) {
+		super.setAnalyzerRegistry(analyzerRegistry);
+	}
 }

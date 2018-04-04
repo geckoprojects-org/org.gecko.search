@@ -40,6 +40,10 @@ import org.gecko.searchindex.IndexDescriptor;
 import org.gecko.searchindex.IndexFieldObject;
 import org.gecko.searchindex.IndexObject;
 import org.gecko.searchindex.SearchableFacetDocumentObject;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
@@ -50,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author Mark Hoffmann
  * @since 05.08.2014
  */
+@Component(name = "LucneneIndexer", configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class LuceneIndexer implements IIndexer {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LuceneIndexer.class.getName());
@@ -136,7 +141,7 @@ public class LuceneIndexer implements IIndexer {
 				eventProperties.put("index.object.id", io.getIdField().getValue());
 				eventProperties.put("deleted", Boolean.TRUE);
 				eventProperties.put("EClasses", eClassUris);
-				eventAdmin.postEvent(new Event("de/dim/index/update/" + io.getDescriptor().getId(), eventProperties));
+				eventAdmin.postEvent(new Event("org/gecko/index/update/" + io.getDescriptor().getId(), eventProperties));
 			});
 		}
 	}
@@ -234,7 +239,7 @@ public class LuceneIndexer implements IIndexer {
 					eventProperties.put("index.object.id", indexObject.getIdField().getValue());
 					eventProperties.put("deleted", Boolean.TRUE);
 					eventProperties.put("EClasses", eClassUris);
-					events.add(new Event("de/dim/index/update/" + indexObject.getDescriptor().getId(), eventProperties));
+					events.add(new Event("org/gecko/index/update/" + indexObject.getDescriptor().getId(), eventProperties));
 				}
 			}
 		}
@@ -283,6 +288,7 @@ public class LuceneIndexer implements IIndexer {
 	 * Sets the index writer provider.
 	 * @param indexWriterProvider the index writer provider to set
 	 */
+	@Reference(cardinality = ReferenceCardinality.MANDATORY, name = "IndexWriterProvider")
 	public void setIndexWriterProvider(IIndexWriterProvider indexWriterProvider) {
 		this.indexWriterProvider = indexWriterProvider;
 	}
@@ -299,6 +305,7 @@ public class LuceneIndexer implements IIndexer {
 	 * Sets the index object provider.
 	 * @param indexObjectProvider the index object provider to set
 	 */
+	@Reference(cardinality = ReferenceCardinality.MANDATORY, name = "IndexObjectProvider")
 	public void setIndexObjectProvider(IIndexObjectProvider indexObjectProvider) {
 		this.indexObjectProvider = indexObjectProvider;
 	}
@@ -315,6 +322,7 @@ public class LuceneIndexer implements IIndexer {
 	 * Sets the EventAdmin.
 	 * @param eventAdmin the EventAdmin to set
 	 */
+	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
 	public void setEventAdmin(EventAdmin eventAdmin) {
 		this.eventAdmin = eventAdmin;
 	}
