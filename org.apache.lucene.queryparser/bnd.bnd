@@ -1,0 +1,7 @@
+-buildpath: org.apache.lucene:lucene-queryparser;version=latest
+
+-resourceonly: true
+
+Bundle-Version: 7.5.0.SNAPSHOT
+
+Export-Package: *

@@ -1,0 +1,11 @@
+-buildpath: org.apache.lucene:lucene-codecs;version=latest
+
+-resourceonly: true
+
+Bundle-Version: 7.5.0.SNAPSHOT
+
+Export-Package:\
+	*
+	
+-includeresource: \
+	@${repo;org.apache.lucene:lucene-codecs;latest}!/META-INF/services/*

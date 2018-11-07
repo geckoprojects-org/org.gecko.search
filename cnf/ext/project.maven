@@ -1,0 +1,7 @@
+org.apache.lucene:lucene-core:7.5.0
+org.apache.lucene:lucene-analyzers-common:7.5.0
+org.apache.lucene:lucene-queries:7.5.0
+org.apache.lucene:lucene-queryparser:7.5.0
+org.apache.lucene:lucene-codecs:7.5.0
+org.apache.lucene:lucene-memory:7.5.0
+org.apache.lucene:lucene-suggest:7.5.0

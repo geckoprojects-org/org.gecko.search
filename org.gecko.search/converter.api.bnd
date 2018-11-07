@@ -1,5 +1,0 @@
-Private-Package: org.gecko.search.converter.registry.impl
-Export-Package: \
-	org.gecko.search.converter,\
-	org.gecko.search.converter.registry
--baseline: *
