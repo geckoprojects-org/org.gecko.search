@@ -1,7 +1,11 @@
--buildpath: org.apache.lucene:lucene-core;version=latest
+-buildpath: org.apache.lucene:lucene-core;version=latest,\
+	org.apache.lucene:lucene-analyzers-common;version=latest
 
 -resourceonly: true
 
 Bundle-Version: 7.5.0.SNAPSHOT
 
 Export-Package: *
+
+-includeresource: \
+	@${repo;org.apache.lucene:lucene-analyzers-common;latest}!/META-INF/services/*
