@@ -62,7 +62,7 @@ public class SuggestionServiceimpl implements SuggestionService {
 	public void activate(ComponentContext ctx) {
 		String indexDir = (String) ctx.getProperties().get(PROP_INDEX_DIR);
 		if (indexDir == null) {
-			indexDir = System.getProperty("user.home");
+			indexDir = System.getProperty("java.io.tmpdir");
 		}
 		logger.info("My index path is: " + indexDir);
 		
