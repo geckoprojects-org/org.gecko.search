@@ -1,0 +1,111 @@
+/**
+ * Copyright (c) 2012 - 2018 Data In Motion and others.
+ * All rights reserved. 
+ * 
+ * This program and the accompanying materials are made available under the terms of the 
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Data In Motion - initial API and implementation
+ */
+package org.gecko.search.suggest.impl;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.lucene.search.suggest.InputIterator;
+import org.apache.lucene.util.BytesRef;
+
+
+/**
+ * 
+ * @author ilenia
+ * @since Nov 9, 2018
+ */
+
+public class ContextIteratorImpl implements InputIterator
+	{
+	    private Iterator<SuggestContext> deviceIterator;
+	    private SuggestContext currentContext;
+
+	    public ContextIteratorImpl(Iterator<SuggestContext> deviceIterator) {
+	        this.deviceIterator = deviceIterator;
+	    }
+	    
+	    /* 
+	     * (non-Javadoc)
+	     * @see org.apache.lucene.search.suggest.InputIterator#hasContexts()
+	     */
+	    public boolean hasContexts() {
+	        return true;
+	    }
+	    
+	    /* 
+	     * (non-Javadoc)
+	     * @see org.apache.lucene.search.suggest.InputIterator#hasPayloads()
+	     */
+	    public boolean hasPayloads() {
+	        return true;
+	    }
+
+	    /**
+	     * @return
+	     */
+	    public Comparator<BytesRef> getComparator() {
+	        return null;
+	    }
+
+	    /* 
+	     * (non-Javadoc)
+	     * @see org.apache.lucene.util.BytesRefIterator#next()
+	     */
+	    public BytesRef next() {
+	        if (deviceIterator.hasNext()) {
+	            currentContext = deviceIterator.next();
+	            try {
+	            	//we want completion against the device description
+	                return new BytesRef(currentContext.getContent().getBytes("UTF8")); 
+	            } catch (UnsupportedEncodingException e) {
+	                throw new Error("Couldn't convert to UTF-8");
+	            }
+	        } else {
+	            return null;
+	        }
+	    }
+
+	    /* 
+	     * (non-Javadoc)
+	     * @see org.apache.lucene.search.suggest.InputIterator#payload()
+	     */
+	    public BytesRef payload() {
+	            return new BytesRef(currentContext.getPayload().getBytes());
+	    }
+
+	    /* 
+	     * (non-Javadoc)
+	     * @see org.apache.lucene.search.suggest.InputIterator#contexts()
+	     */
+	    public Set<BytesRef> contexts() {           	
+	    	try {
+	            Set<BytesRef> labels = new HashSet<BytesRef>();
+	            for (String label : currentContext.getLabels()) {
+	            	labels.add(new BytesRef(label.getBytes("UTF8")));
+	            }
+	            return labels;
+	        } catch (UnsupportedEncodingException e) {
+	            throw new Error("Couldn't convert to UTF-8");
+	        }
+	    }
+
+	    /* 
+	     * (non-Javadoc)
+	     * @see org.apache.lucene.search.suggest.InputIterator#weight()
+	     */
+	    public long weight() {
+	        return currentContext.getWeight();
+	    }
+	}

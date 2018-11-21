@@ -1,0 +1,3 @@
+Export-Package: org.gecko.search.suggest.api
+Bundle-Name: Search Suggester API
+Bundle-Description: API for the Gecko Search Suggester

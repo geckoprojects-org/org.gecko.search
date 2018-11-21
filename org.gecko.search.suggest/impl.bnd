@@ -1,0 +1,3 @@
+Private-Package: org.gecko.search.suggest.impl
+Bundle-Name: Search Suggester Component
+Bundle-Description: Service with Lucene Implementation of the Suggester
