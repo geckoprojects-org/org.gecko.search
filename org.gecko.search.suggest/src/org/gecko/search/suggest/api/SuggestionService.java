@@ -20,6 +20,11 @@ import java.util.Map;
  */
 public interface SuggestionService {
 	
+	public static final String SUGGESTION_FACTORY = "SuggestionServiceFactory";
+	public static final String PROP_SUGGESTION_NAME = "suggestion.name";
+	public static final String PROP_SUGGESTION_INDEX = "suggestion.index";
+	public static final String PROP_SUGGESTION_RESULT_SIZE = "suggestion.resultSize";
+	
 	/**
 	 * This method is the one which computes the actual auto completion. It takes as input parameter the 
 	 * string we want to auto complete and an array of strings in which we can specify whether we want to look

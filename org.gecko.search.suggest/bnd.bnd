@@ -6,7 +6,8 @@
 	org.apache.lucene.suggest,\
 	org.eclipse.emf.common,\
 	org.eclipse.emf.ecore,\
-	org.eclipse.emf.ecore.xmi
+	org.eclipse.emf.ecore.xmi,\
+	org.gecko.runtime.api;version=latest
 
 -testpath: \
 	${junit}

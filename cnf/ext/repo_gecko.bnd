@@ -28,7 +28,7 @@ geckoVersion: release
 		name=GeckoAddons;\
 		cache=${build}/cache/GeckoAddons,\
 	aQute.bnd.repository.osgi.OSGiRepository; \
-		locations=http://devel.data-in-motion.biz/public/repository/gecko/${geckoVersion}/geckoRuntime/index.xml;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/${geckoVersion}/geckoRuntime/latest/index.xml;\
 		max.stale=-1;\
 		readonly = true;\
 		name = "GeckoRuntime";\

@@ -9,14 +9,22 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.impl;
+package org.gecko.search.suggest.api;
 
 /**
- * Context object for one element
+ * Context object for one index element
  * @author ilenia
  * @since Nov 9, 2018
  */
-public interface SuggestContext {	
+public interface SuggestionContext {
+	
+	public static enum ActionType{
+		ADD,
+		MODIFY,
+		REMOVE
+	}
+	
+	ActionType getActionType();
 	
 	String getContent();
 	

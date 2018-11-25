@@ -19,22 +19,36 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
- * 
- * @author ilenia
+ * Object provider that defines the suggestion input and result
+ * @author Ilenia Salvadori
  * @since Nov 8, 2018
  */
 @ProviderType
 public interface SuggestionObjectProvider {
 	
 	
-	public List<EObject> getSampleObjects();
+	/**
+	 * Returns the initial set of data, to be indexed. The list must not be <code>null</code> 
+	 * @return the initial set of data, to be indexed
+	 */
+	public List<? extends EObject> getObjectStream();
 	
+	/**
+	 * Returns the {@link EStructuralFeature}, to be indexed
+	 * @return the {@link EStructuralFeature}, to be indexed
+	 */
 	public Set<EStructuralFeature> getFields();
 	
+	/**
+	 * Returns the {@link EStructuralFeature} for the payload, usually the id feature
+	 * @return the {@link EStructuralFeature} for the payload
+	 */
 	public EStructuralFeature getPayload();
 
+	/**
+	 * Returns different labeling/tagging for indexing
+	 * @return different labeling/tagging for indexing
+	 */
 	public List<String> getLabels();
 	
-	
-
 }

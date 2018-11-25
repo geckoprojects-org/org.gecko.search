@@ -9,21 +9,12 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.impl;
+package org.gecko.search.suggest.api;
 
-/**
- * Context object for one element
- * @author ilenia
- * @since Nov 9, 2018
- */
-public interface SuggestContext {	
+public @interface SuggestionConfiguration {
 	
-	String getContent();
+	String suggestionName();
+	int suggestionNumberResults() default 10;
+	boolean suggestionAllTermsRequired() default true;
 	
-	String[] getLabels();
-	
-	String getPayload();
-	
-	long getWeight();
-
 }

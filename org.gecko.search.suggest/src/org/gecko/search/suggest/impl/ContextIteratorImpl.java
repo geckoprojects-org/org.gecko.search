@@ -22,11 +22,10 @@ import org.apache.lucene.util.BytesRef;
 
 
 /**
- * 
+ * Iterator for the {@link SuggestContext}, that contains all relevant data for suggestion
  * @author ilenia
  * @since Nov 9, 2018
  */
-
 public class ContextIteratorImpl implements InputIterator
 	{
 	    private Iterator<SuggestContext> deviceIterator;
