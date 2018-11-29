@@ -1,0 +1,4 @@
+org.gecko.runtime:org.gecko.runtime.api:1.0.0-SNAPSHOT
+org.gecko.runtime:org.gecko.runtime.resources:1.0.1-SNAPSHOT
+
+org.gecko.addons:org.gecko.util.test:1.0.0

@@ -28,8 +28,8 @@ import org.gecko.runtime.resources.GeckoResourcesConstants;
 import org.gecko.runtime.resources.GeckoResourcesProvider;
 import org.gecko.search.suggest.api.SuggestionObjectProvider;
 import org.gecko.search.suggest.api.SuggestionService;
-import org.gecko.util.test.common.service.ServiceChecker;
-import org.gecko.util.test.common.test.AbstractOSGiTest;
+import org.gecko.util.test.ServiceChecker;
+import org.gecko.util.test.AbstractOSGiTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -84,11 +84,11 @@ public class ProviderIntegrationTest extends AbstractOSGiTest {
 
 	@Test
 	public void testSuggest() throws IOException {
-		ServiceChecker<SuggestionService> suggestChecker = createdCheckerTrackedForCleanUp(SuggestionService.class);
+		ServiceChecker<SuggestionService> suggestChecker = createCheckerTrackedForCleanUp(SuggestionService.class);
 		suggestChecker.start();
-		ServiceChecker<GeckoResourcesProvider> resourceChecker = createdCheckerTrackedForCleanUp(GeckoResourcesProvider.class);
+		ServiceChecker<GeckoResourcesProvider> resourceChecker = createCheckerTrackedForCleanUp(GeckoResourcesProvider.class);
 		resourceChecker.start();
-		ServiceChecker<SuggestionObjectProvider> opChecker = createdCheckerTrackedForCleanUp(SuggestionObjectProvider.class);
+		ServiceChecker<SuggestionObjectProvider> opChecker = createCheckerTrackedForCleanUp(SuggestionObjectProvider.class);
 		opChecker.start();
 		assertEquals(0, resourceChecker.getCurrentCreateCount(false));
 		
