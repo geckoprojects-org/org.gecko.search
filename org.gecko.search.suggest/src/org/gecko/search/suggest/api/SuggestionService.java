@@ -14,7 +14,7 @@ package org.gecko.search.suggest.api;
 import java.util.Map;
 
 /**
- * 
+ * Service that provides auto completion proposals
  * @author ilenia
  * @since Nov 9, 2018
  */
