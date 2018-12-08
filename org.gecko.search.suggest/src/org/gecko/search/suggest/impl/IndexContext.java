@@ -46,12 +46,11 @@ public class IndexContext {
 	 * Returns the text context to be indexed
 	 * @return the text context to be indexed
 	 */
-	public BytesRef text() {
+	public BytesRef content() {
 		try {
-			//we want completion against the device description
 			return new BytesRef(context.getContent().getBytes("UTF8")); 
 		} catch (UnsupportedEncodingException e) {
-			throw new Error("Couldn't convert to UTF-8");
+			throw new IllegalStateException("Couldn't convert content to UTF-8", e);
 		}
 	}
 
@@ -60,7 +59,11 @@ public class IndexContext {
 	 * @return the payload / key of instance
 	 */
 	public BytesRef payload() {
-		return new BytesRef(context.getPayload().getBytes());
+		try {
+			return new BytesRef(context.getPayload().getBytes("UTF8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("Couldn't convert payload to UTF-8", e);
+		}
 	}
 
 	/**
@@ -75,7 +78,7 @@ public class IndexContext {
 			}
 			return labels;
 		} catch (UnsupportedEncodingException e) {
-			throw new Error("Couldn't convert to UTF-8");
+			throw new IllegalStateException("Couldn't convert labels to UTF-8", e);
 		}
 	}
 

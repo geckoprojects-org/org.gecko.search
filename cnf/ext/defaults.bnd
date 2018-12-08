@@ -34,8 +34,8 @@ junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 -groupid: org.gecko.search
 
 # Enable semantic versioning for all bundles
--baselinerepo: DIM_Nexus
--baseline: *
+#-baselinerepo: GeckoSearch
+#-baseline: *
 
 # Ignore files for baselining
 -diffignore: *.xml

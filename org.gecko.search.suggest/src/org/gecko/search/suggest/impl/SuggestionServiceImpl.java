@@ -34,7 +34,10 @@ import org.apache.lucene.util.BytesRef;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.runtime.resources.GeckoResourcesProvider;
+import org.gecko.search.api.IndexActionType;
+import org.gecko.search.suggest.api.SimpleSuggestionContext;
 import org.gecko.search.suggest.api.SuggestionConfiguration;
+import org.gecko.search.suggest.api.SuggestionContext;
 import org.gecko.search.suggest.api.SuggestionObjectProvider;
 import org.gecko.search.suggest.api.SuggestionService;
 import org.osgi.service.cm.ConfigurationException;
@@ -62,7 +65,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	private SuggestionObjectProvider objectProvider;
 
 	private static final Logger logger = Logger.getLogger(SuggestionServiceImpl.class.getName());
-	private List<SuggestContext> contexts;
+	private List<SuggestionContext> contexts;
 	private Promise<AnalyzingInfixSuggester> suggesterPromise;
 	private FSDirectory indexDir;
 	private volatile SuggestionConfiguration configuration;
@@ -155,20 +158,20 @@ public class SuggestionServiceImpl implements SuggestionService {
 	 * data belonging to a particular category.
 	 * @return the list with contexts
 	 */
-	private List<SuggestContext> createContext() {
+	private List<SuggestionContext> createContext() {
 		Set<EStructuralFeature> fields = objectProvider.getFields();
 		List<String> labels = objectProvider.getLabels();
 		String[] labelsArray = new String[labels.size()];
 		labelsArray = labels.toArray(labelsArray);
 		List<?extends EObject> objects = objectProvider.getObjectStream();
-		List<SuggestContext> contexts = new ArrayList<SuggestContext>(objects.size());
+		List<SuggestionContext> contexts = new ArrayList<SuggestionContext>(objects.size());
 		for (EObject eo : objects) {
 			Object payloadObject = eo.eGet(objectProvider.getPayload());
 			String payload = payloadObject == null ? null : payloadObject.toString();				
 			for (EStructuralFeature feature : fields) {
 				Object value = eo.eGet(feature);
 				if (value != null) {
-					SuggestContext ctx = new SuggestContextImpl(payload, eo.eGet(feature).toString(), 4, labelsArray);
+					SuggestionContext ctx = new SimpleSuggestionContext(IndexActionType.ADD, payload, eo.eGet(feature).toString(), labelsArray, 4);
 					contexts.add(ctx);
 				}
 			}			
@@ -201,7 +204,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	 * @param suggester
 	 * @throws IOException
 	 */
-	private void indexData(List<SuggestContext> contexts, AnalyzingInfixSuggester suggester) throws IOException {
+	private void indexData(List<SuggestionContext> contexts, AnalyzingInfixSuggester suggester) throws IOException {
 		suggester.build(new ContextIteratorImpl(contexts.iterator()));
 	}
 

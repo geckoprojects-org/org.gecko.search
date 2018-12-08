@@ -11,6 +11,7 @@
  */
 package org.gecko.search.api;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.emf.ecore.EObject;
@@ -39,6 +40,13 @@ public interface IndexService {
 	public void indexAdd(Map<String, Object> properties, EObject...objects);
 	
 	/**
+	 * Add the given elements to the index
+	 * @param properties the additional index properties
+	 * @param objects the objects to be indexed
+	 */
+	public void indexAdd(Map<String, Object> properties, Collection<EObject> objects);
+	
+	/**
 	 * Updates the given element in the index
 	 * @param properties the additional index properties
 	 * @param object the object to be updated
@@ -53,6 +61,13 @@ public interface IndexService {
 	public void indexUpdate(Map<String, Object> properties, EObject...objects);
 	
 	/**
+	 * Updates the given elements in the index
+	 * @param properties the additional index properties
+	 * @param objects the objects to be updated
+	 */
+	public void indexUpdate(Map<String, Object> properties, Collection<EObject> objects);
+	
+	/**
 	 * Removes the given element from the updated
 	 * @param properties the additional index properties
 	 * @param object the object to be removed
@@ -65,5 +80,12 @@ public interface IndexService {
 	 * @param objects the objects to be removed
 	 */
 	public void indexRemove(Map<String, Object> properties, EObject...objects);
+	
+	/**
+	 * Removes the given elements from the updated
+	 * @param properties the additional index properties
+	 * @param objects the objects to be removed
+	 */
+	public void indexRemove(Map<String, Object> properties, Collection<EObject> objects);
 
 }

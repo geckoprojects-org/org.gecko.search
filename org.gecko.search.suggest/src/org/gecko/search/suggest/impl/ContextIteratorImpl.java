@@ -19,19 +19,19 @@ import java.util.Set;
 
 import org.apache.lucene.search.suggest.InputIterator;
 import org.apache.lucene.util.BytesRef;
-
+import org.gecko.search.suggest.api.SuggestionContext;
 
 /**
- * Iterator for the {@link SuggestContext}, that contains all relevant data for suggestion
+ * Iterator for the {@link SuggestionContext}, that contains all relevant data for suggestion
  * @author ilenia
  * @since Nov 9, 2018
  */
 public class ContextIteratorImpl implements InputIterator
 	{
-	    private Iterator<SuggestContext> deviceIterator;
-	    private SuggestContext currentContext;
+	    private Iterator<SuggestionContext> deviceIterator;
+	    private SuggestionContext currentContext;
 
-	    public ContextIteratorImpl(Iterator<SuggestContext> deviceIterator) {
+	    public ContextIteratorImpl(Iterator<SuggestionContext> deviceIterator) {
 	        this.deviceIterator = deviceIterator;
 	    }
 	    

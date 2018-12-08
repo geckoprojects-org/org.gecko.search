@@ -54,7 +54,8 @@ javac.target: 1.8
 	org.gecko.emf.osgi.component;version='[2.2.6,2.2.7)',\
 	org.gecko.emf.osgi.ecore;version='[2.2.4,2.2.5)',\
 	org.gecko.runtime.resources;version='[1.0.1,1.0.2)',\
-	org.gecko.util.test;version='[1.0.0,1.0.1)'
+	org.gecko.util.test;version='[1.0.0,1.0.1)',\
+	org.gecko.search.api;version=snapshot
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.suggest.test

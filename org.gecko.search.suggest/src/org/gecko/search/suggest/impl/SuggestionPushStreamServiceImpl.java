@@ -160,10 +160,10 @@ public class SuggestionPushStreamServiceImpl implements SuggestionService {
 		try {
 			switch (context.getContext().getActionType()) {
 			case ADD:
-				suggester.add(context.text(), context.labels(), context.weight(), context.payload());
+				suggester.add(context.content(), context.labels(), context.weight(), context.payload());
 				break;
 			case MODIFY:
-				suggester.update(context.text(), context.labels(), context.weight(), context.payload());
+				suggester.update(context.content(), context.labels(), context.weight(), context.payload());
 				break;
 			default:
 				suggester.update(new BytesRef(BytesRef.EMPTY_BYTES), Collections.emptySet(), context.weight(), context.payload());

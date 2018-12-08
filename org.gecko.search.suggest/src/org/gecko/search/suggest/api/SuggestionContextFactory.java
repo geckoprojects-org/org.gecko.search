@@ -9,21 +9,17 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.impl;
+package org.gecko.search.suggest.api;
+
+import org.gecko.search.api.ContextObjectFactory;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
- * Context object for one element
- * @author ilenia
- * @since Nov 9, 2018
+ * 
+ * @author mark
+ * @since 08.12.2018
  */
-public interface SuggestContext {	
-	
-	String getContent();
-	
-	String[] getLabels();
-	
-	String getPayload();
-	
-	long getWeight();
+@ProviderType
+public interface SuggestionContextFactory extends ContextObjectFactory<SuggestionContext> {
 
 }

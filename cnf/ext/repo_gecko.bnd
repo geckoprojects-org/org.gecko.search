@@ -7,6 +7,11 @@ geckoVersion: release
 		index=${.}/dim_nexus.maven;\
 		name='DIM_Nexus',\
 	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/${geckoVersion}/geckoSearch/index.xml;\
+		max.stale=-1;\
+		name=GeckoSearch;\
+		cache=${build}/cache/GeckoSearch,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/${geckoVersion}/geckoEMF/index.xml;\
 		max.stale=-1;\
 		name=GeckoEMF;\
