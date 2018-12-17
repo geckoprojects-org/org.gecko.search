@@ -16,17 +16,14 @@ import java.util.Set;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.osgi.annotation.versioning.ProviderType;
+import org.gecko.search.api.IndexDescriptor;
 
 /**
- * Object provider that defines the suggestion input and result
- * @author Ilenia Salvadori
- * @since Nov 8, 2018
- * @deprecated Use {@link SuggestionDescriptor} instead
+ * Descriptor interface for the suggestion API
+ * @author Mark Hoffmann
+ * @since 08.12.2018
  */
-@ProviderType
-public interface SuggestionObjectProvider {
-	
+public interface SuggestionDescriptor extends IndexDescriptor {
 	
 	/**
 	 * Returns the initial set of data, to be indexed. The list must not be <code>null</code> 
@@ -51,5 +48,5 @@ public interface SuggestionObjectProvider {
 	 * @return different labeling/tagging for indexing
 	 */
 	public List<String> getLabels();
-	
+
 }

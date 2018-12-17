@@ -1,3 +1,5 @@
 Private-Package: org.gecko.search.suggest.impl
 Bundle-Name: Search Suggester Component
 Bundle-Description: Service with Lucene Implementation of the Suggester
+
+Provide-Capability: gecko.search;gecko.search=suggestion

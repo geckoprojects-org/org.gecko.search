@@ -11,6 +11,10 @@
  */
 package org.gecko.search.api;
 
+import java.util.Map;
+
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * A basic index context object.
  * @author Mark Hoffmann
@@ -18,6 +22,22 @@ package org.gecko.search.api;
  */
 public interface IndexContextObject {
 	
+	/**
+	 * Returns the action type that is published over the stream
+	 * @return the action type
+	 */
 	public IndexActionType getActionType();
+	
+	/**
+	 * Returns context properties
+	 * @return context properties
+	 */
+	public Map<String, Object> getProperties();
+	
+	/**
+	 * Returns the original {@link EObject}.
+	 * @return the original {@link EObject}.
+	 */
+	public EObject getObject();
 
 }

@@ -11,27 +11,37 @@
  */
 package org.gecko.search.suggest.api;
 
+import org.gecko.search.api.IndexContextObject;
+
 /**
- * Context object for one index element
+ * Context object for one suggest element to be indexed
  * @author ilenia
  * @since Nov 9, 2018
  */
-public interface SuggestionContext {
+public interface SuggestionContext extends IndexContextObject {	
 	
-	public static enum ActionType{
-		ADD,
-		MODIFY,
-		REMOVE
-	}
-	
-	ActionType getActionType();
-	
+	/**
+	 * The content to be indexed
+	 * @return the content to be indexed
+	 */
 	String getContent();
 	
+	/**
+	 * The categories to put the index content in
+	 * @return the categories to put the index content in
+	 */
 	String[] getLabels();
 	
+	/**
+	 * The key or other payload for the underlying model 
+	 * @return the key or other payload for the underlying model 
+	 */
 	String getPayload();
 	
+	/**
+	 * The weight or boost of this element when indexing
+	 * @return the weight or boost of this element when indexing
+	 */
 	long getWeight();
 
 }

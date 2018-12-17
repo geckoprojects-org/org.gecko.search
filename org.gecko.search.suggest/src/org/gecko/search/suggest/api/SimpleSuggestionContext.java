@@ -11,6 +11,12 @@
  */
 package org.gecko.search.suggest.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.emf.ecore.EObject;
+import org.gecko.search.api.IndexActionType;
+
 /**
  * This class defines the main parameters for the auto completion search, namely:
  * payload : this is the parameter associated with each search result that we want to get back
@@ -24,20 +30,21 @@ package org.gecko.search.suggest.api;
  * @author ilenia
  * @since Nov 9, 2018
  */
-public class SimpleSuggestionContext implements SuggestionContext{
+public class SimpleSuggestionContext implements org.gecko.search.suggest.api.SuggestionContext{
 	
 		private final String payload;
 		private final String content;
 		private final long weight;
 		private final String[] labels;
-		private final ActionType action;
+		private final IndexActionType action;
+		private final Map<String, Object> properties = new HashMap<String, Object>();
 		
-		public SimpleSuggestionContext(String payload, String content, ActionType action, long weight, String[] labels) {
+		public SimpleSuggestionContext(IndexActionType action, String payload, String content, String[] labels, long weight) {
 			this.payload = payload;
 			this.content = content;
 			this.action = action;
-			this.weight = weight;
 			this.labels = labels;
+			this.weight = weight;
 		}
 		
 		/* 
@@ -74,11 +81,29 @@ public class SimpleSuggestionContext implements SuggestionContext{
 
 		/* 
 		 * (non-Javadoc)
-		 * @see org.gecko.search.suggest.api.SuggestionContext#getActionType()
+		 * @see org.gecko.search.api.IndexContextObject#getActionType()
 		 */
 		@Override
-		public ActionType getActionType() {
+		public IndexActionType getActionType() {
 			return action;
+		}
+
+		/* 
+		 * (non-Javadoc)
+		 * @see org.gecko.search.api.IndexContextObject#getProperties()
+		 */
+		@Override
+		public Map<String, Object> getProperties() {
+			return properties;
+		}
+
+		/* 
+		 * (non-Javadoc)
+		 * @see org.gecko.search.api.IndexContextObject#getObject()
+		 */
+		@Override
+		public EObject getObject() {
+			return null;
 		}
 
 	}
