@@ -20,6 +20,7 @@ import java.util.Map;
  */
 public interface SuggestionService {
 	
+	public static final String SUGGESTION_PS_FACTORY = "PushstreamSuggestionServiceFactory";
 	public static final String SUGGESTION_FACTORY = "SuggestionServiceFactory";
 	public static final String PROP_SUGGESTION_NAME = "suggestion.name";
 	public static final String PROP_SUGGESTION_INDEX = "suggestion.index";
