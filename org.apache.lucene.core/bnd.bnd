@@ -3,7 +3,7 @@
 
 -resourceonly: true
 
-Bundle-Version: 7.5.0.SNAPSHOT
+Bundle-Version: 7.6.0.SNAPSHOT
 
 Export-Package: *
 
