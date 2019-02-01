@@ -1,7 +1,6 @@
 -buildpath: org.apache.lucene:lucene-core;version=latest,\
 	org.apache.lucene:lucene-analyzers-common;version=latest
 
--resourceonly: true
 
 Bundle-Version: 7.6.0.SNAPSHOT
 

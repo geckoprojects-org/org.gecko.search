@@ -1,0 +1,59 @@
+/**
+ * Copyright (c) 2012 - 2019 Data In Motion and others.
+ * All rights reserved. 
+ * 
+ * This program and the accompanying materials are made available under the terms of the 
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Data In Motion - initial API and implementation
+ */
+package org.gecko.search.document;
+
+import java.util.Collection;
+
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.SearcherManager;
+
+/**
+ * 
+ * @author Juergen Albert
+ * @since 30 Jan 2019
+ */
+public interface LuceneIndexService {
+
+	/**
+	 * @return the wrapped {@link IndexWriter}
+	 */
+	IndexWriter getIndexWriter();
+
+	/**
+	 * @return aquires a {@link IndexSearcher} from the underlying {@link SearcherManager}
+	 */
+	IndexSearcher aquireSearch();
+
+	/**
+	 * Hands over the given {@link IndexSearcher} to the underlying {@link SearcherManager} for release 
+	 * @param searcher the {@link IndexSearcher} to release
+	 */
+	void releaseSearcher(IndexSearcher searcher);
+
+	/**
+	 * Commits the underlying {@link IndexWriter} and refreshes the {@link SearcherManager}.
+	 * Note that commits directly on the obtained {@link IndexWriter} will not be reflected to the {@link SearcherManager}  
+	 */
+	void commit();
+
+	/**
+	 * @param context
+	 */
+	void handleContext(DocumentIndexContextObject context);
+
+	/**
+	 * @param contexts
+	 */
+	void handleContexts(Collection<? extends DocumentIndexContextObject> contexts);
+
+}
