@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +28,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
@@ -39,8 +37,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.gecko.runtime.boot.GeckoBootConstants;
-import org.gecko.runtime.resources.GeckoResourcesProvider;
-import org.gecko.search.document.CommitCallback;
 import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.LuceneIndexService;
 import org.osgi.framework.Bundle;
@@ -57,7 +53,6 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
-import org.osgi.util.function.Function;
 import org.osgi.util.pushstream.PushEvent;
 import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.pushstream.PushStreamProvider;
@@ -156,7 +151,8 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	}
 	
 	/**
-	 * @param serviceConfig
+	 * Configures and chains the internal Pushsstream according to the configuration
+	 * @param serviceConfig the services configuration
 	 */
 	private void chainPushStream(Config serviceConfig) {
 		singleSource = psp.buildSimpleEventSource(DocumentIndexContextObject.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends DocumentIndexContextObject>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
@@ -186,23 +182,6 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		directory.close();
 	}
 	
-	/**
-	 * Wraps the given {@link BiConsumer} and executes it asyncronious 
-	 * @param consumer the {@link BiConsumer} to execute
-	 */
-	public Consumer<Collection<? extends DocumentIndexContextObject>> executeAsync(Consumer<Collection<? extends DocumentIndexContextObject>> consumer) {
-		return (c) -> {
-			indexExecutors.submit( () -> {
-				try {
-					consumer.accept(c);
-				} catch (Exception e) {
-					logger.error("Error while indexing: " + e.getMessage(), e);
-				}
-			}
-			);
-		};
-	}
-	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#handleContext(org.gecko.search.document.DocumentIndexContextObject)
@@ -212,6 +191,11 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		singleSource.publish(context);
 	}
 
+	/**
+	 * performes the actual action on the index.
+	 * @param context
+	 * @param commit
+	 */
 	public void internalHandleContext(DocumentIndexContextObject context, boolean commit) {
 		try {
 			switch (context.getActionType()) {

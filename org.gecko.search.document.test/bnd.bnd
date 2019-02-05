@@ -45,10 +45,7 @@ javac.target: 1.8
 	org.gecko.search.document.impl;version=snapshot,\
 	org.osgi.util.function;version='[1.1.0,1.1.1)',\
 	org.osgi.util.promise;version='[1.1.0,1.1.1)',\
-	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
-	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)',\
-	org.apache.felix.gogo.runtime;version='[1.1.0,1.1.1)',\
-	org.apache.felix.gogo.shell;version='[1.1.0,1.1.1)'
+	org.osgi.util.pushstream;version='[1.0.0,1.0.1)'
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.document.test
@@ -66,6 +63,4 @@ Bundle-Vendor: Data In Motion Consulting GmbH
 -runee: JavaSE-1.8
 -runrequires: \
 	bnd.identity;id='org.gecko.search.document.test',\
-	bnd.identity;id='org.gecko.search.document.impl',\
-	bnd.identity;id='org.apache.felix.gogo.command',\
-	bnd.identity;id='org.apache.felix.gogo.shell'
+	bnd.identity;id='org.gecko.search.document.impl'
