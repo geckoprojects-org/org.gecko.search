@@ -165,7 +165,7 @@ public class IndexTest extends AbstractOSGiTest{
 		assertTrue("Current Commit count" + commitLatch.getCount(), commitLatch.await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
 		
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		
 		IndexSearcher searcher = getService(IndexSearcher.class);
 		
