@@ -13,7 +13,6 @@ package org.gecko.search.document.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -190,10 +189,15 @@ public class IndexTest extends AbstractOSGiTest{
 	 */
 	@Override
 	public void doBefore() {
-		tempPath = System.getProperty("java.io.tmpdir");
+		tempPath = System.getProperty("tempfolder");
+		if(tempPath == null) {
+			tempPath = System.getProperty("java.io.tmpdir");
+		}
 		tempPath = tempPath.replace("\\", "/");
+		if(!tempPath.endsWith("/")) {
+			tempPath += "/";
+		}
 		tempPath += "indexTest/";
-		
 	}
 
 	/* 
