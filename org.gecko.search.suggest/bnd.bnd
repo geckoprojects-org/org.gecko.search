@@ -8,7 +8,8 @@
 	org.eclipse.emf.ecore,\
 	org.eclipse.emf.ecore.xmi,\
 	org.gecko.runtime.api;version=latest,\
-	org.gecko.search.api;version=latest
+	org.gecko.search.api;version=latest,\
+	org.gecko.runtime.resources
 
 -testpath: \
 	${junit}

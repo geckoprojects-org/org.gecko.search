@@ -14,6 +14,7 @@ package org.gecko.search.document.impl;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
@@ -118,8 +119,15 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		}
 		
 		try {
-			indexFolder = new File(new File(url.toURI()), serviceConfig.id());
-		} catch (URISyntaxException e) {
+			 URI uri = url.toURI();
+
+	        if(uri.getAuthority() != null && uri.getAuthority().length() > 0) {
+	            // Hack for UNC Path
+	            uri = (new URL("file://" + url.toString().substring("file:".length()))).toURI();
+	        }
+
+			indexFolder = new File(new File(uri), serviceConfig.id());
+		} catch (URISyntaxException | MalformedURLException e) {
 			//Can't happen. It was already checked multiple times
 			throw new RuntimeException("should not happen, but it did...", e);
 		}

@@ -115,6 +115,54 @@ public class IndexTest extends AbstractOSGiTest{
 	}
 
 	@Test
+	public void basicTestWithGeckoDataDir() throws InterruptedException, IOException {
+		Dictionary<String, Object> indexConfig = new Hashtable<String, Object>();
+		indexConfig.put("id", "test");
+		indexConfig.put("directory.type", "MMAP");
+		
+		ServiceChecker<LuceneIndexService> indexServiceChecker = createCheckerTrackedForCleanUp(LuceneIndexService.class);
+		indexServiceChecker.start();
+		
+		indexerConfig = createConfigForCleanup("LuceneIndex", "?", indexConfig);
+		
+		assertTrue(indexServiceChecker.awaitCreation());
+		
+		LuceneIndexService indexService = getService(LuceneIndexService.class);
+		
+		CountDownLatch commitLatch = new CountDownLatch(1);
+		
+		DocumentIndexContextObject indexContextObjectImpl = DocumentIndexContextObjectImpl.builder()
+				.withDocuments(Collections.singletonList(createTestDocument(1)))
+				.withIndexActionType(IndexActionType.ADD)
+				.withCommitCallback(new CommitCallback() {
+					
+					@Override
+					public void error(DocumentIndexContextObject ctx, Throwable t) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void commited(DocumentIndexContextObject ctx) {
+						commitLatch.countDown();
+					}
+				})
+				.build();
+		indexService.handleContext(indexContextObjectImpl);
+		
+		assertTrue(commitLatch.await(2, TimeUnit.SECONDS));
+		
+		Thread.sleep(100);
+		
+		IndexSearcher searcher = getService(IndexSearcher.class);
+		
+		TopDocs topDocs = searcher.search(new TermQuery(new Term("test", "test")), 1000);
+		assertNotNull(topDocs);
+		assertEquals(1, topDocs.scoreDocs.length);
+		
+	}
+
+	@Test
 	public void basicTestMany() throws InterruptedException, IOException {
 		Dictionary<String, Object> indexConfig = new Hashtable<String, Object>();
 		indexConfig.put("id", "test");
