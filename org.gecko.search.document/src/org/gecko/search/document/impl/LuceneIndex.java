@@ -177,7 +177,8 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			.adjustBackPressure(l -> 0)
 			.window(() -> Duration.ofMillis(serviceConfig.windowSize()), () -> serviceConfig.batchSize(), indexExecutors , (l,list) -> {
 				return list;
-			})			
+			})
+			.filter(c -> !c.isEmpty())
 			.forEach(this::internalHandleContexts);
 	}
 	
@@ -243,7 +244,6 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	
 	public void internalHandleContexts(Collection<? extends DocumentIndexContextObject> contexts, boolean commit) {
 		contexts.forEach(partial(this::internalHandleContext, false));
-		System.out.println("indexing " + contexts.size());
 		if(commit) {
 			try {
 				commit();
