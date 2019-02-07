@@ -128,6 +128,8 @@ public class IndexTest extends AbstractOSGiTest{
 		assertTrue(indexServiceChecker.awaitCreation());
 		
 		LuceneIndexService indexService = getService(LuceneIndexService.class);
+		indexService.getIndexWriter().deleteAll();
+		indexService.commit();
 		
 		CountDownLatch commitLatch = new CountDownLatch(1);
 		
@@ -275,9 +277,11 @@ public class IndexTest extends AbstractOSGiTest{
 	 * @param tempFolder
 	 */
 	private void delete(File file) {
-		if(!file.isFile()) {
-			Arrays.asList(file.listFiles()).forEach(this::delete);
+		if(file.exists()) {
+			if(!file.isFile()) {
+				Arrays.asList(file.listFiles()).forEach(this::delete);
+			}
+			file.delete();
 		}
-		file.delete();
 	}
 }
