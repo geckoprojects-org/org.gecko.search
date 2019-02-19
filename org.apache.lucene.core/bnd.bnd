@@ -8,4 +8,6 @@ Export-Package: *
 
 -includeresource: \
 	@${repo;org.apache.lucene:lucene-analyzers-common;latest}!/META-INF/services/*,\
-	@${repo;org.apache.lucene:lucene-core;latest}!/META-INF/services/*
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analyzers-common:jar:sources},\
+	@${repo;org.apache.lucene:lucene-core;latest}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-core:jar:sources}

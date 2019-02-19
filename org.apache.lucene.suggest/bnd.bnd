@@ -6,4 +6,5 @@ Export-Package:\
 	*
 	
 -includeresource: \
-	@${repo;org.apache.lucene:lucene-suggest;latest}!/META-INF/services/*
+	@${repo;org.apache.lucene:lucene-suggest;latest}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-suggest:jar:sources}

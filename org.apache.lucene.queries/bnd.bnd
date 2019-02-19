@@ -5,3 +5,6 @@
 Bundle-Version: 7.6.0.SNAPSHOT
 
 Export-Package: *
+
+-includeresource: ,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-queries:jar:sources}

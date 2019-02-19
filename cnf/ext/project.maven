@@ -1,7 +1,14 @@
 org.apache.lucene:lucene-core:7.6.0
+org.apache.lucene:lucene-core:jar:sources:7.6.0
 org.apache.lucene:lucene-analyzers-common:7.6.0
+org.apache.lucene:lucene-analyzers-common:jar:sources:7.6.0
 org.apache.lucene:lucene-queries:7.6.0
+org.apache.lucene:lucene-queries:jar:sources:7.6.0
 org.apache.lucene:lucene-queryparser:7.6.0
+org.apache.lucene:lucene-queryparser:jar:sources:7.6.0
 org.apache.lucene:lucene-codecs:7.6.0
+org.apache.lucene:lucene-codecs:jar:sources:7.6.0
 org.apache.lucene:lucene-memory:7.6.0
+org.apache.lucene:lucene-memory:jar:sources:7.6.0
 org.apache.lucene:lucene-suggest:7.6.0
+org.apache.lucene:lucene-suggest:jar:sources:7.6.0
