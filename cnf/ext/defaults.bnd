@@ -29,7 +29,7 @@ Bundle-Icon: icons/gecko.ico;size=64
 #cnf: ${workspace}/cnf
 junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 
--releaserepo: Release, DIM_Nexus
+-releaserepo: Release, DIM_Public
 -maven-release: pom
 -groupid: org.gecko.search
 
