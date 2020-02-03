@@ -62,7 +62,9 @@ Bundle-Vendor: Data In Motion Consulting GmbH
 -runrequires: \
 	bnd.identity;id='org.gecko.search.document.test',\
 	bnd.identity;id='org.gecko.search.document.impl',\
-	bnd.identity;id='org.gecko.runtime.boot'
+	bnd.identity;id='org.gecko.runtime.boot',\
+	bnd.identity;version='8.4.1.SNAPSHOT';id='org.apache.lucene.core',\
+	bnd.identity;version='8.4.1.SNAPSHOT';id='org.apache.lucene.codecs'
 
 -runproperties: \
 	gecko.data.dir=${.}/runtime/data,\
