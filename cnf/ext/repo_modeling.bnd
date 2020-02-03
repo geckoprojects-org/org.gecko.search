@@ -1,6 +1,0 @@
--plugin.modeling:\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM EMF-2.13;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
-		poll.time=-1;\
-		cache=${build}/cache/dim-emf-3.8

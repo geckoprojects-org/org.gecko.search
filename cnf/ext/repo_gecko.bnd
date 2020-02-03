@@ -2,10 +2,15 @@ geckoVersion: release
 
 -plugin.gecko: \
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
-		releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-releases/;\
-		snapshotUrl=http://devel.data-in-motion.biz/nexus/repository/maven-snapshots/;\
+		releaseUrl=https://devel.data-in-motion.biz/nexus/repository/maven-releases/;\
+		snapshotUrl=https://devel.data-in-motion.biz/nexus/repository/maven-snapshots/;\
 		index=${.}/dim_nexus.maven;\
 		name='DIM_Nexus',\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=https://devel.data-in-motion.biz/nexus/repository/dim-release/;\
+		snapshotUrl=https://devel.data-in-motion.biz/nexus/repository/dim-snapshot/;\
+		index=${.}/dim_public.maven;\
+		name='DIM_Public',\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/${geckoVersion}/geckoSearch/index.xml;\
 		max.stale=-1;\

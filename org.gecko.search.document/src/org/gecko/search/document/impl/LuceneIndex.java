@@ -159,7 +159,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	}
 	
 	/**
-	 * Configures and chains the internal Pushsstream according to the configuration
+	 * Configures and chains the internal Pushstream according to the configuration
 	 * @param serviceConfig the services configuration
 	 */
 	private void chainPushStream(Config serviceConfig) {

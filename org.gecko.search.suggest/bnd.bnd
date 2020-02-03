@@ -2,14 +2,14 @@
 	osgi.annotation;version=7.0,\
 	osgi.core;version=7.0,\
 	osgi.cmpn;version=7.0,\
-	org.apache.lucene.core,\
-	org.apache.lucene.suggest,\
-	org.eclipse.emf.common,\
+	org.apache.lucene.core;version=latest,\
+	org.apache.lucene.suggest;version=latest,\
+	org.eclipse.emf.common;version=latest,\
 	org.eclipse.emf.ecore,\
-	org.eclipse.emf.ecore.xmi,\
+	org.eclipse.emf.ecore.xmi;version=latest;version=latest,\
 	org.gecko.runtime.api;version=latest,\
 	org.gecko.search.api;version=latest,\
-	org.gecko.runtime.resources
+	org.gecko.runtime.resources;version=latest
 
 -testpath: \
 	${junit}

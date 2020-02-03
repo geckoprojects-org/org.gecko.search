@@ -22,14 +22,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.gecko.core.tests.AbstractOSGiTest;
+import org.gecko.core.tests.ServiceChecker;
 import org.gecko.emf.osgi.model.test.Person;
 import org.gecko.emf.osgi.model.test.TestFactory;
 import org.gecko.runtime.resources.GeckoResourcesConstants;
 import org.gecko.runtime.resources.GeckoResourcesProvider;
 import org.gecko.search.suggest.api.SuggestionObjectProvider;
 import org.gecko.search.suggest.api.SuggestionService;
-import org.gecko.util.test.ServiceChecker;
-import org.gecko.util.test.AbstractOSGiTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -84,13 +84,13 @@ public class ProviderIntegrationTest extends AbstractOSGiTest {
 
 	@Test
 	public void testSuggest() throws IOException {
-		ServiceChecker<SuggestionService> suggestChecker = createCheckerTrackedForCleanUp(SuggestionService.class);
+		ServiceChecker<SuggestionService> suggestChecker = createTrackedChecker(SuggestionService.class);
 		suggestChecker.start();
-		ServiceChecker<GeckoResourcesProvider> resourceChecker = createCheckerTrackedForCleanUp(GeckoResourcesProvider.class);
+		ServiceChecker<GeckoResourcesProvider> resourceChecker = createTrackedChecker(GeckoResourcesProvider.class);
 		resourceChecker.start();
-		ServiceChecker<SuggestionObjectProvider> opChecker = createCheckerTrackedForCleanUp(SuggestionObjectProvider.class);
+		ServiceChecker<SuggestionObjectProvider> opChecker = createTrackedChecker(SuggestionObjectProvider.class);
 		opChecker.start();
-		assertEquals(0, resourceChecker.getCurrentCreateCount(false));
+		resourceChecker.assertCreations(0, false);
 		
 		Dictionary<String, Object> resourceProperties = new Hashtable<String, Object>();
 		resourceProperties.put(GeckoResourcesConstants.RESOURCE_NAME, "testIdx");
@@ -98,10 +98,9 @@ public class ProviderIntegrationTest extends AbstractOSGiTest {
 		resourceProperties.put(SuggestionService.PROP_SUGGESTION_INDEX, Boolean.TRUE);
 		createConfigForCleanup(GeckoResourcesConstants.RESOURCES_FACTORY_ID, "?", resourceProperties);
 		
-		assertEquals(1, resourceChecker.getCurrentCreateCount(true));
-		
-		assertEquals(0, opChecker.getCurrentCreateCount(false));
-		assertEquals(0, opChecker.getCurrentRemoveCount(false));
+		resourceChecker.assertCreations(1, true);
+
+		opChecker.assertCreations(0, false);
 		
 		Dictionary<String, Object> opProperties = new Hashtable<String, Object>();
 		opProperties.put(SuggestionService.PROP_SUGGESTION_INDEX, Boolean.TRUE);
@@ -109,19 +108,15 @@ public class ProviderIntegrationTest extends AbstractOSGiTest {
 		
 		registerServiceForCleanup(SuggestionObjectProvider.class, sop, opProperties);
 		
-		assertEquals(1, opChecker.getCurrentCreateCount(true));
-		assertEquals(0, opChecker.getCurrentRemoveCount(false));
-		
-		assertEquals(0, suggestChecker.getCurrentCreateCount(false));
-		assertEquals(0, suggestChecker.getCurrentRemoveCount(false));
+		opChecker.assertCreations(1, true).assertRemovals(0, false);
+		suggestChecker.assertCreations(0, false).assertRemovals(0, false);
 		
 		Dictionary<String, Object> suggestProperties = new Hashtable<String, Object>();
 		suggestProperties.put("suggestionName", "testIdxSug");
 		suggestProperties.put("suggestionNumberResults", 5);
 		createConfigForCleanup(SuggestionService.SUGGESTION_FACTORY, "?", suggestProperties);
 		
-		assertEquals(1, suggestChecker.getCurrentCreateCount(true));
-		assertEquals(0, suggestChecker.getCurrentRemoveCount(false));
+		suggestChecker.assertCreations(1, true).assertRemovals(0, false);
 		
 		SuggestionService service = getService(SuggestionService.class);
 		Map<String, String> suggestResult = service.getAutoCompletion("Tester", new String[] {"person"});

@@ -1,6 +1,6 @@
-org.gecko.runtime:org.gecko.runtime.api:1.0.0-SNAPSHOT
-org.gecko.runtime:org.gecko.runtime.boot:1.1.0
-org.gecko.runtime:org.gecko.runtime.resources:1.0.1-SNAPSHOT
+#org.gecko.runtime:org.gecko.runtime.api:1.0.0-SNAPSHOT
+#org.gecko.runtime:org.gecko.runtime.boot:1.1.0
+#org.gecko.runtime:org.gecko.runtime.resources:1.0.1-SNAPSHOT
 
-org.gecko.addons:org.gecko.util.test:1.0.0
-org.gecko.addons:org.gecko.util.pushstream:4.0.0-SNAPSHOT
+#org.gecko.addons:org.gecko.util.test:1.0.0
+#org.gecko.addons:org.gecko.util.pushstream:4.0.0-SNAPSHOT

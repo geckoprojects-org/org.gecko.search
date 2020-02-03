@@ -2,7 +2,7 @@
 	org.apache.lucene:lucene-analyzers-common;version=latest
 
 
-Bundle-Version: 7.6.0.SNAPSHOT
+Bundle-Version: 8.4.1.SNAPSHOT
 
 Export-Package: *
 

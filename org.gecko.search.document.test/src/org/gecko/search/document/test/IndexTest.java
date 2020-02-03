@@ -35,25 +35,22 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.gecko.core.tests.AbstractOSGiTest;
+import org.gecko.core.tests.ServiceChecker;
 import org.gecko.search.api.IndexActionType;
 import org.gecko.search.document.CommitCallback;
 import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.DocumentIndexContextObjectImpl;
 import org.gecko.search.document.LuceneIndexService;
-import org.gecko.util.test.AbstractOSGiTest;
-import org.gecko.util.test.ServiceChecker;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.cm.Configuration;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IndexTest extends AbstractOSGiTest{
 
 	private String tempPath;
-	private Configuration indexerConfig;
 
 	/**
 	 * Creates a new instance.
@@ -72,15 +69,12 @@ public class IndexTest extends AbstractOSGiTest{
 		
 		indexConfig.put("base.path", tempPath);
 		
-		ServiceChecker<LuceneIndexService> indexServiceChecker = createCheckerTrackedForCleanUp(LuceneIndexService.class);
+		ServiceChecker<LuceneIndexService> indexServiceChecker = createTrackedChecker(LuceneIndexService.class);
 		indexServiceChecker.start();
 		
-		indexerConfig = createConfigForCleanup("LuceneIndex", "?", indexConfig);
+		createConfigForCleanup("LuceneIndex", "?", indexConfig);
 		
-		assertTrue(indexServiceChecker.awaitCreation());
-		
-		LuceneIndexService indexService = getService(LuceneIndexService.class);
-		
+		LuceneIndexService indexService = indexServiceChecker.assertCreations(1, true).getTrackedService();
 		CountDownLatch commitLatch = new CountDownLatch(1);
 		
 		DocumentIndexContextObject indexContextObjectImpl = DocumentIndexContextObjectImpl.builder()
@@ -120,14 +114,13 @@ public class IndexTest extends AbstractOSGiTest{
 		indexConfig.put("id", "test");
 		indexConfig.put("directory.type", "MMAP");
 		
-		ServiceChecker<LuceneIndexService> indexServiceChecker = createCheckerTrackedForCleanUp(LuceneIndexService.class);
+		ServiceChecker<LuceneIndexService> indexServiceChecker = createTrackedChecker(LuceneIndexService.class);
 		indexServiceChecker.start();
 		
-		indexerConfig = createConfigForCleanup("LuceneIndex", "?", indexConfig);
+		createConfigForCleanup("LuceneIndex", "?", indexConfig);
 		
-		assertTrue(indexServiceChecker.awaitCreation());
+		LuceneIndexService indexService = indexServiceChecker.assertCreations(1, true).getTrackedService();
 		
-		LuceneIndexService indexService = getService(LuceneIndexService.class);
 		indexService.getIndexWriter().deleteAll();
 		indexService.commit();
 		
@@ -173,14 +166,12 @@ public class IndexTest extends AbstractOSGiTest{
 		
 		indexConfig.put("base.path", tempPath);
 		
-		ServiceChecker<LuceneIndexService> indexServiceChecker = createCheckerTrackedForCleanUp(LuceneIndexService.class);
+		ServiceChecker<LuceneIndexService> indexServiceChecker = createTrackedChecker(LuceneIndexService.class);
 		indexServiceChecker.start();
 		
 		createConfigForCleanup("LuceneIndex", "?", indexConfig);
 		
-		assertTrue(indexServiceChecker.awaitCreation());
-		
-		LuceneIndexService indexService = getService(LuceneIndexService.class);
+		LuceneIndexService indexService = indexServiceChecker.assertCreations(1, true).getTrackedService();
 		
 		int limit = 10000;
 		
@@ -255,19 +246,7 @@ public class IndexTest extends AbstractOSGiTest{
 	 * @see org.gecko.util.test.AbstractOSGiTest#doAfter()
 	 */
 	@Override
-	@After
 	public void doAfter() {
-		if(indexerConfig != null) {
-			try {
-				deleteConfigurationAndRemoveFromCleanupBlocking(indexerConfig);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		File tempFolder = new File(tempPath);
 		delete(tempFolder);
 		

@@ -15,13 +15,10 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	osgi.annotation;version=7.0,\
 	osgi.core;version=7.0,\
 	osgi.cmpn;version=7.0,\
-	org.osgi.util.pushstream;version=1.0,\
-	org.gecko.runtime.api,\
-	org.gecko.runtime.resources,\
-	org.gecko.util.test,\
 	org.gecko.search.document.api;version=latest,\
 	org.apache.lucene.core;version=latest,\
-	org.gecko.search.api;version=latest
+	org.gecko.search.api;version=latest,\
+	org.gecko.core.test;version=2.0
 
 javac.source: 1.8
 javac.target: 1.8
@@ -35,20 +32,18 @@ javac.target: 1.8
 	org.objenesis;version='[2.2.0,2.2.1)',\
 	org.apache.felix.configadmin;version='[1.9.6,1.9.7)',\
 	org.apache.lucene.core;version=snapshot,\
-	org.eclipse.emf.common;version='[2.13.0,2.13.1)',\
-	org.eclipse.emf.ecore;version='[2.13.0,2.13.1)',\
 	org.gecko.search.api;version=snapshot,\
 	org.gecko.search.document.api;version=snapshot,\
-	org.gecko.util.test;version='[1.0.0,1.0.1)',\
 	org.apache.felix.log;version='[1.2.0,1.2.1)',\
 	org.apache.felix.scr;version='[2.1.8,2.1.9)',\
 	org.gecko.search.document.impl;version=snapshot,\
 	org.osgi.util.function;version='[1.1.0,1.1.1)',\
 	org.osgi.util.promise;version='[1.1.0,1.1.1)',\
 	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
-	org.gecko.runtime.api;version='[1.0.0,1.0.1)',\
-	org.gecko.runtime.resources;version='[1.0.1,1.0.2)',\
-	org.gecko.runtime.boot;version='[1.1.0,1.1.1)'
+	org.eclipse.emf.common;version='[2.15.0,2.15.1)',\
+	org.eclipse.emf.ecore;version='[2.17.0,2.17.1)',\
+	org.gecko.core.test;version='[2.0.2,2.0.3)',\
+	org.gecko.runtime.boot;version='[1.1.4,1.1.5)'
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.document.test
@@ -67,7 +62,6 @@ Bundle-Vendor: Data In Motion Consulting GmbH
 -runrequires: \
 	bnd.identity;id='org.gecko.search.document.test',\
 	bnd.identity;id='org.gecko.search.document.impl',\
-	bnd.identity;id='org.gecko.runtime.resources',\
 	bnd.identity;id='org.gecko.runtime.boot'
 
 -runproperties: \
