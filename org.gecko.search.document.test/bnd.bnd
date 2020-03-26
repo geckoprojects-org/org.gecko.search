@@ -27,23 +27,24 @@ javac.target: 1.8
 # Other runtime dependencies should be added as necessary
 -runbundles: \
 	org.apache.servicemix.bundles.junit;version='[4.12.0,4.12.1)',\
-	org.gecko.search.document.test;version=snapshot,\
 	org.mockito.mockito-core;version='[1.10.19,1.10.20)',\
 	org.objenesis;version='[2.2.0,2.2.1)',\
 	org.apache.felix.configadmin;version='[1.9.6,1.9.7)',\
-	org.apache.lucene.core;version=snapshot,\
-	org.gecko.search.api;version=snapshot,\
-	org.gecko.search.document.api;version=snapshot,\
 	org.apache.felix.log;version='[1.2.0,1.2.1)',\
 	org.apache.felix.scr;version='[2.1.8,2.1.9)',\
-	org.gecko.search.document.impl;version=snapshot,\
 	org.osgi.util.function;version='[1.1.0,1.1.1)',\
 	org.osgi.util.promise;version='[1.1.0,1.1.1)',\
 	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
 	org.eclipse.emf.common;version='[2.15.0,2.15.1)',\
 	org.eclipse.emf.ecore;version='[2.17.0,2.17.1)',\
 	org.gecko.core.test;version='[2.0.2,2.0.3)',\
-	org.gecko.runtime.boot;version='[1.1.4,1.1.5)'
+	org.gecko.runtime.boot;version='[1.1.4,1.1.5)',\
+	org.apache.lucene.codecs;version='[8.4.1,8.4.2)',\
+	org.apache.lucene.core;version='[8.4.1,8.4.2)',\
+	org.gecko.search.api;version='[1.0.0,1.0.1)',\
+	org.gecko.search.document.api;version='[1.0.0,1.0.1)',\
+	org.gecko.search.document.impl;version='[1.0.0,1.0.1)',\
+	org.gecko.search.document.test;version='[1.0.0,1.0.1)'
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.document.test

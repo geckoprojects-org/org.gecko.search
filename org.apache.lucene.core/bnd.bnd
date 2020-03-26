@@ -6,6 +6,10 @@ Bundle-Version: ${lucene-version}.SNAPSHOT
 
 Export-Package: *
 
+Import-Package: sun.misc;resolution:=optional,\
+	com.sun.management;resolution:=optional,\
+	*
+
 -includeresource: \
 	@${repo;org.apache.lucene:lucene-analyzers-common;${lucene-version}}!/META-INF/services/*,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analyzers-common:jar:sources;${lucene-version};EXACT},\
