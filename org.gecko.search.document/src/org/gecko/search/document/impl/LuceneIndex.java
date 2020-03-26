@@ -179,7 +179,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 				return list;
 			})
 			.filter(c -> !c.isEmpty())
-			.forEach(this::internalHandleContexts);
+			.forEach(this::handleContextsSync);
 	}
 	
 	@Deactivate
@@ -200,6 +200,15 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		singleSource.publish(context);
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.LuceneIndexService#handleContextSync(org.gecko.search.document.DocumentIndexContextObject)
+	 */
+	@Override
+	public void handleContextSync(DocumentIndexContextObject context) {
+		internalHandleContext(context, true);
+	}
+	
 	/**
 	 * performes the actual action on the index.
 	 * @param context
@@ -238,7 +247,12 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		contexts.forEach(singleSource::publish);
 	}
 
-	public void internalHandleContexts(Collection<? extends DocumentIndexContextObject> contexts) {
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.LuceneIndexService#handleContextsSync(java.util.Collection)
+	 */
+	@Override
+	public void handleContextsSync(Collection<? extends DocumentIndexContextObject> contexts) {
 		internalHandleContexts(contexts, true);
 	}
 	

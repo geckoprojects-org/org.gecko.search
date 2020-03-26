@@ -23,3 +23,6 @@ org.apache.lucene:lucene-facet:${lucene-version}
 org.apache.lucene:lucene-facet:jar:sources:${lucene-version}
 com.carrotsearch:hppc:0.8.1
 com.carrotsearch:hppc:jar:sources:0.8.1
+
+
+org.apache.lucene:lucene-demo:jar:sources:${lucene-version}

@@ -47,13 +47,27 @@ public interface LuceneIndexService {
 	void commit();
 
 	/**
+	 * Adds the given {@link DocumentIndexContextObject} to the queue to be indexed according to the configuration
 	 * @param context
 	 */
 	void handleContext(DocumentIndexContextObject context);
 
 	/**
+	 * Adds the given {@link Collection} of DocumentIndexContextObject}s to the queue to be indexed according to the configuration
 	 * @param contexts
 	 */
 	void handleContexts(Collection<? extends DocumentIndexContextObject> contexts);
+
+	/**
+	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.
+	 * @param contexts
+	 */
+	void handleContextsSync(Collection<? extends DocumentIndexContextObject> contexts);
+
+	/**
+	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.
+	 * @param contexts
+	 */
+	void handleContextSync(DocumentIndexContextObject context);
 
 }
