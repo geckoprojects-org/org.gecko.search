@@ -43,7 +43,7 @@ junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 # define global blacklist
 -runblacklist.default: osgi.identity;filter:='(osgi.identity=osgi.cmpn)'
 
--testpath: ${junit}
+-testpath.junit: ${junit}
 
 -resolve.effective: active;skip:="osgi.service"
 # > Java 8 runtime

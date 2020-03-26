@@ -1,12 +1,12 @@
--buildpath: org.apache.lucene:lucene-codecs;version=latest
+-buildpath: org.apache.lucene:lucene-codecs;version=${lucene-version}
 
 -resourceonly: true
 
-Bundle-Version: 8.4.1.SNAPSHOT
+Bundle-Version: ${lucene-version}.SNAPSHOT
 
 Export-Package:\
 	*
 	
 -includeresource: \
-	@${repo;org.apache.lucene:lucene-codecs;latest}!/META-INF/services/*,\
-	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-codecs:jar:sources}
+	@${repo;org.apache.lucene:lucene-codecs;${lucene-version}}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-codecs:jar:sources;${lucene-version};EXACT}

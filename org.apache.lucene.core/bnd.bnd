@@ -1,13 +1,13 @@
--buildpath: org.apache.lucene:lucene-core;version=latest,\
-	org.apache.lucene:lucene-analyzers-common;version=latest
+-buildpath: org.apache.lucene:lucene-core;version=${lucene-version},\
+	org.apache.lucene:lucene-analyzers-common;version=${lucene-version}
 
 
-Bundle-Version: 8.4.1.SNAPSHOT
+Bundle-Version: ${lucene-version}.SNAPSHOT
 
 Export-Package: *
 
 -includeresource: \
-	@${repo;org.apache.lucene:lucene-analyzers-common;latest}!/META-INF/services/*,\
-	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analyzers-common:jar:sources},\
-	@${repo;org.apache.lucene:lucene-core;latest}!/META-INF/services/*,\
-	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-core:jar:sources}
+	@${repo;org.apache.lucene:lucene-analyzers-common;${lucene-version}}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analyzers-common:jar:sources;${lucene-version};EXACT},\
+	@${repo;org.apache.lucene:lucene-core;${lucene-version}}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-core:jar:sources;${lucene-version};EXACT}

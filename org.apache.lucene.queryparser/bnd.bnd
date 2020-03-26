@@ -1,10 +1,10 @@
--buildpath: org.apache.lucene:lucene-queryparser;version=latest
+-buildpath: org.apache.lucene:lucene-queryparser;version=${lucene-version}
 
 -resourceonly: true
 
-Bundle-Version: 8.4.1.SNAPSHOT
+Bundle-Version: ${lucene-version}.SNAPSHOT
 
 Export-Package: *
 
 -includeresource: ,\
-	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-queryparser:jar:sources}
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-queryparser:jar:sources;${lucene-version};EXACT}

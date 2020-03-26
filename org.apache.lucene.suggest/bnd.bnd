@@ -1,10 +1,10 @@
--buildpath: org.apache.lucene:lucene-suggest;version=latest
+-buildpath: org.apache.lucene:lucene-suggest;version=${lucene-version}
 
-Bundle-Version: 8.4.1.SNAPSHOT
+Bundle-Version: ${lucene-version}.SNAPSHOT
 
 Export-Package:\
 	*
 	
 -includeresource: \
-	@${repo;org.apache.lucene:lucene-suggest;latest}!/META-INF/services/*,\
-	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-suggest:jar:sources}
+	@${repo;org.apache.lucene:lucene-suggest;${lucene-version}}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-suggest:jar:sources;${lucene-version};EXACT}
