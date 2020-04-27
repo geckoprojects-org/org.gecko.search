@@ -26,3 +26,6 @@ com.carrotsearch:hppc:jar:sources:0.8.1
 
 
 org.apache.lucene:lucene-demo:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-grouping:${lucene-version}
+org.apache.lucene:lucene-grouping:jar:sources:${lucene-version}
