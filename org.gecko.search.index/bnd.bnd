@@ -13,4 +13,5 @@ Bundle-Version: 1.0.0-SNAPSHOT
 	org.gecko.search.document.impl;version=latest,\
 	org.gecko.search.impl;version=latest,\
 	org.gecko.search.suggest.api;version=latest,\
-	org.gecko.search.suggest.impl;version=latest
+	org.gecko.search.suggest.impl;version=latest,\
+	org.apache.lucene.grouping;version=latest
