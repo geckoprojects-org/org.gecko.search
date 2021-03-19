@@ -1,0 +1,18 @@
+-buildpath: \
+	osgi.annotation;version=7.0,\
+	osgi.core;version=7.0,\
+	osgi.cmpn;version=7.0,\
+	org.gecko.search.api;version=latest,\
+	org.gecko.search.document.api;version=latest,\
+	org.gecko.emf.mongo.pushstream,\
+	org.gecko.emf.mongo.api,\
+	org.eclipse.emf.common,\
+	org.eclipse.emf.ecore,\
+	org.eclipse.emf.ecore.xmi,\
+	org.apache.lucene.core;version=latest
+
+Bundle-Copyright: Data In Motion Consulting GmbH
+Bundle-License: Eclipse Public License v1.0
+Bundle-Vendor: Data In Motion Consulting GmbH
+Bundle-Version: 1.0.0.SNAPSHOT
+Export-Package: org.gecko.search.util
