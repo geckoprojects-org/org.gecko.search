@@ -50,12 +50,12 @@ javac.target: 1.8
 	org.apache.lucene.core;version='[8.4.1,8.4.2)',\
 	org.apache.lucene.suggest;version='[8.4.1,8.4.2)',\
 	org.gecko.emf.osgi.api;version='[3.3.0,3.3.1)',\
-	org.gecko.emf.osgi.ecore;version='[2.2.8,2.2.9)',\
-	org.gecko.emf.osgi.test.model;version='[5.0.0,5.0.1)',\
 	org.gecko.search.api;version='[1.0.0,1.0.1)',\
 	org.gecko.search.suggest.api;version='[1.0.0,1.0.1)',\
 	org.gecko.search.suggest.impl;version='[1.0.0,1.0.1)',\
-	org.gecko.search.suggest.test;version='[1.0.0,1.0.1)'
+	org.gecko.search.suggest.test;version='[1.0.0,1.0.1)',\
+	org.gecko.emf.osgi.ecore;version='[2.2.11,2.2.12)',\
+	org.gecko.emf.osgi.test.model;version='[6.0.0,6.0.1)'
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.suggest.test
