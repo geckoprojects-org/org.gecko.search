@@ -13,7 +13,10 @@ package org.gecko.search.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.function.Predicate;
 
@@ -25,11 +28,10 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.BasicEObjectImpl;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -38,6 +40,17 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @since Mar 19, 2021
  */
 public class DocumentUtil {
+	
+	/**
+	 * Option to provide a list of EStructuralFeatures that can be ignored for the index
+	 */
+	public static final String IGNORE_FEATURE_LIST = "ignore.feature.list";
+	
+	/**
+	 * Option to specify whether non-containment reference should be index or not.
+	 * If not provided, <code>false<code> will be used as default value.
+	 */
+	public static final String INDEX_NON_CONTAINEMENT = "index.non.conatinment";
 	
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
@@ -53,22 +66,31 @@ public class DocumentUtil {
 	/** _PROXY_URI */
 	private static final String _PROXY_URI = "_proxyUri";
 
-
-	public static void toDocument(Document doc, EObject eObject, boolean saveNonContainmentAsProxy) {
-		toDocument(doc, eObject, "", saveNonContainmentAsProxy);
+	
+	public static void toDocument(Document doc, EObject eObject, Map<Object, Object> options) {
+		toDocument(doc, eObject, "", options);
 	}
 
 	public static void toDocument(Document doc, EObject eObject) {
-		toDocument(doc, eObject, false);
+		toDocument(doc, eObject, "", Collections.emptyMap());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void toDocument(Document doc, EObject eObject, String prefix, boolean saveNonContainmentAsProxy) {
+	public static void toDocument(Document doc, EObject eObject, String prefix, Map<Object, Object> options) {
+		
+		boolean saveNonContainmentAsProxy = options.containsKey(INDEX_NON_CONTAINEMENT) ? (Boolean) options.get(INDEX_NON_CONTAINEMENT) : false;
 		if(saveNonContainmentAsProxy && eObject.eIsProxy()) {
 			doc.add(new StringField(prefix + _PROXY_URI, EcoreUtil.getURI(eObject).toString(), Store.YES));
 		}
 		doc.add(new StringField(prefix + _E_CLASS_URI, EcoreUtil.getURI(eObject.eClass()).toString(), Store.YES));
-		eObject.eClass().getEAllAttributes().forEach(a -> {
+		
+		Predicate<EStructuralFeature> ignoreFeaturePred = r -> true;
+		if(options.containsKey(IGNORE_FEATURE_LIST)) {
+			List<String> excludedFeatureNames = (List<String>) options.get(IGNORE_FEATURE_LIST);
+			ignoreFeaturePred = r -> !excludedFeatureNames.contains(r.getName());
+		}
+		
+		eObject.eClass().getEAllAttributes().stream().filter(ignoreFeaturePred).forEach(a -> {
 			Object value = eObject.eGet(a);
 			if(value != null) {
 				if(!a.isMany()) {
@@ -83,6 +105,7 @@ public class DocumentUtil {
 				} else {
 					Collection<Object> values = (Collection<Object>) value;
 					int i = 0;
+					
 					for(Object v : values) {
 						if(v != null) {
 							if(v instanceof Date) {
@@ -102,48 +125,45 @@ public class DocumentUtil {
 		});
 
 		Predicate<EReference> predicate = r -> true;
+		Predicate<EReference> containmentPred = r -> true;
+		
 		if(!saveNonContainmentAsProxy) {
-			predicate = r-> r.isContainment();
+			containmentPred = r-> r.isContainment();
 		}
+		predicate = containmentPred.and(ignoreFeaturePred);
+		
 		eObject.eClass().getEAllReferences().stream().filter(predicate).forEach(r -> {
 			Object value = eObject.eGet(r);
 			if(value != null) {
 				String newPrefix = prefix + r.getName() + ".";
 				if(value instanceof EObject) {
-					toDocument(doc, (EObject) value, newPrefix, saveNonContainmentAsProxy);
+					toDocument(doc, (EObject) value, newPrefix, options);
 				}
-				else if(value instanceof EObjectContainmentEList) {					
-					Collection<Object> values = (Collection<Object>) value;
-					int i = 0;
-					for( Object v : values) {
+				else if(r.isMany()) {					
+					BasicEList<EObject> values = (BasicEList<EObject>) value;
+					for(int i = 0 ; i < values.size(); i++) {
+						EObject v = values.basicGet(i);
 						if(v != null && v instanceof EObject) {
-							toDocument(doc, (EObject) v, newPrefix + i++ + ".", saveNonContainmentAsProxy);
+							toDocument(doc, (EObject) v, newPrefix + i++ + ".", options);
 						} else {
 							doc.add(new StringField(newPrefix + _E_CLASS_URI +  i++  , _NULL , Store.YES));
 						}
 					}
-				}
-				else if(value instanceof EObjectResolvingEList) {
-					BasicEList<EObject> values = (BasicEList<EObject>) value;
-					int i = 0;
-					for(Object v : values) {
-						if(v != null && v instanceof EObject) {
-							toDocument(doc, (EObject) v, newPrefix + i++ + ".", saveNonContainmentAsProxy);
-						} else {
-							doc.add(new StringField(newPrefix + _PROXY_URI +  i++  , _NULL , Store.YES));
-						}
-					}	
 				}
 			}
 		});
 	}		
 
 	public static EObject toEObject(Document doc, ResourceSet set) {
-		return toEObject(doc, "", set);
+		return toEObject(doc, "", set, Collections.emptyMap());
+	}
+	
+	public static EObject toEObject(Document doc, ResourceSet set, Map<Object, Object> options) {
+		return toEObject(doc, "", set, options);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static EObject toEObject(Document doc, String prefix, ResourceSet set) {
+	public static EObject toEObject(Document doc, String prefix, ResourceSet set, Map<Object, Object> options) {
 		String uri = doc.get(prefix + _E_CLASS_URI);
 		if(uri == null || _NULL.equals(uri)) {
 				return null;			
@@ -164,7 +184,13 @@ public class DocumentUtil {
 		EClass eClass = (EClass) eObject;
 		EObject result = EcoreUtil.create(eClass);
 
-		eClass.getEAllAttributes().forEach(a -> {
+		Predicate<EStructuralFeature> ignoreFeaturePred = r -> true;
+		if(options.containsKey(IGNORE_FEATURE_LIST)) {
+			List<String> excludedFeatureNames = (List<String>) options.get(IGNORE_FEATURE_LIST);
+			ignoreFeaturePred = r -> !excludedFeatureNames.contains(r.getName());
+		}
+		
+		eClass.getEAllAttributes().stream().filter(ignoreFeaturePred).forEach(a -> {
 			if(!a.isMany()) {
 				String valueString = doc.get(prefix + a.getName());
 				Object value = null;
@@ -187,10 +213,10 @@ public class DocumentUtil {
 			}
 		});
 
-		eClass.getEAllReferences().stream().forEach(r -> {
+		eClass.getEAllReferences().stream().filter(ignoreFeaturePred).forEach(r -> {
 			String newPrefix = prefix + r.getName() + ".";
 			if(!r.isMany()) {
-				result.eSet(r, toEObject(doc, newPrefix, set));
+				result.eSet(r, toEObject(doc, newPrefix, set, options));
 			} else {
 				Collection values = (Collection) result.eGet(r);
 				int i = 0;
@@ -200,7 +226,7 @@ public class DocumentUtil {
 					if(_NULL.equals(valueString)) {
 						values.add(null);
 					} else {
-						values.add(toEObject(doc, countedPrefix, set));
+						values.add(toEObject(doc, countedPrefix, set, options));
 					}
 					countedPrefix = newPrefix + i++ + ".";
 					valueString = doc.get(countedPrefix + _E_CLASS_URI); 
