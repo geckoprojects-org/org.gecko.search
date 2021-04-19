@@ -144,9 +144,9 @@ public class DocumentUtil {
 					for(int i = 0 ; i < values.size(); i++) {
 						EObject v = values.basicGet(i);
 						if(v != null && v instanceof EObject) {
-							toDocument(doc, (EObject) v, newPrefix + i++ + ".", options);
+							toDocument(doc, (EObject) v, newPrefix + i + ".", options);
 						} else {
-							doc.add(new StringField(newPrefix + _E_CLASS_URI +  i++  , _NULL , Store.YES));
+							doc.add(new StringField(newPrefix + _E_CLASS_URI +  i  , _NULL , Store.YES));
 						}
 					}
 				}
