@@ -38,7 +38,7 @@ import org.gecko.search.api.IndexActionType;
 import org.gecko.search.suggest.api.SimpleSuggestionContext;
 import org.gecko.search.suggest.api.SuggestionConfiguration;
 import org.gecko.search.suggest.api.SuggestionContext;
-import org.gecko.search.suggest.api.SuggestionObjectProvider;
+import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.search.suggest.api.SuggestionService;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -62,7 +62,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
 	private GeckoResourcesProvider resourceProvider;
 	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
-	private SuggestionObjectProvider objectProvider;
+	private SuggestionDescriptor suggestionDescriptor;
 
 	private static final Logger logger = Logger.getLogger(SuggestionServiceImpl.class.getName());
 	private List<SuggestionContext> contexts;
@@ -159,14 +159,14 @@ public class SuggestionServiceImpl implements SuggestionService {
 	 * @return the list with contexts
 	 */
 	private List<SuggestionContext> createContext() {
-		Set<EStructuralFeature> fields = objectProvider.getFields();
-		List<String> labels = objectProvider.getLabels();
+		Set<EStructuralFeature> fields = suggestionDescriptor.getFields();
+		List<String> labels = suggestionDescriptor.getLabels();
 		String[] labelsArray = new String[labels.size()];
 		labelsArray = labels.toArray(labelsArray);
-		List<?extends EObject> objects = objectProvider.getObjectStream();
+		List<?extends EObject> objects = suggestionDescriptor.getObjectStream();
 		List<SuggestionContext> contexts = new ArrayList<SuggestionContext>(objects.size());
 		for (EObject eo : objects) {
-			Object payloadObject = eo.eGet(objectProvider.getPayload());
+			Object payloadObject = eo.eGet(suggestionDescriptor.getPayload());
 			String payload = payloadObject == null ? null : payloadObject.toString();				
 			for (EStructuralFeature feature : fields) {
 				Object value = eo.eGet(feature);

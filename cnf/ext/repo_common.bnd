@@ -1,13 +1,11 @@
--include: ${if;${def;release.dir};\
-              ${cnf}/releng/release.bnd;\
-              ${cnf}/releng/snapshot.bnd\
-          }
-
 # Configure Repositories
 -plugin.Central: \
 	aQute.bnd.repository.maven.provider.MavenBndRepository; \
-		releaseUrl=https://repo.maven.apache.org/maven2/; \
-		index=${cnf}/ext/central.maven; \
+		snapshotUrl="https://oss.sonatype.org/content/repositories/snapshots/"; \
+        releaseUrl=https://repo.maven.apache.org/maven2/; \
+        index=${.}/central.maven; \
+        readOnly=true; \
+        poll.time=-1; \
 		name="Maven Central"
 		
 -plugin.Local: \
@@ -21,4 +19,14 @@
 		name = Temp; \
 		pretty = true; \
 		local = ${build}/cache/temp
+		
+# We include setups for
+#	Gecko EMF OSGi - geckoEMF
+#	OSGi-Test Support - gecko-osgitest
+#	DIMC Github-Configuration - gecko-dimc
+#	Jacoco Support - gecko-jacoco
+-library: \
+	geckoEMF,\
+	geckoOSGi-Test,\
+	geckoDIMC
 		

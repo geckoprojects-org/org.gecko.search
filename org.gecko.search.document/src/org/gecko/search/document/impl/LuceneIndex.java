@@ -27,6 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -51,8 +53,6 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.log.Logger;
-import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.util.pushstream.PushEvent;
 import org.osgi.util.pushstream.PushStream;
@@ -67,9 +67,6 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  */
 @Component(name = "LuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, LuceneIndexService{
-
-	@Reference(service = LoggerFactory.class)
-	private Logger logger;
 	
 	@Reference(target = "(" + GeckoBootConstants.PROP_GECKO_DATA_DIR + "=true)", cardinality=ReferenceCardinality.OPTIONAL)
 	private URL geckoDataDir;
@@ -85,6 +82,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	
 	private PushStreamProvider psp = new PushStreamProvider();
 	
+	private static final Logger logger = Logger.getLogger(LuceneIndex.class.getName());
 	private final ExecutorService commitExecutors = Executors.newCachedThreadPool();
 	private ExecutorService indexExecutors = null;
 
@@ -230,11 +228,15 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 					throw new UnsupportedOperationException("SEARCH is currerntly not supported");
 			}
 		} catch (IOException e) {
-			logger.error("Could not handle {} with error {}", context.getActionType().name(), e.getMessage(), e);
+			logger.log(Level.SEVERE, String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage(), e));
 			throw new IllegalStateException("Could not handle " + context.getActionType().name(), e);
 		}
 		if(commit) {
+			System.out.println("commit handle context");
 			commit();
+		} else {
+			
+			System.out.println("no commit @ handle context");
 		}
 	}
 	
@@ -257,7 +259,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	}
 	
 	public void internalHandleContexts(Collection<? extends DocumentIndexContextObject> contexts, boolean commit) {
-		contexts.forEach(partial(this::internalHandleContext, false));
+		contexts.forEach(partial(this::internalHandleContext, commit));
 		if(commit) {
 			try {
 				commit();
@@ -330,10 +332,12 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 				public void run() {
 					try {
 						if(searcherManager != null){
-							searcherManager.maybeRefresh();
+							if (!searcherManager.maybeRefresh()) {
+								logger.log(Level.SEVERE, "Refreshing did not work, because it was called from a wrong thread");
+							}
 						}
 					} catch (IOException e) {
-						logger.error("Could not update SearcherManager for path {}, because {}", indexFolder.toString(), e.getMessage(), e);
+						logger.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage(), e));
 					} 
 				}
 			});

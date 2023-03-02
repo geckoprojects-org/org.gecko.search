@@ -1,61 +1,19 @@
-# This is the version of JUnit that will be used at build time and run time
-junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
-
-# This is the version of Mockito that will be used at build time and run time
-mockito: org.mockito.mockito-core;version="[1.9,2)",\
-  org.objenesis;version="[2.1,3)"
-
-# Discover and run all test cases annotated with the @RunWith annotation
-Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
-
--resolve.effective: active;skip:="osgi.service"
+-library: \
+	enable-emf,\
+	enableOSGi-Test
 
 # Build dependencies 
 -buildpath: \
-	${junit},\
-	${mockito},\
-	osgi.annotation;version=7.0,\
-	osgi.core;version=7.0,\
-	osgi.cmpn;version=7.0,\
 	org.osgi.util.pushstream;version=latest,\
 	org.gecko.search.suggest.api;version=latest,\
-	org.eclipse.emf.common;version=latest,\
-	org.eclipse.emf.ecore;version=latest,\
-	org.eclipse.emf.ecore.xmi;version=latest,\
-	org.gecko.emf.osgi.test.model;version=latest,\
-	org.gecko.core.test;version=latest,\
-	org.gecko.runtime.api;version=latest
-
-javac.source: 1.8
-javac.target: 1.8
-
-# We need JUnit and Mockito to resolve the test cases at runtime. 
-# Other runtime dependencies should be added as necessary
--runbundles: \
-	org.apache.felix.configadmin;version='[1.9.6,1.9.7)',\
-	org.apache.felix.scr;version='[2.1.8,2.1.9)',\
-	org.apache.servicemix.bundles.junit;version='[4.12.0,4.12.1)',\
-	org.gecko.runtime.api;version='[1.0.0,1.0.1)',\
-	org.mockito.mockito-core;version='[1.10.19,1.10.20)',\
-	org.objenesis;version='[2.2.0,2.2.1)',\
-	org.osgi.util.function;version='[1.1.0,1.1.1)',\
-	org.osgi.util.promise;version='[1.1.0,1.1.1)',\
-	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
-	org.eclipse.emf.common;version='[2.15.0,2.15.1)',\
-	org.eclipse.emf.ecore;version='[2.17.0,2.17.1)',\
-	org.eclipse.emf.ecore.xmi;version='[2.15.0,2.15.1)',\
-	org.gecko.core.test;version='[2.0.2,2.0.3)',\
-	org.gecko.emf.osgi.component;version='[2.2.8,2.2.9)',\
-	org.gecko.runtime.resources;version='[1.0.4,1.0.5)',\
-	org.apache.lucene.core;version='[8.4.1,8.4.2)',\
-	org.apache.lucene.suggest;version='[8.4.1,8.4.2)',\
-	org.gecko.emf.osgi.api;version='[3.3.0,3.3.1)',\
-	org.gecko.search.api;version='[1.0.0,1.0.1)',\
-	org.gecko.search.suggest.api;version='[1.0.0,1.0.1)',\
-	org.gecko.search.suggest.impl;version='[1.0.0,1.0.1)',\
-	org.gecko.search.suggest.test;version='[1.0.0,1.0.1)',\
-	org.gecko.emf.osgi.ecore;version='[2.2.11,2.2.12)',\
-	org.gecko.emf.osgi.test.model;version='[6.0.0,6.0.1)'
+	org.gecko.search,\
+	org.gecko.emf.osgi.example.model.basic,\
+	org.gecko.runtime.api,\
+	org.osgi.test.junit5.cm,\
+	org.yaml.snakeyaml,\
+	org.apache.felix.configadmin,\
+	org.osgi.util.promise,\
+	org.osgi.util.function
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.suggest.test
@@ -63,16 +21,8 @@ Private-Package: org.gecko.search.suggest.test
 Bundle-Copyright: Data In Motion Consulting GmbH
 Bundle-License: Eclipse Public License v1.0
 Bundle-Vendor: Data In Motion Consulting GmbH
-
-# Needed for Mockito's mocking to work
--runsystempackages.objenesis: sun.misc,sun.reflect
-
-# Use Felix by default
--runfw: org.apache.felix.framework;version='[6.0.1,6.0.1]'
--runvm: -ea
 Bundle-Name: Search Suggestion Integration Tests
--runrequires: \
-	bnd.identity;id='org.gecko.search.suggest.test',\
-	bnd.identity;id='org.gecko.runtime.resources',\
-	bnd.identity;id='org.gecko.search.suggest.impl'
--runee: JavaSE-1.8
+
+
+Provide-Capability: osgi.service;objectClass:List<String>="org.gecko.search.suggest.api.SuggestionDescriptor",\
+	osgi.service;objectClass:List<String>="org.osgi.util.pushstream.PushStream"

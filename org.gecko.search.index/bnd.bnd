@@ -8,10 +8,9 @@ Bundle-Version: 1.0.1-SNAPSHOT
 	org.apache.lucene.queries;version=latest,\
 	org.apache.lucene.queryparser;version=latest,\
 	org.apache.lucene.suggest;version=latest,\
-	org.gecko.search.api;version=latest,\
+	org.gecko.search;version=latest,\
 	org.gecko.search.document.api;version=latest,\
 	org.gecko.search.document.impl;version=latest,\
-	org.gecko.search.impl;version=latest,\
 	org.gecko.search.suggest.api;version=latest,\
 	org.gecko.search.suggest.impl;version=latest,\
 	org.apache.lucene.grouping;version=latest,\

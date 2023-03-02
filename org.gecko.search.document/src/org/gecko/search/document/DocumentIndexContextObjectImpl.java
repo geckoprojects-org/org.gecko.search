@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;

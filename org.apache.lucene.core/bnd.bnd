@@ -1,5 +1,5 @@
 -buildpath: org.apache.lucene:lucene-core;version=${lucene-version},\
-	org.apache.lucene:lucene-analyzers-common;version=${lucene-version}
+	org.apache.lucene:lucene-analyzers-common;version=${lucene-analyzer-version}
 
 
 Bundle-Version: ${lucene-version}.SNAPSHOT
@@ -11,7 +11,7 @@ Import-Package: sun.misc;resolution:=optional,\
 	*
 
 -includeresource: \
-	@${repo;org.apache.lucene:lucene-analyzers-common;${lucene-version}}!/META-INF/services/*,\
-	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analyzers-common:jar:sources;${lucene-version};EXACT},\
+	@${repo;org.apache.lucene:lucene-analyzers-common;${lucene-analyzer-version}}!/META-INF/services/*,\
+	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analyzers-common:jar:sources;${lucene-analyzer-version};EXACT},\
 	@${repo;org.apache.lucene:lucene-core;${lucene-version}}!/META-INF/services/*,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-core:jar:sources;${lucene-version};EXACT}

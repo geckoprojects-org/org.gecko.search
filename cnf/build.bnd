@@ -1,4 +1,16 @@
-## Place your settings in ext/.
-cnf: ${workspace}/cnf
+# Needed because we enabled library 'gecko-dimc' 	
+github-project: org.gecko.search
+base-version: 1.0.0.SNAPSHOT
 
-lucene-version: 8.4.1
+# Maven Central Group-Id
+-groupid: org.gecko.search
+-noimportjava: true
+
+javac.source: 17
+javac.target: 17
+
+-require-bnd "(version>=6.4.0)"
+
+lucene-version: 9.5.0
+lucene-analyzer-version: 8.11.2
+

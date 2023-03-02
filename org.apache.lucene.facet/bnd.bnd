@@ -5,7 +5,7 @@
 	com.carrotsearch.hppc;\
 	  groupId=com.carrotsearch;\
       artifactId=hppc;\
-      version=0.8.1;\
+      version=0.9.1;\
       scope=compile
 
 -resourceonly: true
