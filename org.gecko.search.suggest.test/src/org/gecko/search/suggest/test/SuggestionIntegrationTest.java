@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
-import org.gecko.runtime.resources.GeckoResourcesProvider;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.search.suggest.api.SuggestionService;
 import org.junit.jupiter.api.AfterEach;
@@ -75,25 +74,16 @@ public class SuggestionIntegrationTest {
 					@Property(key = "suggestion.index", value = "true", scalar = Scalar.Boolean)
 			})
 	@WithFactoryConfiguration(
-			factoryPid = "ResourcesConfiguration",
-			location = "?", 
-			name = "resConfig",
-			properties = {
-					@Property(key = "gecko.resource.name", value = "testIdx"),
-					@Property(key = "gecko.resource.path", value = "/tmp/suggestIdx"),
-					@Property(key = "suggestion.index", value = "true", scalar = Scalar.Boolean)
-			})
-	@WithFactoryConfiguration(
 			factoryPid = "SuggestionServiceFactory",
 			location = "?", 
 			name = "suggService",
 			properties = {
+					@Property(key = "base.path", value = "file:/tmp/suggestIdx"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})
 	public void testSuggest(@InjectService() ServiceAware<BasicPackage> basicPackageAware,
 			@InjectService(timeout = 2000) ServiceAware<SuggestionDescriptor> suggDescAware,
-			@InjectService() ServiceAware<GeckoResourcesProvider> resourceProvAware,
 			@InjectService() ServiceAware<SuggestionService> suggestionServiceAware) throws InterruptedException {
 		
 		assertThat(basicPackageAware).isNotNull();
@@ -104,11 +94,6 @@ public class SuggestionIntegrationTest {
 		assertThat(suggDescService).isNotNull();
 		assertThat(suggDescService).isInstanceOf(DummySuggestionDescriptor.class);
 				
-		resourceProvAware.waitForService(550L);
-		assertThat(resourceProvAware).isNotNull();
-		GeckoResourcesProvider resProviderService = resourceProvAware.getService();
-		assertThat(resProviderService).isNotNull();
-		
 		assertThat(suggestionServiceAware).isNotNull();
 		SuggestionService suggestionService = suggestionServiceAware.getService();
 		assertThat(suggestionService).isNotNull();

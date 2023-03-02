@@ -68,7 +68,7 @@ public class IndexTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "MMAP"),
-					@Property(key = "base.path", value = "/tmp/indexTest/")
+					@Property(key = "base.path", value = "file:/tmp/indexTest/")
 			})
 	public void basicTest(@InjectService() ServiceAware<LuceneIndexService> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searchAware) throws InterruptedException, IOException {
@@ -120,7 +120,7 @@ public class IndexTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "MMAP"),
-					@Property(key = "base.path", value =  "/tmp/indexTest/")
+					@Property(key = "base.path", value =  "file:/tmp/indexTest/")
 			})
 	public void basicTestWithGeckoDataDir(@InjectService() ServiceAware<LuceneIndexService> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searchAware) throws InterruptedException, IOException {
@@ -174,7 +174,7 @@ public class IndexTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "MMAP"),
-					@Property(key = "base.path", value =  "/tmp/indexTest/")
+					@Property(key = "base.path", value =  "file:/tmp/indexTest/")
 			})
 	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searchAware) throws InterruptedException, IOException {

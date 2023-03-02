@@ -5,7 +5,7 @@
 Bundle-Version: ${lucene-version}.SNAPSHOT
 
 Export-Package:\
-	*
+	org.apache.lucene.*
 	
 -includeresource: \
 	@${repo;org.apache.lucene:lucene-codecs;${lucene-version}}!/META-INF/services/*,\

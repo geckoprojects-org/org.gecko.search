@@ -33,7 +33,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.gecko.runtime.resources.GeckoResourcesProvider;
 import org.gecko.search.api.IndexActionType;
 import org.gecko.search.suggest.api.SimpleSuggestionContext;
 import org.gecko.search.suggest.api.SuggestionConfiguration;
@@ -59,8 +58,6 @@ import org.osgi.util.promise.PromiseFactory;
 @Component(configurationPolicy=ConfigurationPolicy.REQUIRE, configurationPid=SuggestionService.SUGGESTION_FACTORY)
 public class SuggestionServiceImpl implements SuggestionService {
 
-	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
-	private GeckoResourcesProvider resourceProvider;
 	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
 	private SuggestionDescriptor suggestionDescriptor;
 
@@ -185,7 +182,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	 * @return suggester
 	 */
 	private AnalyzingInfixSuggester initializeIndex() {
-		URI indexPath = resourceProvider.getURI();
+		URI indexPath = URI.create(configuration.base_path());
 		Path path = Paths.get(indexPath);
 		AnalyzingInfixSuggester suggester = null;
 		try {

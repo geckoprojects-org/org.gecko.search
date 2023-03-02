@@ -30,7 +30,6 @@ import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
-import org.gecko.runtime.resources.GeckoResourcesProvider;
 import org.gecko.search.suggest.api.SuggestionConfiguration;
 import org.gecko.search.suggest.api.SuggestionContext;
 import org.gecko.search.suggest.api.SuggestionService;
@@ -56,8 +55,6 @@ import org.osgi.util.pushstream.PushStream;
 public class SuggestionPushStreamServiceImpl implements SuggestionService {
 
 	private static final Logger logger = Logger.getLogger(SuggestionPushStreamServiceImpl.class.getName());
-	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
-	private GeckoResourcesProvider resourceProvider;
 	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
 	private PushStream<SuggestionContext> contextStream;
 
@@ -136,7 +133,7 @@ public class SuggestionPushStreamServiceImpl implements SuggestionService {
 	 * @throws IOException 
 	 */
 	private AnalyzingInfixSuggester initializeIndex() throws IOException {
-		URI indexPath = resourceProvider.getURI();
+		URI indexPath = URI.create(configuration.base_path());
 		Path path = Paths.get(indexPath);
 		AnalyzingInfixSuggester suggester = null;
 		indexDir = FSDirectory.open(path);

@@ -8,7 +8,6 @@
 	org.gecko.search.suggest.api;version=latest,\
 	org.gecko.search,\
 	org.gecko.emf.osgi.example.model.basic,\
-	org.gecko.runtime.api,\
 	org.osgi.test.junit5.cm,\
 	org.yaml.snakeyaml,\
 	org.apache.felix.configadmin,\
@@ -18,11 +17,7 @@
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.suggest.test
 
-Bundle-Copyright: Data In Motion Consulting GmbH
-Bundle-License: Eclipse Public License v1.0
-Bundle-Vendor: Data In Motion Consulting GmbH
 Bundle-Name: Search Suggestion Integration Tests
-
 
 Provide-Capability: osgi.service;objectClass:List<String>="org.gecko.search.suggest.api.SuggestionDescriptor",\
 	osgi.service;objectClass:List<String>="org.osgi.util.pushstream.PushStream"

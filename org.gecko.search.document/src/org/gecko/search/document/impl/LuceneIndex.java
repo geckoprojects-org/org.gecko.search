@@ -39,7 +39,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
-import org.gecko.runtime.boot.GeckoBootConstants;
 import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.LuceneIndexService;
 import org.osgi.framework.Bundle;
@@ -52,7 +51,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.util.pushstream.PushEvent;
 import org.osgi.util.pushstream.PushStream;
@@ -67,9 +65,6 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  */
 @Component(name = "LuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, LuceneIndexService{
-	
-	@Reference(target = "(" + GeckoBootConstants.PROP_GECKO_DATA_DIR + "=true)", cardinality=ReferenceCardinality.OPTIONAL)
-	private URL geckoDataDir;
 	
 	@Reference(name="analyzer", target="(type=standard)")
 	private Analyzer analyzer = null;;
@@ -104,7 +99,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	
 	@Activate
 	public void activate(Config serviceConfig, ComponentContext context) throws ConfigurationException {
-		URL url = geckoDataDir;
+		URL url = null;
 		if(serviceConfig.base_path().length() > 0) {
 			try {
 				url = new File(serviceConfig.base_path()).toURI().toURL();

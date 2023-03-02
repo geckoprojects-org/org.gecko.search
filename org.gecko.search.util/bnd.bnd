@@ -3,10 +3,8 @@
 -buildpath: \
 	org.gecko.search;version=latest,\
 	org.gecko.search.document.api;version=latest,\
-	org.gecko.emf.mongo.pushstream,\
-	org.gecko.emf.mongo.api,\
 	org.apache.lucene.core;version=latest,\
-	org.osgi.util.promise
+	org.osgi.util.promise;version=latest
 
 Bundle-Copyright: Data In Motion Consulting GmbH
 Bundle-License: Eclipse Public License v1.0

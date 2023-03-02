@@ -6,7 +6,6 @@
 	org.eclipse.emf.common;version=latest,\
 	org.eclipse.emf.ecore;version=latest,\
 	org.eclipse.emf.ecore.xmi;version=latest,\
-	org.gecko.runtime.api;version=latest,\
 	jakarta.annotation-api,\
 	org.gecko.search;version=project,\
 	org.osgi.util.pushstream,\

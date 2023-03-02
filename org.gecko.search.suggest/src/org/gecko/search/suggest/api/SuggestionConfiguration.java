@@ -14,6 +14,7 @@ package org.gecko.search.suggest.api;
 public @interface SuggestionConfiguration {
 	
 	String suggestionName();
+	String base_path() default "";
 	int suggestionNumberResults() default 10;
 	boolean suggestionAllTermsRequired() default true;
 	

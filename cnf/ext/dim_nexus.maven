@@ -1,7 +1,0 @@
-org.gecko.runtime:org.gecko.runtime.api:1.0.0
-org.gecko.runtime:org.gecko.runtime.boot:1.1.4
-org.gecko.runtime:org.gecko.runtime.resources:1.0.4
-org.gecko.runtime:org.gecko.templates:1.0.30
-
-org.geckoprojects.mongo:org.gecko.emf.mongo.pushstream:6.0.5
-org.geckoprojects.mongo:org.gecko.emf.mongo.api:6.0.5

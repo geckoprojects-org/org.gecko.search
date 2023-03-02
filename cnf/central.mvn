@@ -1,3 +1,35 @@
+org.apache.lucene:lucene-core:${lucene-version}
+org.apache.lucene:lucene-core:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-analysis-common:${lucene-version}
+org.apache.lucene:lucene-analysis-common:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-queries:${lucene-version}
+org.apache.lucene:lucene-queries:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-queryparser:${lucene-version}
+org.apache.lucene:lucene-queryparser:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-codecs:${lucene-version}
+org.apache.lucene:lucene-codecs:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-memory:${lucene-version}
+org.apache.lucene:lucene-memory:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-suggest:${lucene-version}
+org.apache.lucene:lucene-suggest:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-facet:${lucene-version}
+org.apache.lucene:lucene-facet:jar:sources:${lucene-version}
+com.carrotsearch:hppc:0.9.1
+com.carrotsearch:hppc:jar:sources:0.9.1
+
+
+org.apache.lucene:lucene-demo:jar:sources:${lucene-version}
+
+org.apache.lucene:lucene-grouping:${lucene-version}
+org.apache.lucene:lucene-grouping:jar:sources:${lucene-version}
+
 com.fasterxml.jackson.core:jackson-annotations:2.14.2
 com.fasterxml.jackson.core:jackson-core:2.14.2
 com.fasterxml.jackson.core:jackson-databind:2.14.2
@@ -104,8 +136,8 @@ org.eclipse.platform:org.eclipse.ui.workbench:3.127.0
 
 
 #Gecko
-org.geckoprojects.bnd:org.gecko.bnd.dimc.library:1.2.0-SNAPSHOT
-org.geckoprojects.bnd:org.gecko.bnd.osgitest.library:1.2.0-SNAPSHOT
+org.geckoprojects.bnd:org.gecko.bnd.dimc.library:1.2.0
+org.geckoprojects.bnd:org.gecko.bnd.osgitest.library:1.2.0
 org.geckoprojects.emf:org.gecko.emf.osgi.api:4.5.0
 org.geckoprojects.emf:org.gecko.emf.osgi.bnd.library.workspace:4.5.0
 org.geckoprojects.emf:org.gecko.emf.osgi.extender:4.5.0

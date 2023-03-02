@@ -14,8 +14,8 @@ package org.gecko.search.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gecko.emf.mongo.Options;
-import org.gecko.emf.mongo.pushstream.constants.MongoPushStreamConstants;
+//import org.gecko.emf.mongo.Options;
+//import org.gecko.emf.mongo.pushstream.constants.MongoPushStreamConstants;
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.util.promise.Promise;
 
@@ -34,8 +34,8 @@ public interface CommonIndexService {
 
 	public static Map<Object, Object> getLoadOptions(){
 		Map<Object, Object> loadOptions = new HashMap<>();
-		loadOptions.put(Options.OPTION_BATCH_SIZE, Integer.valueOf(600));
-		loadOptions.put(MongoPushStreamConstants.OPTION_QUERY_PUSHSTREAM, Boolean.TRUE);
+//		loadOptions.put(Options.OPTION_BATCH_SIZE, Integer.valueOf(600));
+//		loadOptions.put(MongoPushStreamConstants.OPTION_QUERY_PUSHSTREAM, Boolean.TRUE);
 		return loadOptions;
 	}
 
