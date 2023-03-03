@@ -14,8 +14,8 @@ subprojects {
 // Sonar setup
 sonarqube {
   properties {
-    property "sonar.projectName", "org.gecko.vaadin"
-    property "sonar.projectKey", "geckoprojects-org_org.gecko.vaadin"
+    property "sonar.projectName", "org.gecko.search"
+    property "sonar.projectKey", "geckoprojects-org_org.gecko.search"
     property "sonar.organization", "geckoprojects-org"
     property "sonar.host.url", "https://sonarcloud.io"
     property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"

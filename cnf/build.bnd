@@ -1,11 +1,12 @@
 -library: \
 	geckoEMF,\
 	geckoOSGi-Test,\
-	geckoDIMC
+	geckoDIMC,\
+	geckoJacoco
 
 # Needed because we enabled library 'gecko-dimc' 	
 github-project: org.gecko.search
-base-version: 1.0.0.SNAPSHOT
+base-version: 1.1.0.SNAPSHOT
 
 # Maven Central Group-Id
 -groupid: org.gecko.search

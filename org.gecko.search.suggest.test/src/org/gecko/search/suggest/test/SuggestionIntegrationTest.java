@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
@@ -58,11 +59,7 @@ public class SuggestionIntegrationTest {
 
 	@AfterEach
 	public void doAfter() {
-		if (indexPath.exists()) {
-			for (File f : indexPath.listFiles()) {
-				f.delete();
-			}
-		}
+		delete(indexPath);
 	}
 
 	@Test
@@ -101,5 +98,14 @@ public class SuggestionIntegrationTest {
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});
 		assertNotNull(suggestResult);
 		assertEquals(5, suggestResult.size());
+	}
+	
+	private void delete(File file) {
+		if(file.exists()) {
+			if(!file.isFile()) {
+				Arrays.asList(file.listFiles()).forEach(this::delete);
+			}
+			file.delete();
+		}
 	}
 }

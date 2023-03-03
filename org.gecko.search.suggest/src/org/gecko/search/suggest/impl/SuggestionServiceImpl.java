@@ -11,10 +11,8 @@
  */
 package org.gecko.search.suggest.impl;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,9 +49,9 @@ import org.osgi.util.promise.PromiseFactory;
 
 /**
  * Service implementation of the suggestion service. To define the index location,
- * the {@link GeckoResourcesProvider} is used. For that a service property "suggestion.index=true" must be available
- * @author ilenia
- * @since Nov 9, 2018
+ * the corresponding configuration property must be provided
+ * @author Ilenia Salvadori, Mark Hoffmann
+ * @since 03.03.2023
  */
 @Component(configurationPolicy=ConfigurationPolicy.REQUIRE, configurationPid=SuggestionService.SUGGESTION_FACTORY)
 public class SuggestionServiceImpl implements SuggestionService {
@@ -61,7 +59,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
 	private SuggestionDescriptor suggestionDescriptor;
 
-	private static final Logger logger = Logger.getLogger(SuggestionServiceImpl.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(SuggestionServiceImpl.class.getName());
 	private List<SuggestionContext> contexts;
 	private Promise<AnalyzingInfixSuggester> suggesterPromise;
 	private FSDirectory indexDir;
@@ -88,7 +86,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 			try {
 				indexDir.close();
 			} catch (IOException e) {
-				logger.severe("Error closing index directory");
+				LOGGER.severe("Error closing index directory");
 			}
 		}
 	}
@@ -113,7 +111,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 				}
 				results = suggester.lookup(string, contextSet, configuration.suggestionNumberResults(), configuration.suggestionAllTermsRequired(), false);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "[{0}] Error providing a suggestion for {1}", new Object[] {configuration.suggestionName(), string, e});
+				LOGGER.log(Level.SEVERE, "[{0}] Error providing a suggestion for {1}", new Object[] {configuration.suggestionName(), string, e});
 				return Collections.emptyMap();
 			}
 			for (Lookup.LookupResult result : results) {
@@ -123,7 +121,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 				displayRes.put(proposal, id);
 			}		
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "[{0}] Error creating a suggestion proposal for query {1}", new Object[] {configuration.suggestionName(), string});
+			LOGGER.log(Level.SEVERE, "[{0}] Error creating a suggestion proposal for query {1}", new Object[] {configuration.suggestionName(), string});
 		}
 		return displayRes;
 	}
@@ -131,8 +129,9 @@ public class SuggestionServiceImpl implements SuggestionService {
 	/**
 	 * Creates the initial index with data
 	 * @return the suggester;
+	 * @throws ConfigurationException 
 	 */
-	private AnalyzingInfixSuggester initializeSuggestionIndex() {
+	private AnalyzingInfixSuggester initializeSuggestionIndex() throws ConfigurationException {
 		//create data sample and context suggests (according to device Fqdn, Alias and Name)
 		contexts = createContext();
 	
@@ -143,7 +142,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 		try {
 			indexData(contexts, suggester);
 		} catch (IOException e) {
-			logger.severe("Error indexing data ");
+			LOGGER.severe("Error indexing data ");
 		}
 		return suggester;
 	}
@@ -179,18 +178,24 @@ public class SuggestionServiceImpl implements SuggestionService {
 	/**
 	 * This method opens a FSDirectory and creates a StandardAnalyzer and a Suggester which are then needed
 	 * for the data indexing and searching.
-	 * @return suggester
+	 * @throws ConfigurationException
 	 */
-	private AnalyzingInfixSuggester initializeIndex() {
-		URI indexPath = URI.create(configuration.base_path());
-		Path path = Paths.get(indexPath);
+	private AnalyzingInfixSuggester initializeIndex() throws ConfigurationException {
+		File file = null;
 		AnalyzingInfixSuggester suggester = null;
+		if(configuration.base_path().length() > 0) {
+			file = new File(configuration.base_path());
+		}
+		if(file == null) {
+			throw new ConfigurationException("base.path", "The property is required for the suggester index");
+		}
+
 		try {
-			indexDir = FSDirectory.open(path);
+			indexDir = FSDirectory.open(file.toPath());
 			StandardAnalyzer analyzer = new StandardAnalyzer();
 			suggester = new AnalyzingInfixSuggester(indexDir, analyzer);
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Something happened : ", e);
+			throw new ConfigurationException("base.path", String.format("Error opening suggestion index for the given path '%s'"));
 		} 
 		return suggester;
 	}

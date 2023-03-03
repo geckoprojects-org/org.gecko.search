@@ -104,11 +104,11 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			try {
 				url = new File(serviceConfig.base_path()).toURI().toURL();
 			} catch (MalformedURLException e) {
-				throw new ConfigurationException("base.path", "has a invlaid format ", e);
+				throw new ConfigurationException("base.path", "Base path has an invalid format ", e);
 			}
 		}
 		if(url == null) {
-			throw new ConfigurationException("base.path", "the Property is required if no gecko data dir is present");
+			throw new ConfigurationException("base.path", "The property is required");
 		}
 
 		try {
@@ -122,7 +122,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			indexFolder = new File(new File(uri), serviceConfig.id());
 		} catch (URISyntaxException | MalformedURLException e) {
 			//Can't happen. It was already checked multiple times
-			throw new RuntimeException("should not happen, but it did...", e);
+			throw new RuntimeException("This should not happen, but it did...", e);
 		}
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -239,11 +239,10 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			throw new IllegalStateException("Could not handle " + context.getActionType().name(), e);
 		}
 		if(commit) {
-			System.out.println("commit handle context");
+			LOGGER.log(Level.FINE, ()->String.format("Handle commit from internalHandleContext"));
 			commit();
 		} else {
-
-			System.out.println("no commit @ handle context");
+			LOGGER.log(Level.FINE, ()->String.format("Handle NO commit from internalHandleContext"));
 		}
 	}
 
