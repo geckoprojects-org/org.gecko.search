@@ -16,5 +16,6 @@ Import-Package: sun.misc;resolution:=optional,\
 -includeresource: \
 	@${repo;org.apache.lucene:lucene-analysis-common;${lucene-version}}!/META-INF/services/*,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-analysis-common:jar:sources;${lucene-version};EXACT},\
+	@${repo;org.apache.lucene:lucene-core;${lucene-version}}!/META-INF/*.txt,\
 	@${repo;org.apache.lucene:lucene-core;${lucene-version}}!/META-INF/services/*,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-core:jar:sources;${lucene-version};EXACT}

@@ -5,7 +5,8 @@
 
 Bundle-Version: ${lucene-version}.SNAPSHOT
 
-Export-Package: *
+Export-Package: org.apache.lucene.*
 
 -includeresource: \
+	@${repo;org.apache.lucene:lucene-grouping;${lucene-version}}!/META-INF/*.txt,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-grouping:jar:sources;${lucene-version};EXACT}

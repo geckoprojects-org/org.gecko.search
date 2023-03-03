@@ -4,7 +4,8 @@
 
 Bundle-Version: ${lucene-version}.SNAPSHOT
 
-Export-Package: *
+Export-Package: org.apache.lucene.*
 
 -includeresource: ,\
+	@${repo;org.apache.lucene:lucene-queryparser;${lucene-version}}!/META-INF/*.txt,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-queryparser:jar:sources;${lucene-version};EXACT}

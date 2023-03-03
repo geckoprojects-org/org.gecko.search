@@ -9,4 +9,5 @@ Export-Package:\
 	
 -includeresource: \
 	@${repo;org.apache.lucene:lucene-codecs;${lucene-version}}!/META-INF/services/*,\
+	@${repo;org.apache.lucene:lucene-codecs;${lucene-version}}!/META-INF/*.txt,\
 	OSGI-OPT/src=@${repo;org.apache.lucene:lucene-codecs:jar:sources;${lucene-version};EXACT}
