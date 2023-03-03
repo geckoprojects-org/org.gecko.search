@@ -13,7 +13,3 @@
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: org.gecko.search.document.test
-
-Bundle-Copyright: Data In Motion Consulting GmbH
-Bundle-License: Eclipse Public License v1.0
-Bundle-Vendor: Data In Motion Consulting GmbH

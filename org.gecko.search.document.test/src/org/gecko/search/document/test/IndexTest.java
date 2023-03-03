@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.document.Document;
@@ -42,9 +41,13 @@ import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.DocumentIndexContextObjectImpl;
 import org.gecko.search.document.LuceneIndexService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.test.common.annotation.InjectBundleContext;
 import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.annotation.Property;
 import org.osgi.test.common.annotation.config.WithFactoryConfiguration;
@@ -52,13 +55,25 @@ import org.osgi.test.common.service.ServiceAware;
 import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
-import org.osgi.util.promise.PromiseFactory;
 
 @Testable
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(ServiceExtension.class)
 @ExtendWith(ConfigurationExtension.class)
 public class IndexTest {
+	
+	private BundleContext ctx;
+
+	@BeforeEach
+	public void doBeforeEach(@InjectBundleContext BundleContext ctx) {
+		this.ctx = ctx;
+	}
+
+	@AfterEach() 
+	public void doAfterEach() {
+		File tempFolder = new File("/tmp/indexTest/");
+		delete(tempFolder);
+	}
 
 	@Test
 	@WithFactoryConfiguration(
@@ -68,10 +83,9 @@ public class IndexTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "MMAP"),
-					@Property(key = "base.path", value = "file:/tmp/indexTest/")
+					@Property(key = "base.path", value = "/tmp/indexTest/")
 			})
-	public void basicTest(@InjectService() ServiceAware<LuceneIndexService> indexAware,
-			@InjectService() ServiceAware<IndexSearcher> searchAware) throws InterruptedException, IOException {
+	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService indexService = indexAware.getService();
@@ -99,17 +113,20 @@ public class IndexTest {
 		indexService.handleContext(indexContextObjectImpl);
 		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
 		assertTrue(commitLatch.await(5, TimeUnit.SECONDS));
-		indexService.commit();
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
-		Thread.sleep(5000);
+		Thread.sleep(500);
 
-		assertThat(searchAware).isNotNull();			
-		IndexSearcher searcher = searchAware.getService();
+		assertThat(searcherAware).isNotNull();
+		ServiceObjects<IndexSearcher> searcherSO = ctx.getServiceObjects(searcherAware.getServiceReference());
+		assertThat(searcherSO).isNotNull();
+		IndexSearcher searcher = searcherSO.getService();
 		assertThat(searcher).isNotNull();		
 
 		TopDocs topDocs = searcher.search(new TermQuery(new Term("test", "test")), 1000);
 		assertNotNull(topDocs);
 		assertEquals(1, topDocs.scoreDocs.length);
+		
+		searcherSO.ungetService(searcher);
 	}
 
 	@Test
@@ -120,10 +137,10 @@ public class IndexTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "MMAP"),
-					@Property(key = "base.path", value =  "file:/tmp/indexTest/")
+					@Property(key = "base.path", value =  "/tmp/indexTest/")
 			})
 	public void basicTestWithGeckoDataDir(@InjectService() ServiceAware<LuceneIndexService> indexAware,
-			@InjectService() ServiceAware<IndexSearcher> searchAware) throws InterruptedException, IOException {
+			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService indexService = indexAware.getService();
@@ -156,14 +173,17 @@ public class IndexTest {
 
 		Thread.sleep(100);
 
-		assertThat(searchAware).isNotNull();			
-		IndexSearcher searcher = searchAware.getService();
+		assertThat(searcherAware).isNotNull();
+		ServiceObjects<IndexSearcher> searcherSO = ctx.getServiceObjects(searcherAware.getServiceReference());
+		assertThat(searcherSO).isNotNull();
+		IndexSearcher searcher = searcherSO.getService();
 		assertThat(searcher).isNotNull();		
 
 		TopDocs topDocs = searcher.search(new TermQuery(new Term("test", "test")), 1000);
 		assertNotNull(topDocs);
 		assertEquals(1, topDocs.scoreDocs.length);
 
+		searcherSO.ungetService(searcher);
 	}
 
 	@Test
@@ -174,10 +194,10 @@ public class IndexTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "MMAP"),
-					@Property(key = "base.path", value =  "file:/tmp/indexTest/")
+					@Property(key = "base.path", value =  "/tmp/indexTest/")
 			})
 	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,
-			@InjectService() ServiceAware<IndexSearcher> searchAware) throws InterruptedException, IOException {
+			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService indexService = indexAware.getService();
@@ -217,14 +237,17 @@ public class IndexTest {
 
 		Thread.sleep(5000);
 
-		assertThat(searchAware).isNotNull();			
-		IndexSearcher searcher = searchAware.getService();
-		assertThat(searcher).isNotNull();		
+		assertThat(searcherAware).isNotNull();
+		ServiceObjects<IndexSearcher> searcherSO = ctx.getServiceObjects(searcherAware.getServiceReference());
+		assertThat(searcherSO).isNotNull();
+		IndexSearcher searcher = searcherSO.getService();
+		assertThat(searcher).isNotNull();
 
 		TopDocs topDocs = searcher.search(new TermQuery(new Term("test", "test")), 100000);
 		assertNotNull(topDocs);
 		assertEquals(limit, topDocs.scoreDocs.length);
-
+		
+		searcherSO.ungetService(searcher);
 	}
 
 	private Document createTestDocument(int i) {
@@ -233,12 +256,6 @@ public class IndexTest {
 		d.add(new IntPoint("id", i));
 		d.add(new StringField("test", "test", Store.YES));
 		return d;
-	}
-
-	@AfterEach() 
-	public void doAfterEach() {
-		File tempFolder = new File("/tmp/indexTest/");
-		delete(tempFolder);
 	}
 
 	private void delete(File file) {

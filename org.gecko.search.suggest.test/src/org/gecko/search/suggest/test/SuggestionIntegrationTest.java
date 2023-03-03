@@ -78,7 +78,7 @@ public class SuggestionIntegrationTest {
 			location = "?", 
 			name = "suggService",
 			properties = {
-					@Property(key = "base.path", value = "file:/tmp/suggestIdx"),
+					@Property(key = "base.path", value = "/tmp/suggestIdx"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})

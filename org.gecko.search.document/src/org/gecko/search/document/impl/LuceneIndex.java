@@ -65,24 +65,24 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  */
 @Component(name = "LuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, LuceneIndexService{
-	
+
 	@Reference(name="analyzer", target="(type=standard)")
 	private Analyzer analyzer = null;;
-	
+
 	private Directory directory;
 
 	private IndexWriter indexWriter;
-	
+
 	SearcherManager searcherManager;
-	
+
 	private PushStreamProvider psp = new PushStreamProvider();
-	
-	private static final Logger logger = Logger.getLogger(LuceneIndex.class.getName());
+
+	private static final Logger LOGGER = Logger.getLogger(LuceneIndex.class.getName());
 	private final ExecutorService commitExecutors = Executors.newCachedThreadPool();
 	private ExecutorService indexExecutors = null;
 
 	private ServiceRegistration<IndexSearcher> searcherRegistration;
-	
+
 	SimplePushEventSource<DocumentIndexContextObject> singleSource;
 
 	private File indexFolder;
@@ -96,7 +96,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		long windowSize() default 500;
 		int indexThreads() default 5;
 	}	
-	
+
 	@Activate
 	public void activate(Config serviceConfig, ComponentContext context) throws ConfigurationException {
 		URL url = null;
@@ -110,32 +110,32 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		if(url == null) {
 			throw new ConfigurationException("base.path", "the Property is required if no gecko data dir is present");
 		}
-		
-		try {
-			 URI uri = url.toURI();
 
-	        if(uri.getAuthority() != null && uri.getAuthority().length() > 0) {
-	            // Hack for UNC Path
-	            uri = (new URL("file://" + url.toString().substring("file:".length()))).toURI();
-	        }
+		try {
+			URI uri = url.toURI();
+
+			if(uri.getAuthority() != null && uri.getAuthority().length() > 0) {
+				// Hack for UNC Path
+				uri = (new URL("file://" + url.toString().substring("file:".length()))).toURI();
+			}
 
 			indexFolder = new File(new File(uri), serviceConfig.id());
 		} catch (URISyntaxException | MalformedURLException e) {
 			//Can't happen. It was already checked multiple times
 			throw new RuntimeException("should not happen, but it did...", e);
 		}
-		
+
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		try {
 			switch(serviceConfig.directory_type()) {
-				case "FS":
-					directory = FSDirectory.open(indexFolder.toPath());
-				case "NIOFS":
-					directory = new NIOFSDirectory(indexFolder.toPath());
-				case "MMap":
-				default:
-					directory = MMapDirectory.open(indexFolder.toPath());
-					break;
+			case "FS":
+				directory = FSDirectory.open(indexFolder.toPath());
+			case "NIOFS":
+				directory = new NIOFSDirectory(indexFolder.toPath());
+			case "MMap":
+			default:
+				directory = MMapDirectory.open(indexFolder.toPath());
+				break;
 			}
 			indexWriter = new IndexWriter(directory, config);
 			indexWriter.commit();
@@ -145,12 +145,12 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 		}
 		indexExecutors = Executors.newScheduledThreadPool(serviceConfig.indexThreads());
 		chainPushStream(serviceConfig);
-		
+
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", serviceConfig.id());
 		searcherRegistration = context.getBundleContext().registerService(IndexSearcher.class, this, properties);
 	}
-	
+
 	/**
 	 * Configures and chains the internal Pushstream according to the configuration
 	 * @param serviceConfig the services configuration
@@ -166,24 +166,36 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 				.build();
 		pspBuilder
 		.fork(serviceConfig.indexThreads(), 0, indexExecutors)
-			.buildBuffer().withBuffer(new ArrayBlockingQueue<PushEvent<? extends DocumentIndexContextObject>>(serviceConfig.batchSize() * 2)).build()
-			.adjustBackPressure(l -> 0)
-			.window(() -> Duration.ofMillis(serviceConfig.windowSize()), () -> serviceConfig.batchSize(), indexExecutors , (l,list) -> {
-				return list;
-			})
-			.filter(c -> !c.isEmpty())
-			.forEach(this::handleContextsSync);
+		.buildBuffer().withBuffer(new ArrayBlockingQueue<PushEvent<? extends DocumentIndexContextObject>>(serviceConfig.batchSize() * 2)).build()
+		.adjustBackPressure(l -> 0)
+		.window(() -> Duration.ofMillis(serviceConfig.windowSize()), () -> serviceConfig.batchSize(), indexExecutors , (l,list) -> {
+			return list;
+		})
+		.filter(c -> !c.isEmpty())
+		.forEach(this::handleContextsSync);
 	}
-	
+
 	@Deactivate
-	public void deactivate() throws IOException {
+	public void deactivate() {
 		singleSource.close();
 		searcherRegistration.unregister();
-		searcherManager.close();
-		indexWriter.close();
-		directory.close();
+		try {
+			searcherManager.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e, ()->"Failed to close searcher manager");
+		}
+		try {
+			indexWriter.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e, ()->"Failed to close index writer");
+		}
+		try {
+			directory.close();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e, ()->"Failed to close index directory");
+		}
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#handleContext(org.gecko.search.document.DocumentIndexContextObject)
@@ -201,7 +213,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	public void handleContextSync(DocumentIndexContextObject context) {
 		internalHandleContext(context, true);
 	}
-	
+
 	/**
 	 * performes the actual action on the index.
 	 * @param context
@@ -210,31 +222,31 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	public void internalHandleContext(DocumentIndexContextObject context, boolean commit) {
 		try {
 			switch (context.getActionType()) {
-				case ADD:
-					indexWriter.addDocuments(context.getDocuments());
-					break;
-				case MODIFY:
-					indexWriter.updateDocuments(context.getIdentifyingTerm(), context.getDocuments());
-					break;
-				case REMOVE:
-					indexWriter.deleteDocuments(context.getIdentifyingTerm());
-					break;
-				default:
-					throw new UnsupportedOperationException("SEARCH is currerntly not supported");
+			case ADD:
+				indexWriter.addDocuments(context.getDocuments());
+				break;
+			case MODIFY:
+				indexWriter.updateDocuments(context.getIdentifyingTerm(), context.getDocuments());
+				break;
+			case REMOVE:
+				indexWriter.deleteDocuments(context.getIdentifyingTerm());
+				break;
+			default:
+				throw new UnsupportedOperationException("SEARCH is currerntly not supported");
 			}
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage(), e));
+			LOGGER.log(Level.SEVERE, String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage(), e));
 			throw new IllegalStateException("Could not handle " + context.getActionType().name(), e);
 		}
 		if(commit) {
 			System.out.println("commit handle context");
 			commit();
 		} else {
-			
+
 			System.out.println("no commit @ handle context");
 		}
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#handleContexts(java.util.Collection)
@@ -252,15 +264,15 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	public void handleContextsSync(Collection<? extends DocumentIndexContextObject> contexts) {
 		internalHandleContexts(contexts, true);
 	}
-	
+
 	public void internalHandleContexts(Collection<? extends DocumentIndexContextObject> contexts, boolean commit) {
-		contexts.forEach(partial(this::internalHandleContext, commit));
+		contexts.forEach(partial(this::internalHandleContext, false));
 		if(commit) {
 			try {
 				commit();
 				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> {
-						commitExecutors.submit(() -> callback.commited(ctx));
-					}));
+					commitExecutors.submit(() -> callback.commited(ctx));
+				}));
 			} catch (Throwable t) {
 				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> {
 					commitExecutors.submit(() -> callback.error(ctx, t));
@@ -268,11 +280,11 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			}
 		}
 	}
-	
-	public static  Consumer<DocumentIndexContextObject> partial(BiConsumer<DocumentIndexContextObject, Boolean> f, boolean commit) {
-        return (c) -> f.accept(c, commit);
-    }
-	
+
+	public static Consumer<DocumentIndexContextObject> partial(BiConsumer<DocumentIndexContextObject, Boolean> f, boolean commit) {
+		return (c) -> f.accept(c, commit);
+	}
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#getIndexWriter()
@@ -281,7 +293,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	public IndexWriter getIndexWriter() {
 		return indexWriter;
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#aquireSearch()
@@ -294,7 +306,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			throw new IllegalStateException("Could not aquire searcher", e);
 		}
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#releaseSearcher(org.apache.lucene.search.IndexSearcher)
@@ -307,7 +319,7 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 			throw new IllegalStateException("Could not release searcher", e);
 		}
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.document.LuceneIndexService#commit()
@@ -328,16 +340,16 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 					try {
 						if(searcherManager != null){
 							if (!searcherManager.maybeRefresh()) {
-								logger.log(Level.SEVERE, "Refreshing did not work, because it was called from a wrong thread");
+								LOGGER.log(Level.SEVERE, "Refreshing did not work, because it was called from a wrong thread");
 							}
 						}
 					} catch (IOException e) {
-						logger.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage(), e));
+						LOGGER.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage(), e));
 					} 
 				}
 			});
 		}
-		
+
 	}
 
 	/* 
@@ -357,5 +369,5 @@ public class LuceneIndex implements PrototypeServiceFactory<IndexSearcher>, Luce
 	public void ungetService(Bundle bundle, ServiceRegistration<IndexSearcher> registration, IndexSearcher service) {
 		releaseSearcher(service);
 	}
-	
+
 }
