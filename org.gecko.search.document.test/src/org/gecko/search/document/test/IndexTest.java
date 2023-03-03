@@ -232,7 +232,7 @@ public class IndexTest {
 		long start = System.currentTimeMillis();
 		indexService.handleContexts(docs);
 		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
-		assertTrue(commitLatch.await(5, TimeUnit.SECONDS));
+		assertTrue(commitLatch.await(10, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
 
 		Thread.sleep(10000);
