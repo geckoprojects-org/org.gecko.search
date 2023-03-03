@@ -9,7 +9,7 @@ github-project: org.gecko.search
 base-version: 1.1.0.SNAPSHOT
 
 # Maven Central Group-Id
--groupid: org.gecko.search
+-groupid: org.geckoprojects.search
 
 -fixupmessages: \
 	"No metadata for revision";\
