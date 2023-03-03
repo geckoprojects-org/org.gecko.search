@@ -37,7 +37,6 @@ header:
     - '**/*.aird'
     - '**/*.basic'
     - '**/.classpath'
-    - 'org.gecko.emf.osgi.codegen/src/org/gecko/emf/osgi/codegen/templates/model/*'
     - 'LICENSE'
     - 'Jenkinsfile'
     - 'NOTICE'

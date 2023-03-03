@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2012 - 2019 Data In Motion and others.
+ * Copyright (c) 2012 - 2023 Data In Motion and others.
  * All rights reserved. 
  * 
  * This program and the accompanying materials are made available under the terms of the 
- * Eclipse Public License v1.0 which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Eclipse Public License v2.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v20.html
  * 
  * Contributors:
  *     Data In Motion - initial API and implementation
@@ -16,12 +16,14 @@ import java.util.Collection;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
- * 
+ * Index service for Lucene
  * @author Juergen Albert
  * @since 30 Jan 2019
  */
+@ProviderType
 public interface LuceneIndexService {
 
 	/**
