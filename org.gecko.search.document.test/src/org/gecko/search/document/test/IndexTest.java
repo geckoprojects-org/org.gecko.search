@@ -235,7 +235,7 @@ public class IndexTest {
 		assertTrue(commitLatch.await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
 
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 
 		assertThat(searcherAware).isNotNull();
 		ServiceObjects<IndexSearcher> searcherSO = ctx.getServiceObjects(searcherAware.getServiceReference());
