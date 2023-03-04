@@ -19,6 +19,8 @@ header:
   paths-ignore:
     - 'dist'
     - 'licenses'
+    - '**/*.mvn'
+    - '**/*.MF'
     - '**/package-info.java'
     - '**/packageinfo'
     - '**/module-info.java'
@@ -43,8 +45,7 @@ header:
     - '**/*.aird'
     - '**/*.basic'
     - '**/.classpath'
-    - 'org.gecko.emf.osgi.codegen/src/org/gecko/emf/osgi/codegen/templates/model/*'
-    - 'org.gecko.emf.osgi.extender/src/org/gecko/emf/osgi/extender/**'
+    - 'org.apache.lucene.*/*'
     - 'LICENSE'
     - 'Jenkinsfile'
     - 'NOTICE'
