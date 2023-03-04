@@ -19,7 +19,7 @@ sonarqube {
     property "sonar.organization", "geckoprojects-org"
     property "sonar.host.url", "https://sonarcloud.io"
     property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"
-    //property "sonar.exclusions", "org.gecko.project/**/*.java, org.gecko.other.project/**/*.java"
+    property "sonar.exclusions", "org.apache.lucene.codecs/**/*.java, org.apache.lucene.core/**/*.java, org.apache.lucene.facet/**/*.java, org.apache.lucene.grouping/**/*.java, org.apache.lucene.memory/**/*.java, org.apache.lucene.queries/**/*.java, org.apache.lucene.queryparser/**/*.java, org.apache.lucene.suggest/**/*.java, org.gecko.search.suggest.test/**/templates/model/*.java, org.gecko.search.document.test/**/*.java"
   }
 }
 
