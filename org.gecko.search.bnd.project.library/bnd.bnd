@@ -1,0 +1,27 @@
+icondata: data:image/gif;base64,${base64;icon.gif}
+category: ccc/Gecko OSGi Standard Templates
+
+dataurl: data:image/gif;base64
+gecko-icon: ${dataurl},${base64;icons/gecko.ico}
+
+project-template-search:\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Search Example;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/search;\
+		icon="${gecko-icon}";\
+		help=search.xml;\
+		engine=mustache
+				
+gecko-project:\
+    bnd.library;\
+        bnd.library     		= enableGeckoSearch; \
+        path            		= library
+
+Provide-Capability: \
+	${gecko-project},\
+	${project-template-search}
+
+-resourceonly: true
+-includeresource: resources
