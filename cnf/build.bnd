@@ -43,4 +43,14 @@ lucene-version: 9.5.0
 		name = Temp; \
 		pretty = true; \
 		local = ${build}/cache/temp
+		
+jacoco.version: 0.8.8
+
+## Runpath and vm args
+-runpath.jacoco:\
+	org.jacoco.agent,\
+	org.jacoco.ant,\
+	org.jacoco:org.jacoco.agent:jar:runtime
+
+-runvm.coverage: -javaagent:${repo;org.jacoco:org.jacoco.agent:jar:runtime;${jacoco.version}}=destfile=${target-dir}/jacoco.exec
 

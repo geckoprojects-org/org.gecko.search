@@ -1,5 +1,5 @@
 plugins {
-  id "org.sonarqube" version "3.1.1"
+  id "org.sonarqube" version "4.0.0.2929"
   id 'jacoco'
   id 'java'
 }
@@ -40,6 +40,6 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-tasks.named("sonarqube") {
+tasks.named("sonar") {
     dependsOn(codeCoverageReport)
 }// Available to customize the build
