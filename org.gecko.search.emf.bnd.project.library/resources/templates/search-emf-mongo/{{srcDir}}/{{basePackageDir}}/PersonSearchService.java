@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import {{basePackageName}}.pojo.Person;
-import {{basePackageName}}.helper.PersonIndexHelper;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -34,8 +31,14 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import {{basePackageName}}.helper.PersonIndexHelper;
+import org.gecko.emf.osgi.example.model.basic.Person;
 import org.gecko.search.document.LuceneIndexService;
+import org.gecko.search.util.DocumentUtil;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 
 /**
  * This is a sample Search Service to retrieve the objects from the index
@@ -47,8 +50,12 @@ public class PersonSearchService {
 	
 	@Reference(target = "(id=test)")
 	private LuceneIndexService personIndex;
+	
+	@Reference
+	private ResourceSet resourceSet;
 
-	public List<Document> searchPersonsByFirstName(String firstName, boolean exactMatch) {
+
+	public List<Person> searchPersonsByFirstName(String firstName, boolean exactMatch) {
 		Objects.requireNonNull(firstName, "Cannot search Person by null firstName!");
 		Query query;
 		if(exactMatch) {
@@ -63,7 +70,7 @@ public class PersonSearchService {
 	}
 
 
-	public List<Document> searchPersonsByLastName(String lastName, boolean exactMatch) {
+	public List<Person> searchPersonsByLastName(String lastName, boolean exactMatch) {
 		Objects.requireNonNull(lastName, "Cannot search Person by null lastName!");
 		Query query;
 		if(exactMatch) {
@@ -77,10 +84,9 @@ public class PersonSearchService {
 		return executeTermSearch(query);
 	}
 	
-	private List<Document> executeTermSearch(Query query) {
+	private List<Person> executeTermSearch(Query query) {
 
-		IndexSearcher searcher = personIndex.aquireSearch();
-		
+		IndexSearcher searcher = personIndex.aquireSearch();		
 		try {
 			TopDocs topDocs = searcher.search(query, Integer.MAX_VALUE);
 			if (topDocs.scoreDocs.length == 0) {
@@ -95,7 +101,9 @@ public class PersonSearchService {
 				} catch (IOException e) {
 					return null;
 				}
-			}).filter(d -> d != null).collect(Collectors.toList());
+			}).filter(d -> d != null).map(d -> {
+				return (Person) DocumentUtil.toEObject(d, resourceSet);
+			}).collect(Collectors.toList());
 		} catch (Exception e) {
 			System.err.println("Exception while search for Person with query " + query);
 			e.printStackTrace();

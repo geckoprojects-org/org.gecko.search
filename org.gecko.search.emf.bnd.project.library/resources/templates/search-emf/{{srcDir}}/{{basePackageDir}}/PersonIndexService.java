@@ -13,34 +13,38 @@
  */
 package {{basePackageName}};
 
+import org.gecko.emf.osgi.ResourceSetFactory;
+import org.gecko.emf.osgi.example.model.basic.Person;
+import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.search.api.IndexActionType;
 import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.LuceneIndexService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ServiceScope;
 
 import {{basePackageName}}.helper.PersonIndexHelper;
-import {{basePackageName}}.pojo.Person;
-
 
 /**
- * This is a sample Index Service to index objects.
+ * This is a sample Index Service to index EObjects. It references to an EMF model, which is the model from which the 
+ * objects to be indexed come from.
  * 
  * @author ilenia
  * @since Feb 20, 2023
  */
-@Component(name = "PersonIndexService", service = PersonIndexService.class, scope = ServiceScope.SINGLETON)
+@Component(name = "PersonIndexService", service = PersonIndexService.class, 
+		scope = ServiceScope.SINGLETON, reference = {
+		@Reference(name = "modelCondition", service = ResourceSetFactory.class, target = "(emf.model.name=basic)", cardinality = ReferenceCardinality.MANDATORY)
+})
 public class PersonIndexService {
 
 	@Reference(target = "(id=test)")
 	private LuceneIndexService personIndex;
 	
-	private PromiseFactory factory = new PromiseFactory(Executors.newFixedThreadPool(4));
-	
-	private AtomicInteger counter = new AtomicInteger(0);
-	
-	
+	@Reference
+	BasicPackage personPackage;
+
 	public void indexPerson(Person person, boolean isFirstSave) {
 		if(isFirstSave) {
 			indexPerson(person, IndexActionType.ADD);
@@ -48,8 +52,8 @@ public class PersonIndexService {
 		else {
 			indexPerson(person, IndexActionType.MODIFY);
 		}	
+		
 	}
-
 
 	public void deletePerson(Person person) {
 		indexPerson(person, IndexActionType.REMOVE);		
@@ -71,5 +75,4 @@ public class PersonIndexService {
 		personIndex.handleContextSync(context);
 	}
 	
-
 }

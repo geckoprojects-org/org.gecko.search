@@ -19,7 +19,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
-import {{basePackageName}}.pojo.Person;
+import org.gecko.emf.osgi.example.model.basic.Person;
 import org.gecko.search.api.IndexActionType;
 import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.DocumentIndexContextObjectImpl;
@@ -38,7 +38,6 @@ public class PersonIndexHelper {
 	public static final String PERSON_LAST_NAME_LOWER = "person_last_name_lower";
 	public static final String PERSON_FIRST_NAME = "person_first_name";
 	public static final String PERSON_LAST_NAME = "person_last_name";
-	public static final String PERSON_AGE = "person_age";
 
 	
 	public static DocumentIndexContextObject mapPersonNew(Person person) {		
@@ -57,18 +56,18 @@ public class PersonIndexHelper {
 			Deferred<Boolean> deferred) {
 		
 		Document doc = new Document();
+		DocumentUtil.toDocument(doc, person);
 		
 		doc.add(new StringField(PERSON_ID, person.getId(), Store.YES));
 
 		if(person.getFirstName() != null) {
 			doc.add(new StringField(PERSON_FIRST_NAME_LOWER, person.getFirstName().toLowerCase(), Store.NO));
-			doc.add(new StringField(PERSON_FIRST_NAME, person.getFirstName(), Store.YES));
+			doc.add(new StringField(PERSON_FIRST_NAME, person.getFirstName(), Store.NO));
 		}
 		if(person.getLastName() != null) {
 			doc.add(new StringField(PERSON_LAST_NAME_LOWER, person.getLastName().toLowerCase(), Store.NO));
-			doc.add(new StringField(PERSON_LAST_NAME, person.getLastName(), Store.YES));
+			doc.add(new StringField(PERSON_LAST_NAME, person.getLastName(), Store.NO));
 		}
-		doc.add(new IntField(PERSON_AGE, person.getAge(), Store.YES));
 
 		DocumentIndexContextObjectImpl.Builder builder = DocumentIndexContextObjectImpl.builder()
 				.withDocuments(Collections.singletonList(doc)).withSourceObject(person)

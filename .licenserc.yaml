@@ -30,6 +30,7 @@ header:
     - '**/*.setup'
     - '**/*.bndrun'
     - '**/*.xml'
+    - '**/*.json'
     - '**/*.ecore'
     - '**/*.genmodel'
     - '**/*.md'

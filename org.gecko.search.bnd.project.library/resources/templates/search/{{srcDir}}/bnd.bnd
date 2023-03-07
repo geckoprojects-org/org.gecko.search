@@ -12,6 +12,9 @@ Private-Package: \
 Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
 
 -buildpath: \
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest,\
 	org.osgi.service.component,\
 	org.gecko.search,\
 	org.gecko.search.util,\

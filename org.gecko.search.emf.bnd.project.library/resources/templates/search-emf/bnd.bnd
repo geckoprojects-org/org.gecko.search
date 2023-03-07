@@ -1,11 +1,11 @@
 -library: \
-	enableGeckoSearch
+	enableGeckoSearch,\
+	enable-emf
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: \
 	{{basePackageName}},\
-	{{basePackageName}}.helper,\
-	{{basePackageName}}.pojo
+	{{basePackageName}}.helper
 
 -includeresource: \
 	OSGI-INF/configurator/=configs/
@@ -15,5 +15,6 @@ Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
 	org.osgi.service.component,\
 	org.gecko.search,\
 	org.gecko.search.util,\
+	org.gecko.emf.osgi.example.model.basic,\
 	org.gecko.search.document.api,\
 	org.apache.lucene.core;version=latest
