@@ -24,12 +24,12 @@ public interface CommitCallback {
 	 * Called on commit
 	 * @param ctx the context object
 	 */
-	public void commited(DocumentIndexContextObject ctx);
+	public void commited(DocumentIndexContextObject<?> ctx);
 
 	/**
 	 * Called on errors
 	 * @param ctx the context object
 	 * @param t the error
 	 */
-	public void error(DocumentIndexContextObject ctx, Throwable t);
+	public void error(DocumentIndexContextObject<?> ctx, Throwable t);
 }

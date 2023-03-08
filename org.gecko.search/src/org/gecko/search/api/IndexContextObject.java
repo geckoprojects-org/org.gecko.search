@@ -15,14 +15,13 @@ package org.gecko.search.api;
 
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
-
 /**
  * A basic index context object.
+ * @param <T> the object type
  * @author Mark Hoffmann
- * @since 29.11.2018
+ * @since 08.03.2023
  */
-public interface IndexContextObject {
+public interface IndexContextObject<T> {
 	
 	/**
 	 * Returns the action type that is published over the stream
@@ -37,9 +36,9 @@ public interface IndexContextObject {
 	public Map<String, Object> getProperties();
 	
 	/**
-	 * Returns the original {@link EObject}.
-	 * @return the original {@link EObject}.
+	 * Returns the original business object.
+	 * @return the original business object.
 	 */
-	public EObject getObject();
+	public T getObject();
 
 }

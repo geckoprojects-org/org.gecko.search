@@ -30,10 +30,10 @@ import org.gecko.search.suggest.api.SuggestionContext;
  */
 public class ContextIteratorImpl implements InputIterator
 	{
-	    private Iterator<SuggestionContext> deviceIterator;
-	    private SuggestionContext currentContext;
+	    private Iterator<SuggestionContext<?>> deviceIterator;
+	    private SuggestionContext<?> currentContext;
 
-	    public ContextIteratorImpl(Iterator<SuggestionContext> deviceIterator) {
+	    public ContextIteratorImpl(Iterator<SuggestionContext<?>> deviceIterator) {
 	        this.deviceIterator = deviceIterator;
 	    }
 	    

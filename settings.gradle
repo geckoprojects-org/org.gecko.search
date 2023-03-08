@@ -13,6 +13,7 @@ pluginManagement {
     }
     mavenCentral()
     gradlePluginPortal()
+    rootProject.name="org.gecko.search"
   }
 }
 plugins {

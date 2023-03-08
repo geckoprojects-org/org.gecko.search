@@ -58,7 +58,7 @@ public class SuggestionPushStreamServiceImpl implements SuggestionService {
 
 	private static final Logger logger = Logger.getLogger(SuggestionPushStreamServiceImpl.class.getName());
 	@Reference(target="(" + PROP_SUGGESTION_INDEX + "=true)")
-	private PushStream<SuggestionContext> contextStream;
+	private PushStream<SuggestionContext<?>> contextStream;
 
 	private Promise<AnalyzingInfixSuggester> suggesterPromise;
 	private FSDirectory indexDir;

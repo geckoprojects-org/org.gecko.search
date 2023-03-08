@@ -15,6 +15,8 @@ on:
 
 env:
   LC_ALL: en_US.UTF-8
+  GRADLE_OPTS: >-
+    -Dorg.gradle.parallel=true
 
 defaults:
   run:
@@ -24,7 +26,7 @@ jobs:
   Build_Matrix:
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, windows-latest ]
         java: [ 11, 17 ]
         runner: [ 'xvfb-run --auto-servernum {0}' ]
     name: JDK${{ matrix.java }} ${{ matrix.os }}
@@ -38,16 +40,14 @@ jobs:
       uses: actions/setup-java@v3
       with:
         distribution: "temurin"
-        java-version: ${{ matrix.java }}
         cache: "gradle"
+        java-version: ${{ matrix.java }}
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
     - name: Gradle version
       run: ./gradlew --no-daemon --version
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: build
+    - name: Build with Gradle
+      run: ./gradlew build
     - name: Upload Test Reports
       if: ${{ always() && ((steps.build.outcome == 'success') || (steps.build.outcome == 'failure')) }}
       uses: actions/upload-artifact@v3

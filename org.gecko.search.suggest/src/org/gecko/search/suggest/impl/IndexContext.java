@@ -27,12 +27,12 @@ import org.gecko.search.suggest.api.SuggestionContext;
  */
 public class IndexContext {
 
-	private final SuggestionContext context;
+	private final SuggestionContext<?> context;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public IndexContext(SuggestionContext context) {
+	public IndexContext(SuggestionContext<?> context) {
 		this.context = context;
 	}
 	
@@ -40,7 +40,7 @@ public class IndexContext {
 	 * Returns the original context
 	 * @return the original context
 	 */
-	public SuggestionContext getContext() {
+	public SuggestionContext <?>getContext() {
 		return context;
 	}
 

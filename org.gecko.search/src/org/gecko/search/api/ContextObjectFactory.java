@@ -16,32 +16,33 @@ package org.gecko.search.api;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
- * Factory that creates {@link IndexContextObject} instances out of the {@link EObject}. It can be possible
+ * Factory that creates {@link IndexContextObject} instances out of the business object. It can be possible
  * that many context objects arise from one {@link EObject}. Therefore all factory methods return a collection.
+ * @param <O> the business object type
+ * @param <T> the {@link IndexContextObject}
  * @author Mark Hoffmann
- * @since 08.12.2018
+ * @since 08.03.2023
  */
 @ProviderType
-public interface ContextObjectFactory<T extends IndexContextObject> {
+public interface ContextObjectFactory<O, T extends IndexContextObject<?>> {
 	
 	/**
 	 * Creates a single index context object
-	 * @param object the {@link EObject} to create the context object from
+	 * @param object the business objects to create the context object from
 	 * @param properties additional properties, can be <code>null</code>
 	 * @return the {@link IndexContextObject} collection for the object
 	 */
-	public Collection<T> createObject(EObject object, Map<String, Object> properties);
+	public Collection<T> createObject(O object, Map<String, Object> properties);
 	
 	/**
 	 * Creates a collection of index context objects
-	 * @param objects the {@link EObject}s to create the context objects from
+	 * @param objects the business objects to create the context objects from
 	 * @param properties additional properties, can be <code>null</code>
 	 * @return the {@link IndexContextObject} collections for the objects
 	 */
-	public Collection<T> createObjects(Collection<EObject> objects, Map<String, Object> properties);
+	public Collection<T> createObjects(Collection<O> objects, Map<String, Object> properties);
 
 }

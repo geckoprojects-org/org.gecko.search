@@ -39,7 +39,7 @@ public class DeferredCommitCallback implements CommitCallback {
 	 * @see org.gecko.search.document.CommitCallback#commited(org.gecko.search.document.DocumentIndexContextObject)
 	 */
 	@Override
-	public void commited(DocumentIndexContextObject ctx) {
+	public void commited(DocumentIndexContextObject<?> ctx) {
 		deferred.resolve(true);
 	}
 
@@ -48,7 +48,7 @@ public class DeferredCommitCallback implements CommitCallback {
 	 * @see org.gecko.search.document.CommitCallback#error(org.gecko.search.document.DocumentIndexContextObject, java.lang.Throwable)
 	 */
 	@Override
-	public void error(DocumentIndexContextObject ctx, Throwable t) {
+	public void error(DocumentIndexContextObject <?>ctx, Throwable t) {
 		deferred.fail(t);
 	}
 

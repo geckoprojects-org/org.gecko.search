@@ -11,17 +11,6 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.api;
-
-import org.gecko.search.api.ContextObjectFactory;
-import org.osgi.annotation.versioning.ProviderType;
-
-/**
- * 
- * @author mark
- * @since 08.12.2018
- */
-@ProviderType
-public interface SuggestionContextFactory extends ContextObjectFactory<SuggestionContext> {
-
-}
+@org.osgi.annotation.versioning.Version("1.0.0")
+@org.osgi.annotation.bundle.Export
+package org.gecko.emf.search.impl;

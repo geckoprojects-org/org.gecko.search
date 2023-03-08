@@ -20,7 +20,7 @@ import org.gecko.search.api.IndexContextObject;
  * @author ilenia
  * @since Nov 9, 2018
  */
-public interface SuggestionContext extends IndexContextObject {	
+public interface SuggestionContext<T> extends IndexContextObject<T> {	
 	
 	/**
 	 * The content to be indexed

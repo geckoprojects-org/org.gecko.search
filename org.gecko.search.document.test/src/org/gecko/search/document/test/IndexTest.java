@@ -40,8 +40,9 @@ import org.apache.lucene.search.TopDocs;
 import org.gecko.search.api.IndexActionType;
 import org.gecko.search.document.CommitCallback;
 import org.gecko.search.document.DocumentIndexContextObject;
-import org.gecko.search.document.DocumentIndexContextObjectImpl;
 import org.gecko.search.document.LuceneIndexService;
+import org.gecko.search.document.ObjectContextBuilder;
+import org.gecko.search.document.ObjectContextObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +80,7 @@ public class IndexTest {
 
 	@Test
 	@WithFactoryConfiguration(
-			factoryPid = "LuceneIndex",
+			factoryPid = "DefaultLuceneIndex",
 			location = "?", 
 			name = "test",
 			properties = {
@@ -87,26 +88,26 @@ public class IndexTest {
 					@Property(key = "directory.type", value = "MMAP"),
 					@Property(key = "base.path", value = "/tmp/indexTest/")
 			})
-	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
+	public void basicTest(@InjectService ServiceAware<LuceneIndexService<ObjectContextObject>> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
-		LuceneIndexService indexService = indexAware.getService();
+		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
 		assertThat(indexService).isNotNull();			
 
 		CountDownLatch commitLatch = new CountDownLatch(1);
 
-		DocumentIndexContextObject indexContextObjectImpl = DocumentIndexContextObjectImpl.builder()
+		ObjectContextObject indexContextObjectImpl = ObjectContextBuilder.create()
 				.withDocuments(Collections.singletonList(createTestDocument(1)))
 				.withIndexActionType(IndexActionType.ADD)
 				.withCommitCallback(new CommitCallback() {
 
 					@Override
-					public void error(DocumentIndexContextObject ctx, Throwable t) {
+					public void error(DocumentIndexContextObject<?> ctx, Throwable t) {
 						fail(t.getMessage());				
 					}
 
 					@Override
-					public void commited(DocumentIndexContextObject ctx) {
+					public void commited(DocumentIndexContextObject<?> ctx) {
 						commitLatch.countDown();
 					}
 				})
@@ -141,11 +142,11 @@ public class IndexTest {
 					@Property(key = "directory.type", value = "MMAP"),
 					@Property(key = "base.path", value =  "/tmp/indexTest/")
 			})
-	public void basicTestWithGeckoDataDir(@InjectService() ServiceAware<LuceneIndexService> indexAware,
+	public void basicTestWithGeckoDataDir(@InjectService() ServiceAware<LuceneIndexService<ObjectContextObject>> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
-		LuceneIndexService indexService = indexAware.getService();
+		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
 		assertThat(indexService).isNotNull();	
 
 		indexService.getIndexWriter().deleteAll();
@@ -153,18 +154,18 @@ public class IndexTest {
 
 		CountDownLatch commitLatch = new CountDownLatch(1);
 
-		DocumentIndexContextObject indexContextObjectImpl = DocumentIndexContextObjectImpl.builder()
+		ObjectContextObject indexContextObjectImpl = ObjectContextBuilder.create()
 				.withDocuments(Collections.singletonList(createTestDocument(1)))
 				.withIndexActionType(IndexActionType.ADD)
 				.withCommitCallback(new CommitCallback() {
 
 					@Override
-					public void error(DocumentIndexContextObject ctx, Throwable t) {
+					public void error(DocumentIndexContextObject<?> ctx, Throwable t) {
 						fail(t.getMessage());						
 					}
 
 					@Override
-					public void commited(DocumentIndexContextObject ctx) {
+					public void commited(DocumentIndexContextObject<?> ctx) {
 						commitLatch.countDown();
 					}
 				})
@@ -198,32 +199,32 @@ public class IndexTest {
 					@Property(key = "directory.type", value = "MMAP"),
 					@Property(key = "base.path", value =  "/tmp/indexTest/")
 			})
-	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,
+	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService<ObjectContextObject>> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
-		LuceneIndexService indexService = indexAware.getService();
+		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
 		assertThat(indexService).isNotNull();	
 
 		int limit = 10000;
 
 		CountDownLatch commitLatch = new CountDownLatch(1000);
 
-		List<DocumentIndexContextObject> docs = new ArrayList<>();
+		List<ObjectContextObject> docs = new ArrayList<>();
 
 		for(int i = 0; i < limit; i++) {
-			DocumentIndexContextObject indexContextObjectImpl = DocumentIndexContextObjectImpl.builder()
+			ObjectContextObject indexContextObjectImpl = ObjectContextBuilder.create()
 					.withDocuments(Collections.singletonList(createTestDocument(i)))
 					.withIndexActionType(IndexActionType.ADD)
 					.withCommitCallback(new CommitCallback() {
 
 						@Override
-						public void error(DocumentIndexContextObject ctx, Throwable t) {
+						public void error(DocumentIndexContextObject<?> ctx, Throwable t) {
 							fail(t.getMessage());							
 						}
 
 						@Override
-						public void commited(DocumentIndexContextObject ctx) {
+						public void commited(DocumentIndexContextObject<?> ctx) {
 							commitLatch.countDown();
 						}
 					})

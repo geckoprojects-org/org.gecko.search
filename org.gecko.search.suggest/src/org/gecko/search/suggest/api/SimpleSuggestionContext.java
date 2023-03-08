@@ -32,7 +32,7 @@ import org.gecko.search.api.IndexActionType;
  * @author ilenia
  * @since Nov 9, 2018
  */
-public class SimpleSuggestionContext implements org.gecko.search.suggest.api.SuggestionContext{
+public class SimpleSuggestionContext implements SuggestionContext<Object>{
 	
 		private final String payload;
 		private final String content;

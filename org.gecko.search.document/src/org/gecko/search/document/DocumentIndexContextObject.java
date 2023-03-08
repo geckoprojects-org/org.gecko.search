@@ -21,10 +21,11 @@ import org.gecko.search.api.IndexContextObject;
 
 /**
  * {@link DocumentIndexContextObject} that represents one business object
- * @author jalbert
- * @since 30 Jan 2019
+ * @param <T> business object type
+ * @author Jürgen Albert, Mark Hoffmann
+ * @since 08.03.2023
  */
-public interface DocumentIndexContextObject extends IndexContextObject{
+public interface DocumentIndexContextObject<T> extends IndexContextObject<T>{
 	
 	/**
 	 * Get all Lucene {@link Document} representations for the business object (because of different languages)

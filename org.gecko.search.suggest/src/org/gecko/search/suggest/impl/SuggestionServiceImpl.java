@@ -62,7 +62,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	private SuggestionDescriptor suggestionDescriptor;
 
 	private static final Logger LOGGER = Logger.getLogger(SuggestionServiceImpl.class.getName());
-	private List<SuggestionContext> contexts;
+	private List<SuggestionContext<?>> contexts;
 	private Promise<AnalyzingInfixSuggester> suggesterPromise;
 	private FSDirectory indexDir;
 	private volatile SuggestionConfiguration configuration;
@@ -156,20 +156,20 @@ public class SuggestionServiceImpl implements SuggestionService {
 	 * data belonging to a particular category.
 	 * @return the list with contexts
 	 */
-	private List<SuggestionContext> createContext() {
+	private List<SuggestionContext<?>> createContext() {
 		Set<EStructuralFeature> fields = suggestionDescriptor.getFields();
 		List<String> labels = suggestionDescriptor.getLabels();
 		String[] labelsArray = new String[labels.size()];
 		labelsArray = labels.toArray(labelsArray);
 		List<?extends EObject> objects = suggestionDescriptor.getObjectStream();
-		List<SuggestionContext> contexts = new ArrayList<SuggestionContext>(objects.size());
+		List<SuggestionContext<?>> contexts = new ArrayList<SuggestionContext<?>>(objects.size());
 		for (EObject eo : objects) {
 			Object payloadObject = eo.eGet(suggestionDescriptor.getPayload());
 			String payload = payloadObject == null ? null : payloadObject.toString();				
 			for (EStructuralFeature feature : fields) {
 				Object value = eo.eGet(feature);
 				if (value != null) {
-					SuggestionContext ctx = new SimpleSuggestionContext(IndexActionType.ADD, payload, eo.eGet(feature).toString(), labelsArray, 4);
+					SuggestionContext<?> ctx = new SimpleSuggestionContext(IndexActionType.ADD, payload, eo.eGet(feature).toString(), labelsArray, 4);
 					contexts.add(ctx);
 				}
 			}			
@@ -208,7 +208,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 	 * @param suggester
 	 * @throws IOException
 	 */
-	private void indexData(List<SuggestionContext> contexts, AnalyzingInfixSuggester suggester) throws IOException {
+	private void indexData(List<SuggestionContext<?>> contexts, AnalyzingInfixSuggester suggester) throws IOException {
 		suggester.build(new ContextIteratorImpl(contexts.iterator()));
 	}
 

@@ -22,11 +22,12 @@ import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Index service for Lucene
- * @author Juergen Albert
- * @since 30 Jan 2019
+ * @param <T> the business object type
+ * @author Juergen Albert, Mark Hoffmann
+ * @since 08.03.2023
  */
 @ProviderType
-public interface LuceneIndexService {
+public interface LuceneIndexService<DICO extends DocumentIndexContextObject<?>> {
 
 	/**
 	 * @return the wrapped {@link IndexWriter}
@@ -54,24 +55,24 @@ public interface LuceneIndexService {
 	 * Adds the given {@link DocumentIndexContextObject} to the queue to be indexed according to the configuration
 	 * @param context
 	 */
-	void handleContext(DocumentIndexContextObject context);
+	void handleContext(DICO context);
 
 	/**
 	 * Adds the given {@link Collection} of DocumentIndexContextObject}s to the queue to be indexed according to the configuration
 	 * @param contexts
 	 */
-	void handleContexts(Collection<? extends DocumentIndexContextObject> contexts);
+	void handleContexts(Collection<DICO> contexts);
 
 	/**
 	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.
 	 * @param contexts
 	 */
-	void handleContextsSync(Collection<? extends DocumentIndexContextObject> contexts);
+	void handleContextsSync(Collection<DICO> contexts);
 
 	/**
 	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.
 	 * @param contexts
 	 */
-	void handleContextSync(DocumentIndexContextObject context);
+	void handleContextSync(DICO context);
 
 }

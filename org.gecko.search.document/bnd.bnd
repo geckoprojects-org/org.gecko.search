@@ -12,7 +12,9 @@
 	org.osgi.service.component,\
 	org.osgi.service.cm,\
 	org.osgi.util.function,\
-	org.osgi.util.promise
+	org.osgi.util.promise,\
+	org.osgi.service.metatype,\
+	org.osgi.service.metatype.annotations
 
 
 Bundle-Copyright: Data In Motion Consulting GmbH
