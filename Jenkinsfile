@@ -24,7 +24,7 @@ pipeline  {
         }
         stage('Branch snapshot') {
             when { 
-                branch 'develop'
+                branch 'snapshot'
             }
             steps  {
                 echo "I am building on ${env.JOB_NAME}"
