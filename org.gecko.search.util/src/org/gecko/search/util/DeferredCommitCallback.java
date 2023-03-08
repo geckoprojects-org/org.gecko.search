@@ -14,7 +14,7 @@
 package org.gecko.search.util;
 
 import org.gecko.search.document.CommitCallback;
-import org.gecko.search.document.DocumentIndexContextObject;
+import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.util.promise.Deferred;
 
 /**

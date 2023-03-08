@@ -18,8 +18,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.eclipse.emf.ecore.EObject;
 import org.gecko.search.api.IndexActionType;
-import org.gecko.search.document.AbstractContextObjectBuilder;
 import org.gecko.search.document.CommitCallback;
+import org.gecko.search.document.context.AbstractContextObjectBuilder;
 
 /**
  * {@link EObject} typed context object builder

@@ -16,7 +16,6 @@ package org.gecko.search.suggest.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
 import org.gecko.search.api.IndexActionType;
 
 /**
@@ -104,7 +103,7 @@ public class SimpleSuggestionContext implements SuggestionContext<Object>{
 		 * @see org.gecko.search.api.IndexContextObject#getObject()
 		 */
 		@Override
-		public EObject getObject() {
+		public Object getObject() {
 			return null;
 		}
 

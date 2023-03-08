@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.document;
+package org.gecko.search.document.index;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +45,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.gecko.search.api.IndexListener;
+import org.gecko.search.document.LuceneIndexService;
+import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceRegistration;

@@ -11,13 +11,14 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.document;
+package org.gecko.search.document.context;
 
 import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.gecko.search.api.IndexContextObject;
+import org.gecko.search.document.CommitCallback;
 
 /**
  * {@link DocumentIndexContextObject} that represents one business object

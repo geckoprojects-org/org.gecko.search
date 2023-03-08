@@ -17,9 +17,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.gecko.search.api.IndexListener;
-import org.gecko.search.document.LuceneIndexImpl;
 import org.gecko.search.document.LuceneIndexService;
-import org.gecko.search.document.ObjectContextObject;
+import org.gecko.search.document.context.ObjectContextObject;
+import org.gecko.search.document.index.LuceneIndexImpl;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;

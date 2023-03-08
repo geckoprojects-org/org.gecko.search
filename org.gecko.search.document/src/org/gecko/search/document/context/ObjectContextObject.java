@@ -9,7 +9,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.document;
+package org.gecko.search.document.context;
 
 /**
  * Marker interface to deal with objects

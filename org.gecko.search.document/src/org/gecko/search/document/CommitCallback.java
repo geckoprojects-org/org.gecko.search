@@ -13,6 +13,8 @@
  */
 package org.gecko.search.document;
 
+import org.gecko.search.document.context.DocumentIndexContextObject;
+
 /**
  * Callback to get informed about commits
  * @author jalbert

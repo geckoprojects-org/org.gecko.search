@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
+import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.annotation.versioning.ProviderType;
 
 /**

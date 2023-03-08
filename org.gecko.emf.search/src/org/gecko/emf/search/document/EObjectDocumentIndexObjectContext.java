@@ -12,7 +12,7 @@
 package org.gecko.emf.search.document;
 
 import org.eclipse.emf.ecore.EObject;
-import org.gecko.search.document.DocumentIndexContextObject;
+import org.gecko.search.document.context.DocumentIndexContextObject;
 
 /**
  * Marker interface for {@link DocumentIndexContextObject}

@@ -39,10 +39,10 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.gecko.search.api.IndexActionType;
 import org.gecko.search.document.CommitCallback;
-import org.gecko.search.document.DocumentIndexContextObject;
 import org.gecko.search.document.LuceneIndexService;
-import org.gecko.search.document.ObjectContextBuilder;
-import org.gecko.search.document.ObjectContextObject;
+import org.gecko.search.document.context.DocumentIndexContextObject;
+import org.gecko.search.document.context.ObjectContextBuilder;
+import org.gecko.search.document.context.ObjectContextObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,6 +78,7 @@ public class IndexTest {
 		delete(tempFolder);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
 	@WithFactoryConfiguration(
 			factoryPid = "DefaultLuceneIndex",
@@ -88,7 +89,7 @@ public class IndexTest {
 					@Property(key = "directory.type", value = "MMAP"),
 					@Property(key = "base.path", value = "/tmp/indexTest/")
 			})
-	public void basicTest(@InjectService ServiceAware<LuceneIndexService<ObjectContextObject>> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
+	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -132,9 +133,10 @@ public class IndexTest {
 		searcherSO.ungetService(searcher);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	@WithFactoryConfiguration(
-			factoryPid = "LuceneIndex",
+			factoryPid = "DefaultLuceneIndex",
 			location = "?", 
 			name = "test",
 			properties = {
@@ -142,7 +144,7 @@ public class IndexTest {
 					@Property(key = "directory.type", value = "MMAP"),
 					@Property(key = "base.path", value =  "/tmp/indexTest/")
 			})
-	public void basicTestWithGeckoDataDir(@InjectService() ServiceAware<LuceneIndexService<ObjectContextObject>> indexAware,
+	public void basicTestWithGeckoDataDir(@InjectService() ServiceAware<LuceneIndexService> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
@@ -189,9 +191,10 @@ public class IndexTest {
 		searcherSO.ungetService(searcher);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	@WithFactoryConfiguration(
-			factoryPid = "LuceneIndex",
+			factoryPid = "DefaultLuceneIndex",
 			location = "?", 
 			name = "test",
 			properties = {
@@ -199,7 +202,7 @@ public class IndexTest {
 					@Property(key = "directory.type", value = "MMAP"),
 					@Property(key = "base.path", value =  "/tmp/indexTest/")
 			})
-	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService<ObjectContextObject>> indexAware,
+	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,
 			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
 
 		assertThat(indexAware).isNotNull();			
@@ -235,10 +238,10 @@ public class IndexTest {
 		long start = System.currentTimeMillis();
 		indexService.handleContexts(docs);
 		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
-		assertTrue(commitLatch.await(10, TimeUnit.SECONDS));
+		assertTrue(commitLatch.await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
 
-		Thread.sleep(10000);
+		Thread.sleep(5000);
 
 		assertThat(searcherAware).isNotNull();
 		ServiceObjects<IndexSearcher> searcherSO = ctx.getServiceObjects(searcherAware.getServiceReference());
