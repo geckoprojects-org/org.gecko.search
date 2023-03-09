@@ -1,5 +1,3 @@
--library: enable-emf
-
 -buildpath: \
 	org.osgi.util.pushstream;version=latest,\
 	org.osgi.util.promise;version=latest,\
@@ -10,7 +8,14 @@
 	org.apache.lucene.suggest;version=snapshot,\
 	org.gecko.search;version=snapshot
 
--sub: *.bnd
+Bundle-Name: Gecko Search Suggester
+Bundle-Description: Gecko Lucene Suggester Implementation
 
-Bundle-Name: Search Suggester
-Bundle-Description: Suggester Implementation
+Export-Package: \
+	org.gecko.search.suggest.api,\
+	org.gecko.search.suggest.annotation,\
+	org.gecko.search.suggest.context
+
+Private-Package: org.gecko.search.suggest.impl
+
+Provide-Capability: gecko.search;gecko.search=suggestion

@@ -17,8 +17,8 @@ import java.util.Map;
 
 /**
  * Service that provides auto completion proposals
- * @author ilenia
- * @since Nov 9, 2018
+ * @author Ilenia Salvadori
+ * @since 09.11.2018
  */
 public interface SuggestionService {
 	
@@ -36,5 +36,5 @@ public interface SuggestionService {
 	 * 
 	 */
 	public Map<String, String> getAutoCompletion(String string, String[] label);
-
+	
 }

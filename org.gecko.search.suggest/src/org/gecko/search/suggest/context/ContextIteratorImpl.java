@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.impl;
+package org.gecko.search.suggest.context;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
@@ -21,19 +21,18 @@ import java.util.Set;
 
 import org.apache.lucene.search.suggest.InputIterator;
 import org.apache.lucene.util.BytesRef;
-import org.gecko.search.suggest.api.SuggestionContext;
 
 /**
  * Iterator for the {@link SuggestionContext}, that contains all relevant data for suggestion
- * @author ilenia
- * @since Nov 9, 2018
+ * @author Ilenia Salvadori
+ * @since 09.11.2018
  */
-public class ContextIteratorImpl implements InputIterator
+public class ContextIteratorImpl<O, FIELD> implements InputIterator
 	{
-	    private Iterator<SuggestionContext<?>> deviceIterator;
-	    private SuggestionContext<?> currentContext;
+	    private Iterator<SuggestionContext<O, FIELD>> deviceIterator;
+	    private SuggestionContext<O, FIELD> currentContext;
 
-	    public ContextIteratorImpl(Iterator<SuggestionContext<?>> deviceIterator) {
+	    public ContextIteratorImpl(Iterator<SuggestionContext<O, FIELD>> deviceIterator) {
 	        this.deviceIterator = deviceIterator;
 	    }
 	    

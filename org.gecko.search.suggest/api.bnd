@@ -1,5 +1,0 @@
-Export-Package: \
-	org.gecko.search.suggest.api,\
-	org.gecko.search.suggest.annotation
-Bundle-Name: Search Suggester API
-Bundle-Description: API for the Gecko Search Suggester

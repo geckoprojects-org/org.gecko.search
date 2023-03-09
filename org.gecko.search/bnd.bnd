@@ -1,4 +1,5 @@
 Export-Package: org.gecko.search.api
+
 -buildpath: \
 	org.osgi.annotation.bundle;version=latest,\
 	org.osgi.annotation.versioning;version=latest,\
@@ -9,3 +10,6 @@ Export-Package: org.gecko.search.api
 	org.osgi.service.metatype.annotations;version=latest,\
 	org.osgi.service.component.annotations;version=latest,\
 	org.apache.lucene.core;version=snapshot
+	
+Bundle-Name: Gecko Search
+Bundle-Description: Gecko Lucene Search Framework for OSGi 

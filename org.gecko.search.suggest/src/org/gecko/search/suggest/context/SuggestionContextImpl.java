@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.api;
+package org.gecko.search.suggest.context;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +28,12 @@ import org.gecko.search.api.IndexActionType;
  * labels  : this is an array of strings which are used to filter the results belonging to some particular 
  *           category
  * 
- * @author ilenia
- * @since Nov 9, 2018
+ * @param <O> the business object type
+ * @param <FIELD> the business object field type
+ * @author Ilenia Salvadori, Mark Hoffmann
+ * @since 09.03.2023
  */
-public class SimpleSuggestionContext implements SuggestionContext<Object>{
+public class SuggestionContextImpl<O, FIELD> implements SuggestionContext<O, FIELD>{
 	
 		private final String payload;
 		private final String content;
@@ -39,8 +41,10 @@ public class SimpleSuggestionContext implements SuggestionContext<Object>{
 		private final String[] labels;
 		private final IndexActionType action;
 		private final Map<String, Object> properties = new HashMap<String, Object>();
+		private O sourceObject;
+		private FIELD field;
 		
-		public SimpleSuggestionContext(IndexActionType action, String payload, String content, String[] labels, long weight) {
+		public SuggestionContextImpl(IndexActionType action, String payload, String content, String[] labels, long weight) {
 			this.payload = payload;
 			this.content = content;
 			this.action = action;
@@ -103,8 +107,26 @@ public class SimpleSuggestionContext implements SuggestionContext<Object>{
 		 * @see org.gecko.search.api.IndexContextObject#getObject()
 		 */
 		@Override
-		public Object getObject() {
-			return null;
+		public O getObject() {
+			return sourceObject;
+		}
+		
+		public void setObject(O sourceObject) {
+			this.sourceObject = sourceObject;
+			
+		}
+
+		/* 
+		 * (non-Javadoc)
+		 * @see org.gecko.search.suggest.api.SuggestionContext#getField()
+		 */
+		@Override
+		public FIELD getField() {
+			return field;
+		}
+		
+		public void setField(FIELD field) {
+			this.field = field;
 		}
 
 	}

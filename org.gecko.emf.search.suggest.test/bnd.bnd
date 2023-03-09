@@ -1,0 +1,23 @@
+-library: \
+	enable-emf,\
+	enableOSGi-Test
+
+# Build dependencies 
+-buildpath: \
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest,\
+	org.osgi.test.junit5.cm;version=latest,\
+	org.apache.felix.configadmin;version=latest,\
+	org.yaml.snakeyaml;version=latest,\
+	org.gecko.emf.osgi.example.model.basic;version=latest,\
+	org.gecko.search;version=snapshot,\
+	org.gecko.search.suggest;version=snapshot,\
+	org.gecko.emf.search.suggest;version=snapshot
+
+Private-Package: org.gecko.emf.search.suggest.test
+
+Bundle-Name: Search Suggestion Integration Tests
+
+Provide-Capability: osgi.service;objectClass:List<String>="org.gecko.search.suggest.api.SuggestionDescriptor",\
+	osgi.service;objectClass:List<String>="org.osgi.util.pushstream.PushStream"

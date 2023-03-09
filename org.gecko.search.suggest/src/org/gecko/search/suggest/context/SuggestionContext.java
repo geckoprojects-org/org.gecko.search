@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.api;
+package org.gecko.search.suggest.context;
 
 import org.gecko.search.api.IndexContextObject;
 
@@ -20,7 +20,7 @@ import org.gecko.search.api.IndexContextObject;
  * @author ilenia
  * @since Nov 9, 2018
  */
-public interface SuggestionContext<T> extends IndexContextObject<T> {	
+public interface SuggestionContext<O, FIELD> extends IndexContextObject<O> {	
 	
 	/**
 	 * The content to be indexed
@@ -45,5 +45,11 @@ public interface SuggestionContext<T> extends IndexContextObject<T> {
 	 * @return the weight or boost of this element when indexing
 	 */
 	long getWeight();
+	
+	/**
+	 * Returns the source object's field
+	 * @return the source object's field
+	 */
+	FIELD getField();
 
 }

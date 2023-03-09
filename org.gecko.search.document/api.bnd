@@ -1,5 +1,0 @@
-Export-Package: \
-	org.gecko.search.document,\
-	org.gecko.search.document.context,\
-	org.gecko.search.document.index
-

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.search.suggest.api.SuggestionService;
 import org.junit.jupiter.api.AfterEach;
@@ -64,30 +63,28 @@ public class SuggestionIntegrationTest {
 		delete(indexPath);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	@WithFactoryConfiguration(
-			factoryPid = "SuggestionDescriptor",
+			factoryPid = "ObjectSuggestionDescriptor",
 			location = "?", 
 			name = "suggDescr",
 			properties = {
-					@Property(key = "suggestion.index", value = "true", scalar = Scalar.Boolean)
+					@Property(key = "suggestion.index", value = "true", scalar = Scalar.Boolean),
+					@Property(key = "name", value = "dummy")
 			})
 	@WithFactoryConfiguration(
-			factoryPid = "SuggestionServiceFactory",
+			factoryPid = "ObjectSuggestionService",
 			location = "?", 
 			name = "suggService",
 			properties = {
 					@Property(key = "base.path", value = "/tmp/suggestIdx"),
+					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})
-	public void testSuggest(@InjectService() ServiceAware<BasicPackage> basicPackageAware,
-			@InjectService(timeout = 2000) ServiceAware<SuggestionDescriptor> suggDescAware,
+	public void testSuggest(@InjectService(timeout = 2000) ServiceAware<SuggestionDescriptor> suggDescAware,
 			@InjectService() ServiceAware<SuggestionService> suggestionServiceAware) throws InterruptedException {
-		
-		assertThat(basicPackageAware).isNotNull();
-		BasicPackage basicPackage = basicPackageAware.getService();
-		assertThat(basicPackage).isNotNull();
 		
 		SuggestionDescriptor suggDescService = suggDescAware.waitForService(500L);
 		assertThat(suggDescService).isNotNull();

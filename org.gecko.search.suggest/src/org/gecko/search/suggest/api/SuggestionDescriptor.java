@@ -15,9 +15,8 @@ package org.gecko.search.suggest.api;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.search.api.IndexDescriptor;
 
 /**
@@ -25,25 +24,25 @@ import org.gecko.search.api.IndexDescriptor;
  * @author Mark Hoffmann
  * @since 08.12.2018
  */
-public interface SuggestionDescriptor extends IndexDescriptor {
+public interface SuggestionDescriptor<O, FIELD> extends IndexDescriptor {
 	
 	/**
 	 * Returns the initial set of data, to be indexed. The list must not be <code>null</code> 
 	 * @return the initial set of data, to be indexed
 	 */
-	public List<? extends EObject> getObjectStream();
+	public Stream<O> getObjectStream();
 	
 	/**
-	 * Returns the {@link EStructuralFeature}, to be indexed
-	 * @return the {@link EStructuralFeature}, to be indexed
+	 * Returns the object field, to be indexed
+	 * @return the object field, to be indexed
 	 */
-	public Set<EStructuralFeature> getFields();
+	public Set<FIELD> getFields();
 	
 	/**
-	 * Returns the {@link EStructuralFeature} for the payload, usually the id feature
-	 * @return the {@link EStructuralFeature} for the payload
+	 * Returns the object field for the payload, usually the id feature
+	 * @return the object field for the payload
 	 */
-	public EStructuralFeature getPayload();
+	public FIELD getPayload();
 
 	/**
 	 * Returns different labeling/tagging for indexing

@@ -11,28 +11,27 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.suggest.impl;
+package org.gecko.search.suggest.context;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.util.BytesRef;
-import org.gecko.search.suggest.api.SuggestionContext;
 
 /**
  * Index context that wraps a suggest context into the Lucene special data
  * @author Mark Hoffmann
  * @since 24.11.2018
  */
-public class IndexContext {
+public class IndexContext<O, FIELD> {
 
-	private final SuggestionContext<?> context;
+	private final SuggestionContext<O, FIELD> context;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public IndexContext(SuggestionContext<?> context) {
+	public IndexContext(SuggestionContext<O, FIELD> context) {
 		this.context = context;
 	}
 	
@@ -40,7 +39,7 @@ public class IndexContext {
 	 * Returns the original context
 	 * @return the original context
 	 */
-	public SuggestionContext <?>getContext() {
+	public SuggestionContext <O, FIELD>getContext() {
 		return context;
 	}
 

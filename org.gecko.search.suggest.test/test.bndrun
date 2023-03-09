@@ -4,8 +4,6 @@
 -runfw: org.apache.felix.framework;version='[7.0.5,7.0.5]'
 -runrequires: \
 	bnd.identity;id='org.gecko.search.suggest.test',\
-	bnd.identity;id='org.gecko.search.suggest.api',\
-	bnd.identity;id='org.gecko.search.suggest.impl',\
 	bnd.identity;id='org.apache.felix.configadmin'
 -runbundles: \
 	junit-jupiter-api;version='[5.9.1,5.9.2)',\
@@ -15,24 +13,16 @@
 	org.apache.felix.scr;version='[2.2.6,2.2.7)',\
 	org.apache.lucene.core;version=snapshot,\
 	org.apache.lucene.suggest;version=snapshot,\
-	org.gecko.emf.osgi.api;version='[4.5.0,4.5.1)',\
-	org.gecko.emf.osgi.component;version='[4.5.0,4.5.1)',\
-	org.gecko.emf.osgi.example.model.basic;version='[4.5.0,4.5.1)',\
 	org.gecko.search;version=snapshot,\
-	org.gecko.search.suggest.api;version=snapshot,\
-	org.gecko.search.suggest.impl;version=snapshot,\
 	org.gecko.search.suggest.test;version=snapshot,\
 	org.opentest4j;version='[1.2.0,1.2.1)',\
 	org.osgi.service.component;version='[1.5.1,1.5.2)',\
 	org.osgi.test.common;version='[1.2.1,1.2.2)',\
 	org.osgi.test.junit5;version='[1.2.1,1.2.2)',\
-	org.osgi.util.converter;version='[1.0.9,1.0.10)',\
 	org.osgi.util.function;version='[1.2.0,1.2.1)',\
 	org.osgi.util.promise;version='[1.3.0,1.3.1)',\
 	org.osgi.util.pushstream;version='[1.1.0,1.1.1)',\
 	org.osgi.test.junit5.cm;version='[1.2.1,1.2.2)',\
 	assertj-core;version='[3.24.1,3.24.2)',\
 	net.bytebuddy.byte-buddy;version='[1.12.21,1.12.22)',\
-	org.eclipse.emf.common;version='[2.28.0,2.28.1)',\
-	org.eclipse.emf.ecore;version='[2.33.0,2.33.1)',\
-	org.eclipse.emf.ecore.xmi;version='[2.18.0,2.18.1)'
+	org.gecko.search.suggest;version=snapshot

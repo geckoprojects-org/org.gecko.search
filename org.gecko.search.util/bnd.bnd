@@ -1,13 +1,11 @@
 -library: enable-emf
 
 -buildpath: \
-	org.gecko.search;version=latest,\
-	org.gecko.search.document.api;version=latest,\
+	org.osgi.util.promise;version=latest,\
 	org.apache.lucene.core;version=latest,\
-	org.osgi.util.promise;version=latest
+	org.gecko.search;version=snapshot,\
+	org.gecko.search.document;version=snapshot
 
-Bundle-Copyright: Data In Motion Consulting GmbH
-Bundle-License: Eclipse Public License v1.0
-Bundle-Vendor: Data In Motion Consulting GmbH
-Bundle-Version: 1.0.0.SNAPSHOT
 Export-Package: org.gecko.search.util
+
+Bundle-Name: Gecko Search Utils

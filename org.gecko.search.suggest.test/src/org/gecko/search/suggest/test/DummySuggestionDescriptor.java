@@ -13,40 +13,40 @@
  */
 package org.gecko.search.suggest.test;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.gecko.emf.osgi.example.model.basic.BasicPackage;
-import org.gecko.emf.osgi.example.model.basic.Person;
 import org.gecko.search.api.IndexType;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.promise.PromiseFactory;
 
 
 /**
  * 
- * @author ilenia
- * @since Feb 24, 2023
+ * @author Ilenia Salvadory
+ * @since 24.022023
  */
-@Component(service = SuggestionDescriptor.class, configurationPolicy=ConfigurationPolicy.REQUIRE, configurationPid = "SuggestionDescriptor")
-public class DummySuggestionDescriptor implements SuggestionDescriptor {
-
-	@Reference
-	BasicPackage basicPackage;	
+@Component(name = "ObjectSuggestionDescriptor", service = SuggestionDescriptor.class, configurationPolicy=ConfigurationPolicy.REQUIRE)
+public class DummySuggestionDescriptor implements SuggestionDescriptor<Object, Field> {
+	
+	public static class Person {
+		public String firstName;
+		public String lastName;
+		public long id;
+	}
 
 	private PromiseFactory factory = new PromiseFactory(Executors.newFixedThreadPool(4));
-	List<Person> persons = new ArrayList<>();
+	List<Object> persons = new ArrayList<>();
 
 	@Activate
 	public void activate() {
@@ -60,10 +60,10 @@ public class DummySuggestionDescriptor implements SuggestionDescriptor {
 	private void initialize() {
 
 		for (int i = 0; i < 10; i++) {
-			Person p = basicPackage.getBasicFactory().createPerson();
-			p.setFirstName("Emil-" + i);
-			p.setLastName("Tester-" + i);
-			p.setId("et-" + i);
+			Person p = new Person();
+			p.firstName = "Emil-" + i;
+			p.lastName = "Tester-" + i;
+			p.id = i;
 			persons.add(p);
 		}
 	}
@@ -80,7 +80,7 @@ public class DummySuggestionDescriptor implements SuggestionDescriptor {
 	 */
 	@Override
 	public String getName() {
-		return null;
+		return Person.class.getName();
 	}
 
 	/* 
@@ -97,8 +97,8 @@ public class DummySuggestionDescriptor implements SuggestionDescriptor {
 	 * @see org.gecko.search.suggest.api.SuggestionDescriptor#getObjectStream()
 	 */
 	@Override
-	public List<? extends EObject> getObjectStream() {
-		return persons;
+	public Stream<Object> getObjectStream() {
+		return persons.stream();
 	}
 
 	/* 
@@ -106,9 +106,15 @@ public class DummySuggestionDescriptor implements SuggestionDescriptor {
 	 * @see org.gecko.search.suggest.api.SuggestionDescriptor#getFields()
 	 */
 	@Override
-	public Set<EStructuralFeature> getFields() {
-		Set<EStructuralFeature> features = new HashSet<EStructuralFeature>();
-		features.add(basicPackage.getPerson_LastName());
+	public Set<Field> getFields() {
+		Set<Field> features = new HashSet<Field>();
+		try {
+			features.add(Person.class.getField("lastName"));
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		}
 		return features;
 	}
 
@@ -117,8 +123,15 @@ public class DummySuggestionDescriptor implements SuggestionDescriptor {
 	 * @see org.gecko.search.suggest.api.SuggestionDescriptor#getPayload()
 	 */
 	@Override
-	public EStructuralFeature getPayload() {
-		return basicPackage.getPerson_Id();
+	public Field getPayload() {
+		try {
+			return Person.class.getField("id");
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/* 

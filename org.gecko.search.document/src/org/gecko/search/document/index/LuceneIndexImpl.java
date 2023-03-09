@@ -381,7 +381,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 					try {
 						if(searcherManager != null){
 							if (!searcherManager.maybeRefresh()) {
-								LOGGER.log(Level.SEVERE, "Refreshing did not work, because it was called from a wrong thread");
+								LOGGER.log(Level.FINE, "Refreshing did not work, because it was called from a wrong thread");
 							}
 						}
 					} catch (IOException e) {
