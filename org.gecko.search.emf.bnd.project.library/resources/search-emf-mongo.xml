@@ -1,0 +1,3 @@
+<form>
+	<p>Creates a bundle providing the setup for an index service and the corresponding search service using EMF and mongo.</p>
+</form>
