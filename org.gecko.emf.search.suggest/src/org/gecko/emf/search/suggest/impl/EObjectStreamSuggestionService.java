@@ -32,13 +32,13 @@ import org.osgi.util.pushstream.PushStream;
 
 /**
  * Service implementation of the suggestion service, based on a push stream. To define the index location,
- * the {@link GeckoResourcesProvider} is used. For that a service property "suggestion.index=true" must be available.
+ * the configuration is used. 
  * That is for the push stream as well as for the resource provider
  * @author Mark Hoffmann
  * @since Nov 9, 2018
  */
 @Component(name = "EObjectStreamSuggestionService", service = SuggestionService.class, configurationPolicy=ConfigurationPolicy.REQUIRE)
-public abstract class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<EObject, EStructuralFeature> {
+public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<EObject, EStructuralFeature> {
 
 	/**
 	 * Called on component activation
@@ -75,7 +75,7 @@ public abstract class EObjectStreamSuggestionService extends StreamSuggestionSer
 	@Override
 	@Reference(name = "contextStream")
 	protected void setContextStream(PushStream<EObject> contextStream) {
-		super.setContextStream(contextStream);
+		super.setContextStream((PushStream<EObject>) contextStream);
 	}
 
 	/* 

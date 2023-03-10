@@ -52,7 +52,7 @@ public class DocumentUtil {
 	 * Option to specify whether non-containment reference should be index or not.
 	 * If not provided, <code>false<code> will be used as default value.
 	 */
-	public static final String INDEX_NON_CONTAINEMENT = "index.non.conatinment";
+	public static final String INDEX_NON_CONTAINEMENT = "index.non.containment";
 	
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 

@@ -8,8 +8,10 @@
 	org.osgi.test.junit5.cm;version=latest,\
 	org.apache.lucene.core;version=snapshot,\
 	org.gecko.search.document;version=snapshot,\
-	org.gecko.search;version=snapshot
+	org.gecko.search;version=snapshot,\
+	org.gecko.search.document.test;version=project
 
 Bundle-Name: Gecko Search Document Integration Test
 
-Export-Package: org.gecko.search.document.test
+
+Private-Package: org.gecko.emf.search.test

@@ -29,8 +29,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Reference;
 import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.annotation.Property;
 import org.osgi.test.common.annotation.Property.Scalar;
@@ -45,15 +43,14 @@ import org.osgi.test.junit5.service.ServiceExtension;
 @ExtendWith(ConfigurationExtension.class)
 public class SuggestionIntegrationTest {
 	
-	@Reference
-	BundleContext bundleContext;
+	private static final String INDEX_PATH = "/tmp/indexEMFSuggestTest/"; 
 
 	File indexPath;
 	
 	@BeforeEach
 	public void doBefore() throws InterruptedException, IOException {	
 			
-		indexPath = new File("/tmp/suggestIdx");
+		indexPath = new File(INDEX_PATH);
 		if (!indexPath.exists()) {
 			indexPath.mkdirs();
 		}
@@ -79,14 +76,14 @@ public class SuggestionIntegrationTest {
 			location = "?", 
 			name = "suggService",
 			properties = {
-					@Property(key = "base.path", value = "/tmp/suggestIdx"),
+					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})
-	public void testSuggest(@InjectService() ServiceAware<BasicPackage> basicPackageAware,
-			@InjectService(timeout = 2000) ServiceAware<SuggestionDescriptor> suggDescAware,
-			@InjectService() ServiceAware<SuggestionService> suggestionServiceAware) throws InterruptedException {
+	public void testSuggest(@InjectService ServiceAware<BasicPackage> basicPackageAware,
+			@InjectService ServiceAware<SuggestionDescriptor> suggDescAware,
+			@InjectService ServiceAware<SuggestionService> suggestionServiceAware) throws InterruptedException {
 		
 		assertThat(basicPackageAware).isNotNull();
 		BasicPackage basicPackage = basicPackageAware.getService();

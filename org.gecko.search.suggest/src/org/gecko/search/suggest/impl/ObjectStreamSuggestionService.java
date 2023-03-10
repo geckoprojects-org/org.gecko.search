@@ -38,7 +38,7 @@ import org.osgi.util.pushstream.PushStream;
  * @since Nov 9, 2018
  */
 @Component(name = "ObjectStreamSuggestionService", service = SuggestionService.class, configurationPolicy=ConfigurationPolicy.REQUIRE)
-public abstract class ObjectStreamSuggestionService extends StreamSuggestionServiceImpl<Object, Field> {
+public class ObjectStreamSuggestionService extends StreamSuggestionServiceImpl<Object, Field> {
 
 	/**
 	 * Called on component activation

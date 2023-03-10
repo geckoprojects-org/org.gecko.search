@@ -13,6 +13,8 @@
  */
 package org.gecko.search.document.index;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -25,7 +27,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -44,14 +45,15 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.NRTCachingDirectory;
 import org.gecko.search.api.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.util.pushstream.PushEvent;
 import org.osgi.util.pushstream.PushStream;
@@ -116,7 +118,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @param listener the listener to add
 	 */
 	protected void addIndexListener(IndexListener listener) {
-		Objects.requireNonNull(listener);
+		requireNonNull(listener);
 		indexListeners.add(listener);
 	}
 	
@@ -125,7 +127,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @param listener the listener to be removed
 	 */
 	protected void removeIndexListener(IndexListener listener) {
-		Objects.requireNonNull(listener);
+		requireNonNull(listener);
 		indexListeners.remove(listener);
 	}
 	
@@ -137,7 +139,9 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 		return psp;
 	}
 
-	protected void activate(Config serviceConfig, ComponentContext context) throws ConfigurationException {
+	protected void activate(Config serviceConfig, BundleContext context) throws ConfigurationException {
+		requireNonNull(serviceConfig);
+		requireNonNull(context);
 		URL url = null;
 		if(serviceConfig.base_path().length() > 0) {
 			try {
@@ -161,23 +165,29 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 			indexFolder = new File(new File(uri), serviceConfig.id());
 		} catch (URISyntaxException | MalformedURLException e) {
 			//Can't happen. It was already checked multiple times
-			throw new RuntimeException("This should not happen, but it did...", e);
+			throw new ConfigurationException("base.path", "The given path.path format is invalid '" + url.toString() + "'", e);
 		}
-
+		requireNonNull(analyzer);
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		try {
 			switch(serviceConfig.directory_type()) {
+			case "NRT":
+				directory = FSDirectory.open(indexFolder.toPath());
+				break;
 			case "FS":
 				directory = FSDirectory.open(indexFolder.toPath());
+				break;
 			case "NIOFS":
 				directory = new NIOFSDirectory(indexFolder.toPath());
+				break;
 			case "MMap":
 			default:
+				LOGGER.warning("Unrecognized directory format: " + serviceConfig.directory_type() + "; Falling back to MMap");
 				directory = MMapDirectory.open(indexFolder.toPath());
 				break;
 			}
-			indexWriter = new IndexWriter(directory, config);
-			indexWriter.commit();
+			NRTCachingDirectory cachedFSDir = new NRTCachingDirectory(directory, 5.0, 60.0);
+			indexWriter = new IndexWriter(cachedFSDir, config);
 			searcherManager = new SearcherManager(indexWriter, null);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not open index directory for " + indexFolder.getPath() + " with message "+ e.getMessage(), e);
@@ -187,26 +197,36 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", serviceConfig.id());
-		searcherRegistration = context.getBundleContext().registerService(IndexSearcher.class, this, properties);
+		searcherRegistration = context.registerService(IndexSearcher.class, this, properties);
 	}
 
 	protected void deactivate() {
-		singleSource.close();
-		searcherRegistration.unregister();
-		try {
-			searcherManager.close();
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e, ()->"Failed to close searcher manager");
+		if (singleSource != null) {
+			singleSource.close();
 		}
-		try {
-			indexWriter.close();
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e, ()->"Failed to close index writer");
+		if (searcherRegistration != null) {
+			searcherRegistration.unregister();
 		}
-		try {
-			directory.close();
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e, ()->"Failed to close index directory");
+		if (searcherManager != null) {
+			try {
+				searcherManager.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e, ()->"Failed to close searcher manager");
+			}
+		}
+		if (indexWriter != null) {
+			try {
+				indexWriter.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e, ()->"Failed to close index writer");
+			}
+		}
+		if (directory != null) {
+			try {
+				directory.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e, ()->"Failed to close index directory");
+			}
 		}
 	}
 	
@@ -218,6 +238,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 */
 	protected void chainPushStream(Config serviceConfig) {
 		singleSource = createSimplePushEventSource();
+		requireNonNull(singleSource);
 		PushStream<DICO> pspBuilder = psp.buildStream(singleSource)
 				.withPushbackPolicy( q -> {
 					return Math.max(0, q.size() - (serviceConfig.batchSize() + 50));
@@ -242,6 +263,8 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @param commit
 	 */
 	protected void internalHandleContext(DICO context, boolean commit) {
+		requireNonNull(context);
+		requireNonNull(indexWriter);
 		try {
 			switch (context.getActionType()) {
 			case ADD:
@@ -267,10 +290,17 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 			LOGGER.log(Level.FINE, ()->String.format("Handle NO commit from internalHandleContext"));
 		}
 		// Trigger listeners asynchronous
-		indexListeners.forEach(l->commitExecutors.submit(()->l.onIndex(context)));
+		commitExecutors.submit(()->{
+			synchronized (indexListeners) {
+				indexListeners.stream().
+					filter(l->l.canHandle(context)).
+					forEach(l->l.onIndex(context));
+			}
+		});
 	}
 
 	protected void internalHandleContexts(Collection<DICO> contexts, boolean commit) {
+		requireNonNull(contexts);
 		contexts.forEach(partial(this::internalHandleContext, false));
 		if(commit) {
 			try {
@@ -287,6 +317,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	}
 
 	public static <T> Consumer<T> partial(BiConsumer<T, Boolean> f, boolean commit) {
+		requireNonNull(f);
 		return (c) -> f.accept(c, commit);
 	}
 
@@ -296,6 +327,8 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 */
 	@Override
 	public void handleContext(DICO context) {
+		requireNonNull(context);
+		requireNonNull(singleSource);
 		singleSource.publish(context);
 	}
 
@@ -341,6 +374,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 */
 	@Override
 	public IndexSearcher aquireSearch() {
+		requireNonNull(searcherManager);
 		try {
 			return searcherManager.acquire();
 		} catch (IOException e) {
@@ -354,6 +388,8 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 */
 	@Override
 	public void releaseSearcher(IndexSearcher searcher) {
+		requireNonNull(searcherManager);
+		requireNonNull(searcher);
 		try {
 			searcherManager.release(searcher);
 		} catch (IOException e) {
@@ -367,6 +403,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 */
 	@Override
 	public void commit()  {
+		requireNonNull(indexWriter);
 		if(indexWriter.hasUncommittedChanges()) {
 			try {
 				indexWriter.commit();

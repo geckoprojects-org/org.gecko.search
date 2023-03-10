@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.document.test;
+package org.gecko.emf.search.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +39,7 @@ import org.gecko.search.api.IndexActionType;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextBuilder;
 import org.gecko.search.document.context.ObjectContextObject;
+import org.gecko.search.document.test.CDLCommitCallback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ import org.osgi.test.junit5.service.ServiceExtension;
 @ExtendWith(ConfigurationExtension.class)
 public class IndexTest {
 	
-	private static final String INDEX_PATH = "/tmp/indexTest/"; 
+	private static final String INDEX_PATH = "/tmp/indexEMFTest/"; 
 	private BundleContext ctx;
 
 	@BeforeEach
@@ -78,7 +79,7 @@ public class IndexTest {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
 	@WithFactoryConfiguration(
-			factoryPid = "DefaultLuceneIndex",
+			factoryPid = "EMFLuceneIndex",
 			location = "?", 
 			name = "test",
 			properties = {
@@ -122,7 +123,7 @@ public class IndexTest {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	@WithFactoryConfiguration(
-			factoryPid = "DefaultLuceneIndex",
+			factoryPid = "EMFLuceneIndex",
 			location = "?", 
 			name = "test",
 			properties = {

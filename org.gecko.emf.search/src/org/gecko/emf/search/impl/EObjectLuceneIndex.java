@@ -20,8 +20,8 @@ import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
 import org.gecko.search.api.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.index.LuceneIndexImpl;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -48,7 +48,7 @@ public class EObjectLuceneIndex extends LuceneIndexImpl<EObjectDocumentIndexObje
 	 */
 	@Override
 	@Activate
-	protected void activate(Config serviceConfig, ComponentContext context) throws ConfigurationException {
+	protected void activate(Config serviceConfig, BundleContext context) throws ConfigurationException {
 		super.activate(serviceConfig, context);
 	}
 	

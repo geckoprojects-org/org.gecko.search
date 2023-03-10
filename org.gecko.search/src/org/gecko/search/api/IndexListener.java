@@ -19,7 +19,14 @@ package org.gecko.search.api;
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
-public interface IndexListener {
+public interface IndexListener{
+	
+	/**
+	 * Returns <code>true</code>, if this context object can be handled, otherwise <code>false</code>
+	 * @param context the context object
+	 * @return <code>true</code>, if this context object can be handled, otherwise <code>false</code>
+	 */
+	boolean canHandle(IndexContextObject<?> context);
 	
 	/**
 	 * Called on indexing

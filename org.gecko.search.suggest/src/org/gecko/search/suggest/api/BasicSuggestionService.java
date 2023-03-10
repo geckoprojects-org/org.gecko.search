@@ -17,6 +17,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,11 +110,18 @@ public abstract class BasicSuggestionService<O, FIELD> implements SuggestionServ
 	 * Called on component de-activation
 	 */
 	protected void deactivate() {
+		try (AnalyzingInfixSuggester value = suggesterPromise.getValue()) {
+			if (value != null) {
+				value.close();
+			}
+		} catch (InvocationTargetException | InterruptedException | IOException e) {
+			LOGGER.log(Level.SEVERE, "Error closing suggester", e);
+		};
 		if (indexDir != null) {
 			try {
 				indexDir.close();
 			} catch (IOException e) {
-				LOGGER.severe("Error closing index directory");
+				LOGGER.log(Level.SEVERE, "Error closing index directory", e);
 			}
 		}
 	}
@@ -289,7 +297,7 @@ public abstract class BasicSuggestionService<O, FIELD> implements SuggestionServ
 			suggester.commit();
 			suggester.refresh();
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "[{0}] Error handling context for payload {1}", new Object[] {configuration.suggestionName(), context.getContext().getPayload(), e});
+			LOGGER.log(Level.SEVERE, String.format("[%s] Error handling context for payload %s", configuration.suggestionName(), context.getContext().getPayload()), e);
 		}
 	}
 	
