@@ -1,5 +1,6 @@
 -buildpath: \
-	org.apache.lucene:lucene-facet;version=${lucene-version}
+	org.apache.lucene:lucene-facet;version=${lucene-version},\
+	com.carrotsearch:hppc;version=0.9.1
 	
 -maven-dependencies: \
 	com.carrotsearch.hppc;\
@@ -12,7 +13,9 @@
 
 Bundle-Version: ${lucene-version}.SNAPSHOT
 
-Export-Package: org.apache.lucene.*
+Export-Package: \
+	org.apache.lucene.*,\
+	com.carrotsearch.*
 
 -includeresource: \
 	@${repo;org.apache.lucene:lucene-facet;${lucene-version}}!/META-INF/*.txt,\
