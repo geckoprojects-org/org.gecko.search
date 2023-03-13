@@ -23,7 +23,6 @@ subprojects {
     }
     
 }
-
 // Sonar setup
 sonarqube {
   properties {
@@ -55,7 +54,7 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-tasks.named("sonar") {
+tasks.named("sonarqube") {
     dependsOn(codeCoverageReport)
 }
 

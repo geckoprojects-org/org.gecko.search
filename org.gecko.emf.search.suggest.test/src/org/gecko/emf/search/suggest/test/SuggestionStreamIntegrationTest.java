@@ -120,7 +120,7 @@ public class SuggestionStreamIntegrationTest {
 		SuggestionService suggestionService = suggestionServiceAware.waitForService(500l);
 		assertThat(suggestionService).isNotNull();
 		
-		Thread.sleep(2000l);
+		Thread.sleep(5000l);
 				
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});
 		assertNotNull(suggestResult);
@@ -180,7 +180,7 @@ public class SuggestionStreamIntegrationTest {
 		suggestionService = suggestionServiceAware.waitForService(500l);
 		assertThat(suggestionService).isNotNull();
 		
-		Thread.sleep(2000l);
+		Thread.sleep(5000l);
 		
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});
 		assertNotNull(suggestResult);
