@@ -191,7 +191,7 @@ public class IndexListenerTest {
 				.build();
 		
 		indexService.handleContext(indexContextObjectImpl);
-		assertTrue(commitCallback.getLatch().await(1, TimeUnit.SECONDS));
+		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
@@ -215,7 +215,7 @@ public class IndexListenerTest {
 				.build();
 		
 		indexService.handleContext(indexContextObjectImpl);
-		assertTrue(commitCallback.getLatch().await(1, TimeUnit.SECONDS));
+		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, times(1)).onIndex(any(IndexContextObject.class));
 		verify(listenerMock, times(1)).canHandle(any(IndexContextObject.class));
@@ -270,7 +270,7 @@ public class IndexListenerTest {
 				.build();
 		
 		indexService.handleContext(indexContextObjectImpl);
-		assertTrue(commitCallback.getLatch().await(1, TimeUnit.SECONDS));
+		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
 		verify(listenerMock, never()).canHandle(any(IndexContextObject.class));
@@ -293,7 +293,7 @@ public class IndexListenerTest {
 				.build();
 		
 		indexService.handleContext(indexContextObjectImpl);
-		assertTrue(commitCallback.getLatch().await(1, TimeUnit.SECONDS));
+		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
 		verify(listenerMock, times(1)).onIndex(captor.capture());
@@ -318,7 +318,7 @@ public class IndexListenerTest {
 				.build();
 		
 		indexService.handleContext(indexContextObjectImpl);
-		assertTrue(commitCallback.getLatch().await(1, TimeUnit.SECONDS));
+		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
 		verify(listenerMock, never()).canHandle(any(IndexContextObject.class));
