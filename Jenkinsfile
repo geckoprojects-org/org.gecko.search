@@ -6,30 +6,42 @@ pipeline  {
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
+        skipDefaultCheckout()
     }
 
     stages {
-        stage('Main branch release') {
-            when { 
-                branch 'main' 
-            }
+    	stage('Clean Workspace') {
             steps {
-                echo "I am building on ${env.BRANCH_NAME}"
-                sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/org.gecko.search --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
+                // Cleanup before starting the stage
+                cleanWs()
             }
         }
-        stage('Snapshot branch release') {
+    	stage('Checkout') {
+            steps {
+                // Checkout the repository
+                checkout scm 
+            }
+        }
+        stage('Branch snapshot') {
             when { 
                 branch 'snapshot'
             }
             steps  {
                 echo "I am building on ${env.JOB_NAME}"
                 sh "./gradlew clean release --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
-                sh "mkdir -p $JENKINS_HOME/repo.gecko/snapshot/org.gecko.search"
-                sh "rm -rf $JENKINS_HOME/repo.gecko/snapshot/org.gecko.search/*"
-                sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/snapshot/org.gecko.search"
+                sh "mkdir -p $JENKINS_HOME/repo.gecko/org.gecko.search"
+                sh "rm -rf $JENKINS_HOME/repo.gecko/org.gecko.search/*"
+                sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/org.gecko.search"
+            }
+        }
+        stage('Branch main - release') {
+            when { 
+                branch 'main'
+            }
+            steps  {
+                echo "I am building on ${env.JOB_NAME}"
+                sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/org.gecko.search --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
             }
         }
     }
-
 }
