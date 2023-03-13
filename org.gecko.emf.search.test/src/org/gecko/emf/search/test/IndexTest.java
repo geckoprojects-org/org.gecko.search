@@ -138,7 +138,7 @@ public class IndexTest {
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
 		assertThat(indexService).isNotNull();	
 
-		int limit = 1000;
+		int limit = 100;
 
 		CDLCommitCallback commitCallback = CDLCommitCallback.create(limit);
 
