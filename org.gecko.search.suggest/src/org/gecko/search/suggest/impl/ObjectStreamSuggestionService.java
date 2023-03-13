@@ -45,6 +45,7 @@ public class ObjectStreamSuggestionService extends StreamSuggestionServiceImpl<O
 	 * @param ctx the component context
 	 * @throws ConfigurationException
 	 */
+	@Override
 	@Activate
 	public void activate(ComponentContext ctx , SuggestionConfiguration configuration) {
 		super.activate(ctx, configuration);
@@ -53,6 +54,7 @@ public class ObjectStreamSuggestionService extends StreamSuggestionServiceImpl<O
 	/**
 	 * Called on component de-activation
 	 */
+	@Override
 	@Deactivate
 	public void deactivate() {
 		super.deactivate();

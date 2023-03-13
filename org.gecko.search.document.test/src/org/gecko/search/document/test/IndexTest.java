@@ -164,7 +164,7 @@ public class IndexTest {
 		IndexSearcher searcher = searcherSO.getService();
 		assertThat(searcher).isNotNull();
 
-		TopDocs topDocs = searcher.search(new TermQuery(new Term("test", "test")), 100000);
+		TopDocs topDocs = searcher.search(new TermQuery(new Term("test", "test")), 100);
 		assertNotNull(topDocs);
 		assertEquals(limit, topDocs.scoreDocs.length);
 		

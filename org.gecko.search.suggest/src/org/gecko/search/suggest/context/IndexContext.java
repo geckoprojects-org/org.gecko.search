@@ -13,7 +13,7 @@
  */
 package org.gecko.search.suggest.context;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,14 +24,14 @@ import org.apache.lucene.util.BytesRef;
  * @author Mark Hoffmann
  * @since 24.11.2018
  */
-public class IndexContext<O, FIELD> {
+public class IndexContext<O, F> {
 
-	private final SuggestionContext<O, FIELD> context;
+	private final SuggestionContext<O, F> context;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public IndexContext(SuggestionContext<O, FIELD> context) {
+	public IndexContext(SuggestionContext<O, F> context) {
 		this.context = context;
 	}
 	
@@ -39,7 +39,7 @@ public class IndexContext<O, FIELD> {
 	 * Returns the original context
 	 * @return the original context
 	 */
-	public SuggestionContext <O, FIELD>getContext() {
+	public SuggestionContext <O, F>getContext() {
 		return context;
 	}
 
@@ -48,11 +48,7 @@ public class IndexContext<O, FIELD> {
 	 * @return the text context to be indexed
 	 */
 	public BytesRef content() {
-		try {
-			return new BytesRef(context.getContent().getBytes("UTF8")); 
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("Couldn't convert content to UTF-8", e);
-		}
+		return new BytesRef(context.getContent().getBytes(StandardCharsets.UTF_8)); 
 	}
 
 	/**
@@ -60,11 +56,7 @@ public class IndexContext<O, FIELD> {
 	 * @return the payload / key of instance
 	 */
 	public BytesRef payload() {
-		try {
-			return new BytesRef(context.getPayload().getBytes("UTF8"));
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("Couldn't convert payload to UTF-8", e);
-		}
+		return new BytesRef(context.getPayload().getBytes(StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -72,15 +64,11 @@ public class IndexContext<O, FIELD> {
 	 * @return the tags for that this element belongs to
 	 */
 	public Set<BytesRef> labels() {           	
-		try {
-			Set<BytesRef> labels = new HashSet<BytesRef>();
-			for (String label : context.getLabels()) {
-				labels.add(new BytesRef(label.getBytes("UTF8")));
-			}
-			return labels;
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("Couldn't convert labels to UTF-8", e);
+		Set<BytesRef> labels = new HashSet<>();
+		for (String label : context.getLabels()) {
+			labels.add(new BytesRef(label.getBytes(StandardCharsets.UTF_8)));
 		}
+		return labels;
 	}
 
 	/**

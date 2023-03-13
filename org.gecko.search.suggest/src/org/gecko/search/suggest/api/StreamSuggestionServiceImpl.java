@@ -28,7 +28,7 @@ import org.osgi.util.pushstream.PushStream;
  * @author Mark Hoffmann
  * @since Nov 9, 2018
  */
-public abstract class StreamSuggestionServiceImpl<O, FIELD> extends BasicSuggestionService<O, FIELD> {
+public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionService<O, F> {
 
 	private static final Logger logger = Logger.getLogger(StreamSuggestionServiceImpl.class.getName());
 	private PushStream<O> contextStream;
@@ -38,10 +38,11 @@ public abstract class StreamSuggestionServiceImpl<O, FIELD> extends BasicSuggest
 	 * @param ctx the component context
 	 * @throws ConfigurationException
 	 */
+	@Override
 	protected void activate(ComponentContext ctx , SuggestionConfiguration configuration) {
 		super.activate(ctx, configuration);
 		suggesterPromise.
-			onFailure(t->logger.log(Level.SEVERE, "[{0}] Error creating the suggester instance", new Object[] {configuration.suggestionName(), t})).
+			onFailure(t->logger.log(Level.SEVERE, String.format("[%s] Error creating the suggester instance", configuration.suggestionName()), t)).
 			thenAccept(this::connectToPushStream);
 	}
 	

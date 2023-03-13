@@ -20,7 +20,7 @@ import org.gecko.search.api.IndexContextObject;
  * @author ilenia
  * @since Nov 9, 2018
  */
-public interface SuggestionContext<O, FIELD> extends IndexContextObject<O> {	
+public interface SuggestionContext<O, F> extends IndexContextObject<O> {	
 	
 	/**
 	 * The content to be indexed
@@ -50,6 +50,6 @@ public interface SuggestionContext<O, FIELD> extends IndexContextObject<O> {
 	 * Returns the source object's field
 	 * @return the source object's field
 	 */
-	FIELD getField();
+	F getField();
 
 }

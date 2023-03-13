@@ -36,7 +36,7 @@ public class DocumentIndexContextObjectImpl<T> implements DocumentIndexContextOb
 	private final Term identifyingTerm;
 	private final CommitCallback commitCallback;
 
-	private DocumentIndexContextObjectImpl(AbstractContextObjectBuilder<T, ?> builder) {
+	protected DocumentIndexContextObjectImpl(AbstractContextObjectBuilder<T, ?> builder) {
 		this.indexActionType = builder.indexActionType;
 		this.properties = builder.properties;
 		this.sourceObject = builder.sourceObject;

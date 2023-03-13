@@ -62,11 +62,11 @@ public class DocumentUtil {
 	}
 
 	/** _E_CLASS_URI */
-	private static final String _E_CLASS_URI = "_eClassUri";
+	private static final String ECLASS_URI = "_eClassUri";
 	/** _NULL */
-	private static final String _NULL = "_NULL_";	
+	private static final String NULL_VALUE = "_NULL_";	
 	/** _PROXY_URI */
-	private static final String _PROXY_URI = "_proxyUri";
+	private static final String PROXY_URI = "_proxyUri";
 
 	
 	public static void toDocument(Document doc, EObject eObject, Map<Object, Object> options) {
@@ -82,9 +82,9 @@ public class DocumentUtil {
 		
 		boolean saveNonContainmentAsProxy = options.containsKey(INDEX_NON_CONTAINEMENT) ? (Boolean) options.get(INDEX_NON_CONTAINEMENT) : false;
 		if(saveNonContainmentAsProxy && eObject.eIsProxy()) {
-			doc.add(new StringField(prefix + _PROXY_URI, EcoreUtil.getURI(eObject).toString(), Store.YES));
+			doc.add(new StringField(prefix + PROXY_URI, EcoreUtil.getURI(eObject).toString(), Store.YES));
 		}
-		doc.add(new StringField(prefix + _E_CLASS_URI, EcoreUtil.getURI(eObject.eClass()).toString(), Store.YES));
+		doc.add(new StringField(prefix + ECLASS_URI, EcoreUtil.getURI(eObject.eClass()).toString(), Store.YES));
 		
 		Predicate<EStructuralFeature> ignoreFeaturePred = r -> true;
 		if(options.containsKey(IGNORE_FEATURE_LIST)) {
@@ -119,7 +119,7 @@ public class DocumentUtil {
 								doc.add(new StringField(prefix +  a.getName() + "." +  i++  , EcoreUtil.convertToString(a.getEAttributeType(), v), Store.YES));
 							}
 						} else {
-							doc.add(new StringField(prefix +  a.getName() + "." +  i++  , _NULL , Store.YES));
+							doc.add(new StringField(prefix +  a.getName() + "." +  i++  , NULL_VALUE , Store.YES));
 						}
 					}
 				}
@@ -148,7 +148,7 @@ public class DocumentUtil {
 						if(v != null && v instanceof EObject) {
 							toDocument(doc, (EObject) v, newPrefix + i + ".", options);
 						} else {
-							doc.add(new StringField(newPrefix + _E_CLASS_URI +  i  , _NULL , Store.YES));
+							doc.add(new StringField(newPrefix + ECLASS_URI +  i  , NULL_VALUE , Store.YES));
 						}
 					}
 				}
@@ -166,11 +166,11 @@ public class DocumentUtil {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static EObject toEObject(Document doc, String prefix, ResourceSet set, Map<Object, Object> options) {
-		String uri = doc.get(prefix + _E_CLASS_URI);
-		if(uri == null || _NULL.equals(uri)) {
+		String uri = doc.get(prefix + ECLASS_URI);
+		if(uri == null || NULL_VALUE.equals(uri)) {
 				return null;			
 		}
-		String proxyUri = doc.get(prefix + _PROXY_URI);
+		String proxyUri = doc.get(prefix + PROXY_URI);
 		boolean isProxy = proxyUri != null;
 		
 		URI theUri = URI.createURI(uri);
@@ -205,7 +205,7 @@ public class DocumentUtil {
 				int i = 0;
 				String valueString = doc.get(prefix + a.getName() + "." + i++);
 				while(valueString != null) {
-					if(_NULL.equals(valueString)) {
+					if(NULL_VALUE.equals(valueString)) {
 						values.add(null);
 					} else {
 						values.add(EcoreUtil.createFromString(a.getEAttributeType(), valueString));
@@ -223,15 +223,15 @@ public class DocumentUtil {
 				Collection values = (Collection) result.eGet(r);
 				int i = 0;
 				String countedPrefix = newPrefix + i++ + ".";
-				String valueString = doc.get(countedPrefix + _E_CLASS_URI); 
+				String valueString = doc.get(countedPrefix + ECLASS_URI); 
 				while(valueString != null) {
-					if(_NULL.equals(valueString)) {
+					if(NULL_VALUE.equals(valueString)) {
 						values.add(null);
 					} else {
 						values.add(toEObject(doc, countedPrefix, set, options));
 					}
 					countedPrefix = newPrefix + i++ + ".";
-					valueString = doc.get(countedPrefix + _E_CLASS_URI); 
+					valueString = doc.get(countedPrefix + ECLASS_URI); 
 				}
 			}
 		});

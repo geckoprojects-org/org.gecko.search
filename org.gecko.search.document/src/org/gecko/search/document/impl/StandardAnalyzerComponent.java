@@ -15,6 +15,8 @@ package org.gecko.search.document.impl;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -35,6 +37,7 @@ import org.osgi.service.component.annotations.Deactivate;
 public class StandardAnalyzerComponent implements PrototypeServiceFactory<Analyzer>{
 
 	private ServiceRegistration<Analyzer> registerService;
+	private final  Map<Bundle, Analyzer> analyzerInUse = new ConcurrentHashMap<>();
 
 	@Activate
 	public void activate(ComponentContext ctx) {
@@ -56,7 +59,7 @@ public class StandardAnalyzerComponent implements PrototypeServiceFactory<Analyz
 	 */
 	@Override
 	public Analyzer getService(Bundle bundle, ServiceRegistration<Analyzer> registration) {
-		return new StandardAnalyzer();
+		return analyzerInUse.computeIfAbsent(bundle, b->new StandardAnalyzer());
 	}
 
 	/* 
@@ -65,7 +68,10 @@ public class StandardAnalyzerComponent implements PrototypeServiceFactory<Analyz
 	 */
 	@Override
 	public void ungetService(Bundle bundle, ServiceRegistration<Analyzer> registration, Analyzer service) {
-		
+		Analyzer analyzer = analyzerInUse.remove(bundle);
+		if (analyzer != null) {
+			analyzer.close();
+		}
 	}
 	
 }

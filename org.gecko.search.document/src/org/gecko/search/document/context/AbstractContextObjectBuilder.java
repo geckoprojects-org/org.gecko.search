@@ -27,7 +27,7 @@ import org.gecko.search.document.CommitCallback;
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
-public abstract class AbstractContextObjectBuilder<T, DICO extends DocumentIndexContextObject<?>> {
+public abstract class AbstractContextObjectBuilder<T, D extends DocumentIndexContextObject<?>> {
 	protected IndexActionType indexActionType;
 	protected Map<String, Object> properties = Collections.emptyMap();
 	protected T sourceObject;
@@ -38,35 +38,35 @@ public abstract class AbstractContextObjectBuilder<T, DICO extends DocumentIndex
 	protected AbstractContextObjectBuilder() {
 	}
 
-	public AbstractContextObjectBuilder<T, DICO> withIndexActionType(IndexActionType indexActionType) {
+	public AbstractContextObjectBuilder<T, D> withIndexActionType(IndexActionType indexActionType) {
 		this.indexActionType = indexActionType;
 		return this;
 	}
 
-	public AbstractContextObjectBuilder<T, DICO> withProperties(Map<String, Object> properties) {
+	public AbstractContextObjectBuilder<T, D> withProperties(Map<String, Object> properties) {
 		this.properties = properties;
 		return this;
 	}
 
-	public AbstractContextObjectBuilder<T, DICO> withSourceObject(T sourceObject) {
+	public AbstractContextObjectBuilder<T, D> withSourceObject(T sourceObject) {
 		this.sourceObject = sourceObject;
 		return this;
 	}
 
-	public AbstractContextObjectBuilder<T, DICO> withDocuments(List<Document> documents) {
+	public AbstractContextObjectBuilder<T, D> withDocuments(List<Document> documents) {
 		this.documents = documents;
 		return this;
 	}
 
-	public AbstractContextObjectBuilder<T, DICO> withIdentifyingTerm(Term identifyingTerm) {
+	public AbstractContextObjectBuilder<T, D> withIdentifyingTerm(Term identifyingTerm) {
 		this.identifyingTerm = identifyingTerm;
 		return this;
 	}
 
-	public AbstractContextObjectBuilder<T, DICO> withCommitCallback(CommitCallback commitCallback) {
+	public AbstractContextObjectBuilder<T, D> withCommitCallback(CommitCallback commitCallback) {
 		this.commitCallback = commitCallback;
 		return this;
 	}
 
-	public abstract DICO build();
+	public abstract D build();
 }

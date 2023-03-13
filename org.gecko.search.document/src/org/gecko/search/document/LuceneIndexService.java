@@ -28,7 +28,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @since 08.03.2023
  */
 @ProviderType
-public interface LuceneIndexService<DICO extends DocumentIndexContextObject<?>> {
+public interface LuceneIndexService<D extends DocumentIndexContextObject<?>> {
 
 	/**
 	 * @return the wrapped {@link IndexWriter}
@@ -56,24 +56,24 @@ public interface LuceneIndexService<DICO extends DocumentIndexContextObject<?>> 
 	 * Adds the given {@link DocumentIndexContextObject} to the queue to be indexed according to the configuration
 	 * @param context
 	 */
-	void handleContext(DICO context);
+	void handleContext(D context);
 
 	/**
 	 * Adds the given {@link Collection} of DocumentIndexContextObject}s to the queue to be indexed according to the configuration
 	 * @param contexts
 	 */
-	void handleContexts(Collection<DICO> contexts);
+	void handleContexts(Collection<D> contexts);
 
 	/**
 	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.
 	 * @param contexts
 	 */
-	void handleContextsSync(Collection<DICO> contexts);
+	void handleContextsSync(Collection<D> contexts);
 
 	/**
 	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.
 	 * @param contexts
 	 */
-	void handleContextSync(DICO context);
+	void handleContextSync(D context);
 
 }

@@ -24,7 +24,7 @@ import org.gecko.search.api.IndexDescriptor;
  * @author Mark Hoffmann
  * @since 08.12.2018
  */
-public interface SuggestionDescriptor<O, FIELD> extends IndexDescriptor {
+public interface SuggestionDescriptor<O, F> extends IndexDescriptor {
 	
 	/**
 	 * Returns the initial set of data, to be indexed. The list must not be <code>null</code> 
@@ -36,13 +36,13 @@ public interface SuggestionDescriptor<O, FIELD> extends IndexDescriptor {
 	 * Returns the object field, to be indexed
 	 * @return the object field, to be indexed
 	 */
-	public Set<FIELD> getFields();
+	public Set<F> getFields();
 	
 	/**
 	 * Returns the object field for the payload, usually the id feature
 	 * @return the object field for the payload
 	 */
-	public FIELD getPayload();
+	public F getPayload();
 
 	/**
 	 * Returns different labeling/tagging for indexing

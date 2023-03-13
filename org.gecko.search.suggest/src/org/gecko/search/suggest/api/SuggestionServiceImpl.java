@@ -30,13 +30,14 @@ import org.osgi.service.cm.ConfigurationException;
  * @author Ilenia Salvadori, Mark Hoffmann
  * @since 03.03.2023
  */
-public abstract class SuggestionServiceImpl<O, FIELD> extends BasicSuggestionService<O, FIELD> {
+public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionService<O, F> {
 
 	/**
 	 * Sets the suggestionDescriptor.
 	 * @param suggestionDescriptor the suggestionDescriptor to set
 	 */
-	protected void setSuggestionDescriptor(SuggestionDescriptor<O, FIELD> suggestionDescriptor) {
+	@Override
+	protected void setSuggestionDescriptor(SuggestionDescriptor<O, F> suggestionDescriptor) {
 		this.suggestionDescriptor = suggestionDescriptor;
 	}
 	/**
@@ -44,6 +45,7 @@ public abstract class SuggestionServiceImpl<O, FIELD> extends BasicSuggestionSer
 	 * @return the suggester;
 	 * @throws ConfigurationException 
 	 */
+	@Override
 	protected AnalyzingInfixSuggester initializeSuggestionIndex() throws ConfigurationException {
 		//Initialize path and analyzer
 		AnalyzingInfixSuggester suggester = super.initializeSuggestionIndex();
@@ -58,16 +60,15 @@ public abstract class SuggestionServiceImpl<O, FIELD> extends BasicSuggestionSer
 	 * data belonging to a particular category.
 	 * @return the list with contexts
 	 */
-	protected List<SuggestionContext<O, FIELD>> createContext() {
-		Set<FIELD> fields = suggestionDescriptor.getFields();
+	protected List<SuggestionContext<O, F>> createContext() {
+		Set<F> fields = suggestionDescriptor.getFields();
 		List<String> labels = suggestionDescriptor.getLabels();
 		final String[] labelsArray = labels.toArray(new String[labels.size()]);
 		Stream<O> objects = suggestionDescriptor.getObjectStream();
-		List<SuggestionContext<O, FIELD>> contexts = objects.
+		return objects.
 				map(object-> createContextsForFields(fields, object, IndexActionType.ADD, labelsArray, 4)).
 				flatMap(Collection::stream).
 				collect(Collectors.toList());
-		return contexts;
 	}
 
 }

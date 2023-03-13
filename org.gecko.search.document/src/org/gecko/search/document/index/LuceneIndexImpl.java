@@ -43,7 +43,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.NRTCachingDirectory;
 import org.gecko.search.api.IndexListener;
@@ -66,25 +65,28 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  * Indexing triggers commits using the push stream. The searcher are registered as {@link PrototypeServiceFactory} that are created 
  * out of the {@link SearcherManager}
  * @param <O> the business object type
- * @param <DICO> the concrete {@link DocumentIndexContextObject} of the business object type
+ * @param <D> the concrete {@link DocumentIndexContextObject} of the business object type
  * @author Juergen Albert, Mark Hoffmann
  * @since 08.03.2023
  */
-public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>> implements PrototypeServiceFactory<IndexSearcher>, LuceneIndexService<DICO>{
+public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> implements PrototypeServiceFactory<IndexSearcher>, LuceneIndexService<D>{
+
+	/** BASE_PATH */
+	private static final String BASE_PATH = "base.path";
 
 	private static final Logger LOGGER = Logger.getLogger(LuceneIndexImpl.class.getName());
 
 	private final PushStreamProvider psp = new PushStreamProvider();
 	private final ExecutorService commitExecutors = Executors.newCachedThreadPool();
 	private final List<IndexListener> indexListeners = new LinkedList<>();
-	private Analyzer analyzer = null;;
+	private Analyzer analyzer = null;
 	private Directory directory;
 	private IndexWriter indexWriter;
 	private SearcherManager searcherManager;
 
 	private ExecutorService indexExecutors = null;
 	private ServiceRegistration<IndexSearcher> searcherRegistration;
-	private SimplePushEventSource<DICO> singleSource;
+	private SimplePushEventSource<D> singleSource;
 	private File indexFolder;
 
 	@ObjectClassDefinition
@@ -96,7 +98,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 		long windowSize() default 500;
 		int indexThreads() default 5;
 	}	
-	
+
 	/**
 	 * Sets the analyzer.
 	 * @param analyzer the analyzer to set
@@ -104,7 +106,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	public void setAnalyzer(Analyzer analyzer) {
 		this.analyzer = analyzer;
 	}
-	
+
 	/**
 	 * Returns the analyzer.
 	 * @return the analyzer
@@ -112,7 +114,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	protected Analyzer getAnalyzer() {
 		return analyzer;
 	}
-	
+
 	/**
 	 * Adds an index listener
 	 * @param listener the listener to add
@@ -121,7 +123,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 		requireNonNull(listener);
 		indexListeners.add(listener);
 	}
-	
+
 	/**
 	 * Removes an index listener
 	 * @param listener the listener to be removed
@@ -130,7 +132,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 		requireNonNull(listener);
 		indexListeners.remove(listener);
 	}
-	
+
 	/**
 	 * Returns the {@link PushStreamProvider}.
 	 * @return the {@link PushStreamProvider}
@@ -147,11 +149,11 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 			try {
 				url = new File(serviceConfig.base_path()).toURI().toURL();
 			} catch (MalformedURLException e) {
-				throw new ConfigurationException("base.path", "Base path has an invalid format ", e);
+				throw new ConfigurationException(BASE_PATH, "Base path has an invalid format ", e);
 			}
 		}
 		if(url == null) {
-			throw new ConfigurationException("base.path", "The property is required");
+			throw new ConfigurationException(BASE_PATH, "The property is required");
 		}
 
 		try {
@@ -165,7 +167,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 			indexFolder = new File(new File(uri), serviceConfig.id());
 		} catch (URISyntaxException | MalformedURLException e) {
 			//Can't happen. It was already checked multiple times
-			throw new ConfigurationException("base.path", "The given path.path format is invalid '" + url.toString() + "'", e);
+			throw new ConfigurationException(BASE_PATH, "The given path.path format is invalid '" + url.toString() + "'", e);
 		}
 		requireNonNull(analyzer);
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -182,8 +184,8 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 				break;
 			case "MMap":
 			default:
-				LOGGER.warning("Unrecognized directory format: " + serviceConfig.directory_type() + "; Falling back to MMap");
-				directory = MMapDirectory.open(indexFolder.toPath());
+				LOGGER.warning("Unrecognized directory format: " + serviceConfig.directory_type() + "; Falling back to system defaults");
+				directory = FSDirectory.open(indexFolder.toPath());
 				break;
 			}
 			NRTCachingDirectory cachedFSDir = new NRTCachingDirectory(directory, 5.0, 60.0);
@@ -195,7 +197,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 		indexExecutors = Executors.newScheduledThreadPool(serviceConfig.indexThreads());
 		chainPushStream(serviceConfig);
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("id", serviceConfig.id());
 		searcherRegistration = context.registerService(IndexSearcher.class, this, properties);
 	}
@@ -229,9 +231,9 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 			}
 		}
 	}
-	
-	protected abstract SimplePushEventSource<DICO> createSimplePushEventSource();
-	
+
+	protected abstract SimplePushEventSource<D> createSimplePushEventSource();
+
 	/**
 	 * Configures and chains the internal Pushstream according to the configuration
 	 * @param serviceConfig the services configuration
@@ -239,30 +241,26 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	protected void chainPushStream(Config serviceConfig) {
 		singleSource = createSimplePushEventSource();
 		requireNonNull(singleSource);
-		PushStream<DICO> pspBuilder = psp.buildStream(singleSource)
-				.withPushbackPolicy( q -> {
-					return Math.max(0, q.size() - (serviceConfig.batchSize() + 50));
-				})
+		PushStream<D> pspBuilder = psp.buildStream(singleSource)
+				.withPushbackPolicy( q -> Math.max(0, q.size() - (serviceConfig.batchSize() + 50)))
 				.withQueuePolicy(QueuePolicyOption.BLOCK)
-				.withBuffer(new ArrayBlockingQueue<PushEvent<? extends DICO>>(serviceConfig.batchSize() * 2))
+				.withBuffer(new ArrayBlockingQueue<PushEvent<? extends D>>(serviceConfig.batchSize() * 2))
 				.build();
 		pspBuilder
 		.fork(serviceConfig.indexThreads(), 0, indexExecutors)
-		.buildBuffer().withBuffer(new ArrayBlockingQueue<PushEvent<? extends DICO>>(serviceConfig.batchSize() * 2)).build()
+		.buildBuffer().withBuffer(new ArrayBlockingQueue<PushEvent<? extends D>>(serviceConfig.batchSize() * 2)).build()
 		.adjustBackPressure(l -> 0)
-		.window(() -> Duration.ofMillis(serviceConfig.windowSize()), () -> serviceConfig.batchSize(), indexExecutors , (l,list) -> {
-			return list;
-		})
+		.window(() -> Duration.ofMillis(serviceConfig.windowSize()), () -> serviceConfig.batchSize(), indexExecutors , (l,list) -> list)
 		.filter(c -> !c.isEmpty())
 		.forEach(this::handleContextsSync);
 	}
-	
+
 	/**
 	 * Performs the actual action on the index.
 	 * @param context
 	 * @param commit
 	 */
-	protected void internalHandleContext(DICO context, boolean commit) {
+	protected void internalHandleContext(D context, boolean commit) {
 		requireNonNull(context);
 		requireNonNull(indexWriter);
 		try {
@@ -280,45 +278,44 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 				throw new UnsupportedOperationException("SEARCH is currerntly not supported");
 			}
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage(), e));
-			throw new IllegalStateException("Could not handle " + context.getActionType().name(), e);
+			throw new IllegalStateException(String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage()), e);
 		}
 		if(commit) {
-			LOGGER.log(Level.FINE, ()->String.format("Handle commit from internalHandleContext"));
+			LOGGER.log(Level.FINE, ()->"Handle commit from internalHandleContext");
 			commit();
 		} else {
-			LOGGER.log(Level.FINE, ()->String.format("Handle NO commit from internalHandleContext"));
+			LOGGER.log(Level.FINE, ()->"Handle NO commit from internalHandleContext");
 		}
 		// Trigger listeners asynchronous
 		commitExecutors.submit(()->{
 			synchronized (indexListeners) {
 				indexListeners.stream().
-					filter(l->l.canHandle(context)).
-					forEach(l->l.onIndex(context));
+				filter(l->l.canHandle(context)).
+				forEach(l->l.onIndex(context));
 			}
 		});
 	}
 
-	protected void internalHandleContexts(Collection<DICO> contexts, boolean commit) {
+	protected void internalHandleContexts(Collection<D> contexts, boolean commit) {
 		requireNonNull(contexts);
 		contexts.forEach(partial(this::internalHandleContext, false));
 		if(commit) {
 			try {
 				commit();
-				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> {
-					commitExecutors.submit(() -> callback.commited(ctx));
-				}));
-			} catch (Throwable t) {
-				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> {
-					commitExecutors.submit(() -> callback.error(ctx, t));
-				}));
+				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
+					commitExecutors.submit(() -> callback.commited(ctx))
+				));
+			} catch (Exception e) {
+				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
+					commitExecutors.submit(() -> callback.error(ctx, e))
+				));
 			}
 		}
 	}
 
 	public static <T> Consumer<T> partial(BiConsumer<T, Boolean> f, boolean commit) {
 		requireNonNull(f);
-		return (c) -> f.accept(c, commit);
+		return c -> f.accept(c, commit);
 	}
 
 	/* 
@@ -326,7 +323,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @see org.gecko.search.document.LuceneIndexService#handleContext(org.gecko.search.document.DocumentIndexContextObject)
 	 */
 	@Override
-	public void handleContext(DICO context) {
+	public void handleContext(D context) {
 		requireNonNull(context);
 		requireNonNull(singleSource);
 		singleSource.publish(context);
@@ -337,7 +334,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @see org.gecko.search.document.LuceneIndexService#handleContextSync(org.gecko.search.document.DocumentIndexContextObject)
 	 */
 	@Override
-	public void handleContextSync(DICO context) {
+	public void handleContextSync(D context) {
 		internalHandleContext(context, true);
 	}
 
@@ -346,7 +343,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @see org.gecko.search.document.LuceneIndexService#handleContexts(java.util.Collection)
 	 */
 	@Override
-	public void handleContexts(Collection<DICO> contexts) {
+	public void handleContexts(Collection<D> contexts) {
 		contexts.forEach(singleSource::publish);
 	}
 
@@ -355,7 +352,7 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 	 * @see org.gecko.search.document.LuceneIndexService#handleContextsSync(java.util.Collection)
 	 */
 	@Override
-	public void handleContextsSync(Collection<DICO> contexts) {
+	public void handleContextsSync(Collection<D> contexts) {
 		internalHandleContexts(contexts, true);
 	}
 
@@ -412,19 +409,14 @@ public abstract class LuceneIndexImpl<DICO extends DocumentIndexContextObject<?>
 			}
 		}
 		if(searcherManager != null) {
-			commitExecutors.submit(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						if(searcherManager != null){
-							if (!searcherManager.maybeRefresh()) {
-								LOGGER.log(Level.FINE, "Refreshing did not work, because it was called from a wrong thread");
-							}
-						}
-					} catch (IOException e) {
-						LOGGER.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage(), e));
-					} 
-				}
+			commitExecutors.submit(()-> {
+				try {
+					if(searcherManager != null && !searcherManager.maybeRefresh()) {
+						LOGGER.log(Level.FINE, "Refreshing did not work, because it was called from a wrong thread");
+					}
+				} catch (IOException e) {
+					LOGGER.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage()), e);
+				} 
 			});
 		}
 

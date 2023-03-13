@@ -13,24 +13,57 @@
  */
 package org.gecko.search.suggest.impl;
 
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.gecko.search.api.IndexContextObject;
 import org.gecko.search.api.IndexListener;
+import org.gecko.search.document.context.ObjectContextObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.pushstream.PushEvent;
+import org.osgi.util.pushstream.PushStream;
+import org.osgi.util.pushstream.PushStreamProvider;
+import org.osgi.util.pushstream.QueuePolicyOption;
+import org.osgi.util.pushstream.SimplePushEventSource;
 
 /**
  * IndexListener that connects to the index process to also create a suggestion index out of this data
  * @author Mark Hoffmann
  * @since 10.03.2023
  */
-@Component(name = "SuggestionIndexListener")
-public class SuggestIndexListener<T> implements IndexListener {
+@Component(name = "SuggestionIndexListener", configurationPolicy = ConfigurationPolicy.REQUIRE)
+public class SuggestIndexListener implements IndexListener {
+	
+	private final PushStreamProvider psp = new PushStreamProvider();
+	private SimplePushEventSource<ObjectContextObject> eventSource;
+	@SuppressWarnings("rawtypes")
+	private ServiceRegistration<PushStream> serviceRegistration;
 
 	@Activate
-	public void activate(Map<String, Object> properties) {
-		
+	public void activate(Map<String, Object> properties, BundleContext context) {
+		eventSource = psp.buildSimpleEventSource(ObjectContextObject.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends ObjectContextObject>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
+		PushStream<ObjectContextObject> stream = psp.buildStream(eventSource)
+				.withPushbackPolicy( q -> Math.max(0, q.size() - 50))
+				.withQueuePolicy(QueuePolicyOption.BLOCK)
+				.withBuffer(new ArrayBlockingQueue<PushEvent<? extends ObjectContextObject>>(50))
+				.build();
+		serviceRegistration = context.registerService(PushStream.class, stream, new Hashtable<>(properties));
+	}
+	
+	@Deactivate
+	public void deactivate() {
+		if (serviceRegistration != null) {
+			serviceRegistration.unregister();
+		}
+		if (eventSource != null && eventSource.isConnected()) {
+			eventSource.close();
+		}
 	}
 	
 	/* 
@@ -39,8 +72,7 @@ public class SuggestIndexListener<T> implements IndexListener {
 	 */
 	@Override
 	public boolean canHandle(IndexContextObject<?> context) {
-		// TODO Auto-generated method stub
-		return false;
+		return context instanceof ObjectContextObject;
 	}
 	/* 
 	 * (non-Javadoc)
@@ -48,8 +80,9 @@ public class SuggestIndexListener<T> implements IndexListener {
 	 */
 	@Override
 	public void onIndex(IndexContextObject<?> context) {
-		// TODO Auto-generated method stub
-		
+		if (eventSource != null && context instanceof ObjectContextObject) {
+			eventSource.publish((ObjectContextObject) context);
+		}
 	}
 
 }

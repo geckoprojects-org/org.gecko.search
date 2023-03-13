@@ -46,6 +46,7 @@ public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<
 	 * @throws ConfigurationException
 	 */
 	@Activate
+	@Override
 	public void activate(ComponentContext ctx , SuggestionConfiguration configuration) {
 		super.activate(ctx, configuration);
 	}
@@ -54,6 +55,7 @@ public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<
 	 * Called on component de-activation
 	 */
 	@Deactivate
+	@Override
 	public void deactivate() {
 		super.deactivate();
 	}
@@ -75,7 +77,7 @@ public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<
 	@Override
 	@Reference(name = "contextStream")
 	protected void setContextStream(PushStream<EObject> contextStream) {
-		super.setContextStream((PushStream<EObject>) contextStream);
+		super.setContextStream(contextStream);
 	}
 
 	/* 

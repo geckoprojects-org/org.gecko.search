@@ -13,7 +13,7 @@
  */
 package org.gecko.search.suggest.context;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,85 +27,77 @@ import org.apache.lucene.util.BytesRef;
  * @author Ilenia Salvadori
  * @since 09.11.2018
  */
-public class ContextIteratorImpl<O, FIELD> implements InputIterator
-	{
-	    private Iterator<SuggestionContext<O, FIELD>> deviceIterator;
-	    private SuggestionContext<O, FIELD> currentContext;
+public class ContextIteratorImpl<O, F> implements InputIterator
+{
+	private Iterator<SuggestionContext<O, F>> deviceIterator;
+	private SuggestionContext<O, F> currentContext;
 
-	    public ContextIteratorImpl(Iterator<SuggestionContext<O, FIELD>> deviceIterator) {
-	        this.deviceIterator = deviceIterator;
-	    }
-	    
-	    /* 
-	     * (non-Javadoc)
-	     * @see org.apache.lucene.search.suggest.InputIterator#hasContexts()
-	     */
-	    public boolean hasContexts() {
-	        return true;
-	    }
-	    
-	    /* 
-	     * (non-Javadoc)
-	     * @see org.apache.lucene.search.suggest.InputIterator#hasPayloads()
-	     */
-	    public boolean hasPayloads() {
-	        return true;
-	    }
-
-	    /**
-	     * @return
-	     */
-	    public Comparator<BytesRef> getComparator() {
-	        return null;
-	    }
-
-	    /* 
-	     * (non-Javadoc)
-	     * @see org.apache.lucene.util.BytesRefIterator#next()
-	     */
-	    public BytesRef next() {
-	        if (deviceIterator.hasNext()) {
-	            currentContext = deviceIterator.next();
-	            try {
-	            	//we want completion against the device description
-	                return new BytesRef(currentContext.getContent().getBytes("UTF8")); 
-	            } catch (UnsupportedEncodingException e) {
-	                throw new Error("Couldn't convert to UTF-8");
-	            }
-	        } else {
-	            return null;
-	        }
-	    }
-
-	    /* 
-	     * (non-Javadoc)
-	     * @see org.apache.lucene.search.suggest.InputIterator#payload()
-	     */
-	    public BytesRef payload() {
-	            return new BytesRef(currentContext.getPayload().getBytes());
-	    }
-
-	    /* 
-	     * (non-Javadoc)
-	     * @see org.apache.lucene.search.suggest.InputIterator#contexts()
-	     */
-	    public Set<BytesRef> contexts() {           	
-	    	try {
-	            Set<BytesRef> labels = new HashSet<BytesRef>();
-	            for (String label : currentContext.getLabels()) {
-	            	labels.add(new BytesRef(label.getBytes("UTF8")));
-	            }
-	            return labels;
-	        } catch (UnsupportedEncodingException e) {
-	            throw new Error("Couldn't convert to UTF-8");
-	        }
-	    }
-
-	    /* 
-	     * (non-Javadoc)
-	     * @see org.apache.lucene.search.suggest.InputIterator#weight()
-	     */
-	    public long weight() {
-	        return currentContext.getWeight();
-	    }
+	public ContextIteratorImpl(Iterator<SuggestionContext<O, F>> deviceIterator) {
+		this.deviceIterator = deviceIterator;
 	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.apache.lucene.search.suggest.InputIterator#hasContexts()
+	 */
+	public boolean hasContexts() {
+		return true;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.apache.lucene.search.suggest.InputIterator#hasPayloads()
+	 */
+	public boolean hasPayloads() {
+		return true;
+	}
+
+	/**
+	 * @return
+	 */
+	public Comparator<BytesRef> getComparator() {
+		return null;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.apache.lucene.util.BytesRefIterator#next()
+	 */
+	public BytesRef next() {
+		if (deviceIterator.hasNext()) {
+			currentContext = deviceIterator.next();
+			//we want completion against the device description
+			return new BytesRef(currentContext.getContent().getBytes(StandardCharsets.UTF_8)); 
+		} else {
+			return null;
+		}
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.apache.lucene.search.suggest.InputIterator#payload()
+	 */
+	public BytesRef payload() {
+		return new BytesRef(currentContext.getPayload().getBytes());
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.apache.lucene.search.suggest.InputIterator#contexts()
+	 */
+	public Set<BytesRef> contexts() {           	
+		Set<BytesRef> labels = new HashSet<>();
+		for (String label : currentContext.getLabels()) {
+			labels.add(new BytesRef(label.getBytes(StandardCharsets.UTF_8)));
+		}
+		return labels;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.apache.lucene.search.suggest.InputIterator#weight()
+	 */
+	public long weight() {
+		return currentContext.getWeight();
+	}
+}

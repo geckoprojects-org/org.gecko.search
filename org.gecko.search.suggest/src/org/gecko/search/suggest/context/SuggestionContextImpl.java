@@ -29,20 +29,20 @@ import org.gecko.search.api.IndexActionType;
  *           category
  * 
  * @param <O> the business object type
- * @param <FIELD> the business object field type
+ * @param <F> the business object field type
  * @author Ilenia Salvadori, Mark Hoffmann
  * @since 09.03.2023
  */
-public class SuggestionContextImpl<O, FIELD> implements SuggestionContext<O, FIELD>{
+public class SuggestionContextImpl<O, F> implements SuggestionContext<O, F>{
 	
 		private final String payload;
 		private final String content;
 		private final long weight;
 		private final String[] labels;
 		private final IndexActionType action;
-		private final Map<String, Object> properties = new HashMap<String, Object>();
+		private final Map<String, Object> properties = new HashMap<>();
 		private O sourceObject;
-		private FIELD field;
+		private F field;
 		
 		public SuggestionContextImpl(IndexActionType action, String payload, String content, String[] labels, long weight) {
 			this.payload = payload;
@@ -121,11 +121,11 @@ public class SuggestionContextImpl<O, FIELD> implements SuggestionContext<O, FIE
 		 * @see org.gecko.search.suggest.api.SuggestionContext#getField()
 		 */
 		@Override
-		public FIELD getField() {
+		public F getField() {
 			return field;
 		}
 		
-		public void setField(FIELD field) {
+		public void setField(F field) {
 			this.field = field;
 		}
 
