@@ -94,7 +94,7 @@ public class IndexListenerTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "MMAP"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "base.path", value = INDEX_PATH)
 			})
 	public void basicTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
@@ -161,7 +161,7 @@ public class IndexListenerTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "MMAP"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "base.path", value = INDEX_PATH)
 			})
 	public void noHandlingTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
@@ -239,7 +239,7 @@ public class IndexListenerTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "indexListener.target", value = "(type=test)"),
-					@Property(key = "directory.type", value = "MMAP"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "base.path", value = INDEX_PATH)
 			})
 	public void bindTargetTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 

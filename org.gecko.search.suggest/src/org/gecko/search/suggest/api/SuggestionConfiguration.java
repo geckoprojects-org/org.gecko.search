@@ -19,5 +19,6 @@ public @interface SuggestionConfiguration {
 	String base_path() default "";
 	int suggestionNumberResults() default 10;
 	boolean suggestionAllTermsRequired() default true;
+	String directory_type() default "FS";
 	
 }

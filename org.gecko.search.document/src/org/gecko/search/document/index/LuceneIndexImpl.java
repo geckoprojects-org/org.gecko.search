@@ -41,6 +41,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
@@ -175,6 +176,9 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 			switch(serviceConfig.directory_type()) {
 			case "NRT":
 				directory = FSDirectory.open(indexFolder.toPath());
+				break;
+			case "ByteBuffer":
+				directory = new ByteBuffersDirectory();
 				break;
 			case "FS":
 				directory = FSDirectory.open(indexFolder.toPath());

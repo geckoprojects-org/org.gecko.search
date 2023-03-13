@@ -83,7 +83,7 @@ public class IndexTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "MMAP"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "base.path", value = INDEX_PATH)
 			})
 	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
@@ -127,7 +127,7 @@ public class IndexTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "MMAP"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "base.path", value =  INDEX_PATH)
 			})
 	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,

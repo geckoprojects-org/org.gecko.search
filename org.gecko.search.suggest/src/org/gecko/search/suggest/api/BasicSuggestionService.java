@@ -36,6 +36,8 @@ import java.util.stream.Stream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
+import org.apache.lucene.store.ByteBuffersDirectory;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.gecko.search.api.IndexActionType;
@@ -60,7 +62,7 @@ public abstract class BasicSuggestionService<O, F> implements SuggestionService 
 	protected final StandardAnalyzer analyzer = new StandardAnalyzer();
 	protected SuggestionDescriptor<O, F> suggestionDescriptor;
 	protected Promise<AnalyzingInfixSuggester> suggesterPromise;
-	protected FSDirectory indexDir;
+	protected Directory indexDir;
 	protected SuggestionConfiguration configuration;
 	
 	/* 
@@ -174,7 +176,11 @@ public abstract class BasicSuggestionService<O, F> implements SuggestionService 
 		}
 	
 		try {
-			indexDir = FSDirectory.open(file.toPath());
+			if ("ByteBuffer".equals(configuration.directory_type())) {
+				indexDir = new ByteBuffersDirectory();
+			} else {
+				indexDir = FSDirectory.open(file.toPath());
+			}
 			suggester = new AnalyzingInfixSuggester(indexDir, analyzer);
 		} catch (IOException e) {
 			throw new ConfigurationException("base.path", String.format("Error opening suggestion index for the given path '%s'", file.toString()));

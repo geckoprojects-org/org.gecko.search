@@ -90,6 +90,7 @@ public class SuggestionStreamIntegrationTest {
 					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})
 	public void testSuggestStream(@InjectService ServiceAware<BasicPackage> basicPackageAware,
@@ -145,6 +146,7 @@ public class SuggestionStreamIntegrationTest {
 					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "contextStream.target", value = "(name=myStream)"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})

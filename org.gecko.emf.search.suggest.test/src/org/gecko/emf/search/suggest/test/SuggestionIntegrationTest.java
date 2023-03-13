@@ -79,6 +79,7 @@ public class SuggestionIntegrationTest {
 					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})
 	public void testSuggest(@InjectService ServiceAware<BasicPackage> basicPackageAware,

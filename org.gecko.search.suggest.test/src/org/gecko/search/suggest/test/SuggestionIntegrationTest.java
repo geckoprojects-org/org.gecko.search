@@ -76,6 +76,7 @@ public class SuggestionIntegrationTest {
 			properties = {
 					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
+					@Property(key = "directory.type", value = "ByteBuffer"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "suggestionNumberResults", value = "5", scalar = Scalar.Integer)
 			})
