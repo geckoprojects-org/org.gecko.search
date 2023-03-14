@@ -20,7 +20,8 @@
 	bnd.identity;id='org.apache.lucene.queryparser',\
 	bnd.identity;id='org.apache.lucene.spatial',\
 	bnd.identity;id='org.apache.lucene.suggest',\
-	bnd.identity;id='org.apache.lucene.benchmark'
+	bnd.identity;id='org.apache.lucene.benchmark',\
+	bnd.identity;id='org.apache.lucene.backward.codecs'
 -runbundles: \
 	com.ibm.icu;version='[70.1.0,70.1.1)',\
 	org.antlr.antlr4-runtime;version='[4.9.3,4.9.4)',\
@@ -53,4 +54,5 @@
 	org.locationtech.spatial4j;version='[0.8.0,0.8.1)',\
 	org.objectweb.asm;version='[9.3.0,9.3.1)',\
 	org.objectweb.asm.commons;version='[9.3.0,9.3.1)',\
-	org.objectweb.asm.tree;version='[9.3.0,9.3.1)'
+	org.objectweb.asm.tree;version='[9.3.0,9.3.1)',\
+	org.apache.lucene.backward.codecs;version=snapshot

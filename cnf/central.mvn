@@ -8,6 +8,8 @@ org.apache.lucene:lucene-queryparser:${lucene-version}
 org.apache.lucene:lucene-queryparser:jar:sources:${lucene-version}
 org.apache.lucene:lucene-codecs:${lucene-version}
 org.apache.lucene:lucene-codecs:jar:sources:${lucene-version}
+org.apache.lucene:lucene-backward-codecs:${lucene-version}
+org.apache.lucene:lucene-backward-codecs:jar:sources:${lucene-version}
 org.apache.lucene:lucene-memory:${lucene-version}
 org.apache.lucene:lucene-memory:jar:sources:${lucene-version}
 org.apache.lucene:lucene-suggest:${lucene-version}

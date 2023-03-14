@@ -17,24 +17,25 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -55,11 +56,8 @@ import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
-import org.osgi.util.pushstream.PushEvent;
-import org.osgi.util.pushstream.PushStream;
-import org.osgi.util.pushstream.PushStreamProvider;
-import org.osgi.util.pushstream.QueuePolicyOption;
-import org.osgi.util.pushstream.SimplePushEventSource;
+import org.osgi.util.promise.Promise;
+import org.osgi.util.promise.PromiseFactory;
 
 /**
  * Service implementation using a {@link SearcherManager} to enable NRT search.
@@ -70,34 +68,35 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  * @author Juergen Albert, Mark Hoffmann
  * @since 08.03.2023
  */
-public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> implements PrototypeServiceFactory<IndexSearcher>, LuceneIndexService<D>{
+public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> implements LuceneIndexService<D>{
 
 	/** BASE_PATH */
 	private static final String BASE_PATH = "base.path";
 
 	private static final Logger LOGGER = Logger.getLogger(LuceneIndexImpl.class.getName());
 
-	private final PushStreamProvider psp = new PushStreamProvider();
-	private final ExecutorService commitExecutors = Executors.newCachedThreadPool();
+	private ExecutorService commitExecutors = null;
+	private PromiseFactory pf = null;
 	private final List<IndexListener> indexListeners = new LinkedList<>();
 	private Analyzer analyzer = null;
 	private Directory directory;
 	private IndexWriter indexWriter;
 	private SearcherManager searcherManager;
 
-	private ExecutorService indexExecutors = null;
 	private ServiceRegistration<IndexSearcher> searcherRegistration;
-	private SimplePushEventSource<D> singleSource;
-	private File indexFolder;
+	private int threadCount = 0;
+
+	private IndexConfig configuration;
+
 
 	@ObjectClassDefinition
-	public @interface Config {
+	public @interface IndexConfig {
 		String id();
 		String directory_type();
 		String base_path() default "";
 		int batchSize() default 500;
 		long windowSize() default 500;
-		int indexThreads() default 5;
+		int indexThreads() default 4;
 	}	
 
 	/**
@@ -134,82 +133,27 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		indexListeners.remove(listener);
 	}
 
-	/**
-	 * Returns the {@link PushStreamProvider}.
-	 * @return the {@link PushStreamProvider}
-	 */
-	protected PushStreamProvider getPushStreamProvider() {
-		return psp;
-	}
-
-	protected void activate(Config serviceConfig, BundleContext context) throws ConfigurationException {
-		requireNonNull(serviceConfig);
+	protected void activate(IndexConfig configuration, BundleContext context) throws ConfigurationException {
+		requireNonNull(configuration);
 		requireNonNull(context);
-		URL url = null;
-		if(serviceConfig.base_path().length() > 0) {
-			try {
-				url = new File(serviceConfig.base_path()).toURI().toURL();
-			} catch (MalformedURLException e) {
-				throw new ConfigurationException(BASE_PATH, "Base path has an invalid format ", e);
-			}
-		}
-		if(url == null) {
-			throw new ConfigurationException(BASE_PATH, "The property is required");
-		}
+		this.configuration = configuration;
 
-		try {
-			URI uri = url.toURI();
-
-			if(uri.getAuthority() != null && uri.getAuthority().length() > 0) {
-				// Hack for UNC Path
-				uri = (new URL("file://" + url.toString().substring("file:".length()))).toURI();
-			}
-
-			indexFolder = new File(new File(uri), serviceConfig.id());
-		} catch (URISyntaxException | MalformedURLException e) {
-			//Can't happen. It was already checked multiple times
-			throw new ConfigurationException(BASE_PATH, "The given path.path format is invalid '" + url.toString() + "'", e);
-		}
 		requireNonNull(analyzer);
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		try {
-			switch(serviceConfig.directory_type()) {
-			case "NRT":
-				directory = FSDirectory.open(indexFolder.toPath());
-				break;
-			case "ByteBuffer":
-				directory = new ByteBuffersDirectory();
-				break;
-			case "FS":
-				directory = FSDirectory.open(indexFolder.toPath());
-				break;
-			case "NIOFS":
-				directory = new NIOFSDirectory(indexFolder.toPath());
-				break;
-			case "MMap":
-			default:
-				LOGGER.warning("Unrecognized directory format: " + serviceConfig.directory_type() + "; Falling back to system defaults");
-				directory = FSDirectory.open(indexFolder.toPath());
-				break;
-			}
-			NRTCachingDirectory cachedFSDir = new NRTCachingDirectory(directory, 5.0, 60.0);
-			indexWriter = new IndexWriter(cachedFSDir, config);
+			directory = initializeDirectory(configuration);
+			directory = new NRTCachingDirectory(directory, 5.0, 60.0);
+			indexWriter = new IndexWriter(directory, config);
 			searcherManager = new SearcherManager(indexWriter, null);
+			initializeExecutors(configuration);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Could not open index directory for " + indexFolder.getPath() + " with message "+ e.getMessage(), e);
+			throw new IllegalArgumentException(String.format("Could not open index directory for %s with message %s", configuration.base_path(), e.getMessage()), e);
 		}
-		indexExecutors = Executors.newScheduledThreadPool(serviceConfig.indexThreads());
-		chainPushStream(serviceConfig);
 
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put("id", serviceConfig.id());
-		searcherRegistration = context.registerService(IndexSearcher.class, this, properties);
+		registerIndexSearcher(configuration, context);
 	}
 
 	protected void deactivate() {
-		if (singleSource != null) {
-			singleSource.close();
-		}
 		if (searcherRegistration != null) {
 			searcherRegistration.unregister();
 		}
@@ -236,60 +180,206 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		}
 	}
 
-	protected abstract SimplePushEventSource<D> createSimplePushEventSource();
-
 	/**
-	 * Configures and chains the internal Pushstream according to the configuration
-	 * @param serviceConfig the services configuration
+	 * Create the index creation location
+	 * @param configuration the index configuration
+	 * @throws ConfigurationException
 	 */
-	protected void chainPushStream(Config serviceConfig) {
-		singleSource = createSimplePushEventSource();
-		requireNonNull(singleSource);
-		PushStream<D> pspBuilder = psp.buildStream(singleSource)
-				.withPushbackPolicy( q -> Math.max(0, q.size() - (serviceConfig.batchSize() + 50)))
-				.withQueuePolicy(QueuePolicyOption.BLOCK)
-				.withBuffer(new ArrayBlockingQueue<PushEvent<? extends D>>(serviceConfig.batchSize() * 2))
-				.build();
-		pspBuilder
-		.fork(serviceConfig.indexThreads(), 0, indexExecutors)
-		.buildBuffer().withBuffer(new ArrayBlockingQueue<PushEvent<? extends D>>(serviceConfig.batchSize() * 2)).build()
-		.adjustBackPressure(l -> 0)
-		.window(() -> Duration.ofMillis(serviceConfig.windowSize()), () -> serviceConfig.batchSize(), indexExecutors , (l,list) -> list)
-		.filter(c -> !c.isEmpty())
-		.forEach(this::handleContextsSync);
+	protected File initializeIndexLocation(IndexConfig configuration) throws ConfigurationException {
+		URL url = null;
+		if(configuration.base_path().length() > 0) {
+			try {
+				url = new File(configuration.base_path()).toURI().toURL();
+			} catch (MalformedURLException e) {
+				throw new ConfigurationException(BASE_PATH, "Base path has an invalid format ", e);
+			}
+		}
+		if(url == null) {
+			throw new ConfigurationException(BASE_PATH, "The property is required");
+		}
+		try {
+			URI uri = url.toURI();
+	
+			if(uri.getAuthority() != null && uri.getAuthority().length() > 0) {
+				// Hack for UNC Path
+				uri = (new URL("file://" + url.toString().substring("file:".length()))).toURI();
+			}
+			return new File(new File(uri), configuration.id());
+		} catch (URISyntaxException | MalformedURLException e) {
+			//Should not happen. It was already checked multiple times
+			throw new ConfigurationException(BASE_PATH, "The given path.path format is invalid '" + url.toString() + "'", e);
+		}
 	}
 
 	/**
-	 * Performs the actual action on the index.
-	 * @param context
+	 * Creates a Lucene {@link Directory} dependent on the configuration
+	 * @param configuration the service configuration
+	 * @return the directory instance
+	 * @throws IOException thrown on errors during directory creation
+	 * @throws ConfigurationException 
+	 */
+	protected Directory initializeDirectory(IndexConfig configuration) throws IOException, ConfigurationException {
+		File indexFolder = initializeIndexLocation(configuration);
+		switch(configuration.directory_type()) {
+		case "NRT":
+			directory = FSDirectory.open(indexFolder.toPath());
+			break;
+		case "ByteBuffer":
+			directory = new ByteBuffersDirectory();
+			break;
+		case "FS":
+			directory = FSDirectory.open(indexFolder.toPath());
+			break;
+		case "NIOFS":
+			directory = new NIOFSDirectory(indexFolder.toPath());
+			break;
+		case "MMap":
+		default:
+			LOGGER.warning("Unrecognized directory format: " + configuration.directory_type() + "; Falling back to system defaults");
+			directory = FSDirectory.open(indexFolder.toPath());
+			break;
+		}
+		return directory;
+	}
+	
+	/**
+	 * Creates the setup for {@link ExecutorService} and {@link PromiseFactory}
+	 * @param serviceConfig the configuration
+	 */
+	protected void initializeExecutors(IndexConfig serviceConfig) {
+		commitExecutors = Executors.newFixedThreadPool(2, (r)->{
+			Thread t = new Thread(r, "Index+Commit-" + threadCount++);
+			t.setDaemon(true);
+			return t;
+		});
+		pf = new PromiseFactory(commitExecutors);
+	}
+
+	/**
+	 * Registers the Index Searcher as {@link PrototypeServiceFactory}
+	 * @param configuration the index configuration
+	 * @param context the {@link BundleContext}
+	 */
+	protected void registerIndexSearcher(IndexConfig configuration, BundleContext context) {
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put("id", configuration.id());
+		searcherRegistration = context.registerService(IndexSearcher.class, new PrototypeServiceFactory<IndexSearcher>() {
+
+			@Override
+			public IndexSearcher getService(Bundle bundle, ServiceRegistration<IndexSearcher> registration) {
+				return aquireSearch();
+			}
+
+			@Override
+			public void ungetService(Bundle bundle, ServiceRegistration<IndexSearcher> registration,
+					IndexSearcher service) {
+				releaseSearcher(service);
+			}
+		}, properties);
+	}
+
+	/**
+	 * Performs the actual action on the index. Depending on the commit state, a commit will be executed,
+	 * all commit callbacks will be informed and all index listeners will be called.
+	 * @param context 
 	 * @param commit
 	 */
-	protected void internalHandleContext(D context, boolean commit) {
-		requireNonNull(context);
+	protected Promise<Void> internalHandleContext(D context, boolean commit) {
+		return pf.
+				submit(()-> {
+					requireNonNull(context);
+					requireNonNull(indexWriter);
+					switch (context.getActionType()) {
+					case ADD:
+						indexWriter.addDocuments(context.getDocuments());
+						break;
+					case MODIFY:
+						indexWriter.updateDocuments(context.getIdentifyingTerm(), context.getDocuments());
+						break;
+					case REMOVE:
+						indexWriter.deleteDocuments(context.getIdentifyingTerm());
+						break;
+					default:
+						throw new UnsupportedOperationException("SEARCH is currerntly not supported");
+					}
+					return null;
+				}).
+				then(v->doCommitWithCommitCallbacks(Collections.singleton(context), commit).
+						onResolve(()->notifyIndexListener(context)));
+	}
+
+	/**
+	 * Delegates the indexing to a {@link Collections} of contexts
+	 * @param contexts the collection of contexts
+	 * @param commit <code>true</code>, if a commit should executed after the whole batch
+	 * @return A {@link Promise}
+	 */
+	protected Promise<Void> internalHandleContexts(Collection<D> contexts, boolean commit) {
+		requireNonNull(contexts);
+		// We are batching here, so we do not
+		List<Promise<Void>> promises = contexts.parallelStream().map(partial(this::internalHandleContext, false)).collect(Collectors.toList());
+		return pf.all(promises).onResolve(()->doCommitWithCommitCallbacks(contexts, commit)).map(null);
+	}
+
+	/**
+	 * Commit index changes an refresh the searcher manager
+	 * @return {@link Promise} that resolves when searcher manager is refreshed
+	 */
+	protected Promise<Void> doCommit() {
 		requireNonNull(indexWriter);
-		try {
-			switch (context.getActionType()) {
-			case ADD:
-				indexWriter.addDocuments(context.getDocuments());
-				break;
-			case MODIFY:
-				indexWriter.updateDocuments(context.getIdentifyingTerm(), context.getDocuments());
-				break;
-			case REMOVE:
-				indexWriter.deleteDocuments(context.getIdentifyingTerm());
-				break;
-			default:
-				throw new UnsupportedOperationException("SEARCH is currerntly not supported");
+		return pf.submit(()->{
+			if(indexWriter.hasUncommittedChanges()) {
+				try {
+					indexWriter.commit();
+				} catch (IOException e) {
+					throw new IllegalStateException(String.format("Could not commit indexer for index path '%s', because: '%s'", configuration.base_path(), e.getMessage()), e);
+				}
 			}
-		} catch (IOException e) {
-			throw new IllegalStateException(String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage()), e);
-		}
+			if(searcherManager != null) {
+				try {
+					if(searcherManager != null && !searcherManager.maybeRefresh()) {
+						LOGGER.log(Level.FINE, ()->"Refreshing did not work, because it was called from a wrong thread");
+					}
+				} catch (IOException e) {
+					throw new IllegalStateException(String.format("Could not update SearcherManager for index path '%s', because: '%s'", configuration.base_path(), e.getMessage()), e);
+				}
+			} else {
+				LOGGER.log(Level.WARNING, ()->"No searcher manager is available yet to be updated. Just committed the index");
+			}
+			return null;
+		});
+	}
+
+	/**
+	 * Executes a commit and notifies the commit callbacks, if they are available. This handles the batching,
+	 * where few documents are indexed and commited after the batch.
+	 * @param contexts the context to be notified
+	 * @param commit <code>true</code>, if a commit is needed, otherwise <code>false</code>
+	 * @return Promise that resolved with <code>true</code> on successful action
+	 */
+	protected Promise<Void> doCommitWithCommitCallbacks(Collection<D> contexts, boolean commit) {
 		if(commit) {
-			LOGGER.log(Level.FINE, ()->"Handle commit from internalHandleContext");
-			commit();
-		} else {
-			LOGGER.log(Level.FINE, ()->"Handle NO commit from internalHandleContext");
+			return doCommit().then((c)->{
+				contexts.forEach(ctx -> 
+					Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
+						commitExecutors.submit(() -> callback.commited(ctx))));
+				return c;
+			}).onFailure((t)->{
+				contexts.forEach(ctx -> 
+					Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
+						commitExecutors.submit(() -> callback.error(ctx, t))));
+			});
+		} else  {
+			LOGGER.log(Level.FINE, ()->"No commit needed for contexts");
+			return pf.resolved(null);
 		}
+	}
+
+	/**
+	 * Notify all index listeners 
+	 * @param context the document context
+	 */
+	protected void notifyIndexListener(D context) {
 		// Trigger listeners asynchronous
 		commitExecutors.submit(()->{
 			synchronized (indexListeners) {
@@ -300,26 +390,9 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		});
 	}
 
-	protected void internalHandleContexts(Collection<D> contexts, boolean commit) {
-		requireNonNull(contexts);
-		contexts.forEach(partial(this::internalHandleContext, false));
-		if(commit) {
-			try {
-				commit();
-				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
-					commitExecutors.submit(() -> callback.commited(ctx))
-				));
-			} catch (Exception e) {
-				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
-					commitExecutors.submit(() -> callback.error(ctx, e))
-				));
-			}
-		}
-	}
-
-	public static <T> Consumer<T> partial(BiConsumer<T, Boolean> f, boolean commit) {
+	public static <T> Function<T, Promise<Void>> partial(BiFunction<T, Boolean, Promise<Void>> f, boolean commit) {
 		requireNonNull(f);
-		return c -> f.accept(c, commit);
+		return c -> f.apply(c, commit);
 	}
 
 	/* 
@@ -329,8 +402,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	@Override
 	public void handleContext(D context) {
 		requireNonNull(context);
-		requireNonNull(singleSource);
-		singleSource.publish(context);
+		pf.submit(()->internalHandleContext(context, true));
 	}
 
 	/* 
@@ -348,7 +420,8 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	 */
 	@Override
 	public void handleContexts(Collection<D> contexts) {
-		contexts.forEach(singleSource::publish);
+		requireNonNull(contexts);
+		pf.submit(()-> internalHandleContexts(contexts, true));
 	}
 
 	/* 
@@ -404,44 +477,14 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	 */
 	@Override
 	public void commit()  {
-		requireNonNull(indexWriter);
-		if(indexWriter.hasUncommittedChanges()) {
-			try {
-				indexWriter.commit();
-			} catch (IOException e) {
-				throw new IllegalStateException("Could not commit indexer", e);
-			}
+		try {
+			doCommit().getValue();
+		} catch (InvocationTargetException e) {
+			LOGGER.log(Level.SEVERE, "Commit failed with invocation target exception", e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			LOGGER.log(Level.SEVERE, "Commit failed with interrupted exception", e);
 		}
-		if(searcherManager != null) {
-			commitExecutors.submit(()-> {
-				try {
-					if(searcherManager != null && !searcherManager.maybeRefresh()) {
-						LOGGER.log(Level.FINE, "Refreshing did not work, because it was called from a wrong thread");
-					}
-				} catch (IOException e) {
-					LOGGER.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage()), e);
-				} 
-			});
-		}
-
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.PrototypeServiceFactory#getService(org.osgi.framework.Bundle, org.osgi.framework.ServiceRegistration)
-	 */
-	@Override
-	public IndexSearcher getService(Bundle bundle, ServiceRegistration<IndexSearcher> registration) {
-		return aquireSearch();
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.PrototypeServiceFactory#ungetService(org.osgi.framework.Bundle, org.osgi.framework.ServiceRegistration, java.lang.Object)
-	 */
-	@Override
-	public void ungetService(Bundle bundle, ServiceRegistration<IndexSearcher> registration, IndexSearcher service) {
-		releaseSearcher(service);
 	}
 
 }

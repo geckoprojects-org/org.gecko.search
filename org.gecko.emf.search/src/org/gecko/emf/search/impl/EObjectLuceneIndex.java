@@ -19,7 +19,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
 import org.gecko.search.api.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
-import org.gecko.search.document.index.LuceneIndexImpl;
+import org.gecko.search.document.index.LucenePushStreamIndexImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
@@ -35,12 +35,12 @@ import org.osgi.util.pushstream.QueuePolicyOption;
 import org.osgi.util.pushstream.SimplePushEventSource;
 
 /**
- * EMF implementation of the {@link LuceneIndexImpl}
+ * EMF implementation of the {@link LucenePushStreamIndexImpl}
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
 @Component(name = "EMFLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
-public class EObjectLuceneIndex extends LuceneIndexImpl<EObjectDocumentIndexObjectContext> {
+public class EObjectLuceneIndex extends LucenePushStreamIndexImpl<EObjectDocumentIndexObjectContext> {
 
 	/* 
 	 * (non-Javadoc)

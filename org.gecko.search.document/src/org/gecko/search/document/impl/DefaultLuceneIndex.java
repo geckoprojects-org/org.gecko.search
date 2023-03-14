@@ -19,7 +19,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.gecko.search.api.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextObject;
-import org.gecko.search.document.index.LuceneIndexImpl;
+import org.gecko.search.document.index.LucenePushStreamIndexImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
@@ -40,7 +40,7 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  * @since 08.03.2023
  */
 @Component(name = "DefaultLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
-public class DefaultLuceneIndex extends LuceneIndexImpl<ObjectContextObject> {
+public class DefaultLuceneIndex extends LucenePushStreamIndexImpl<ObjectContextObject> {
 
 	/* 
 	 * (non-Javadoc)

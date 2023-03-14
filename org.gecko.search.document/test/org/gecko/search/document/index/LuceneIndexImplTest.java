@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.IndexSearcher;
 import org.gecko.search.document.context.DocumentIndexContextObject;
-import org.gecko.search.document.index.LuceneIndexImpl.Config;
+import org.gecko.search.document.index.LucenePushStreamIndexImpl.Config;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,13 +55,13 @@ public class LuceneIndexImplTest {
 	@Mock
 	private DocumentIndexContextObject<?> dico;
 	@SuppressWarnings("rawtypes")
-	private LuceneIndexImpl indexService;
+	private LucenePushStreamIndexImpl indexService;
 	private final Converter converter = Converters.standardConverter();
 	private final PushStreamProvider psp = new PushStreamProvider();
 
 	@BeforeEach
 	public void beforeEach() {
-		indexService = createAbstractMock(LuceneIndexImpl.class);
+		indexService = createAbstractMock(LucenePushStreamIndexImpl.class);
 	}
 	
 	@AfterEach
