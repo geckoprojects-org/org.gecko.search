@@ -235,7 +235,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 					return null;
 				}).
 				then(v->commitWithCommitCallbacks(Collections.singleton(context), commit).
-						onResolve(()->notifyIndexListener(context)));
+						then((c)->notifyIndexListener(context)));
 	}
 
 	/**

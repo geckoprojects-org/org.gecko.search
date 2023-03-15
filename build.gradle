@@ -54,7 +54,7 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-tasks.named("sonarqube") {
+tasks.named("sonar") {
     dependsOn(codeCoverageReport)
 }
 
