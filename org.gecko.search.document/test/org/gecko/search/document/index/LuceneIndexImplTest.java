@@ -26,6 +26,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -678,8 +679,8 @@ public class LuceneIndexImplTest {
 		verify(dico01, times(3)).getCommitCallback();
 		verify(cc01, times(3)).commited(any());
 		verify(cc01, never()).error(any(), any());
-		verify(listener, times(2)).canHandle(any());
-		verify(listener, times(1)).onIndex(any());
+		verify(listener, timeout(500).times(2)).canHandle(any());
+		verify(listener, timeout(500).times(1)).onIndex(any());
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
