@@ -1040,6 +1040,17 @@ public class LuceneIndexImplTest {
 		verify(listener, never()).onIndex(any());
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testHandleContext() throws ConfigurationException {
+		assertThrows(NullPointerException.class, ()->indexService.handleContext(null));
+		
+		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
+		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
+		indexService.setAnalyzer(analyzer);
+		indexService.activate(config, ctx);
+	}
+	
 	public <T> T createAbstractMock(Class<T> mockClass) {
 		return mock(mockClass, 
 				Mockito.withSettings().

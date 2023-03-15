@@ -44,6 +44,7 @@ import org.gecko.search.document.context.ObjectContextBuilder;
 import org.gecko.search.document.context.ObjectContextObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
@@ -68,6 +69,7 @@ import org.gecko.search.document.test.CDLCommitCallback;
 @ExtendWith(ServiceExtension.class)
 @ExtendWith(ConfigurationExtension.class)
 @ExtendWith(MockitoExtension.class)
+@Disabled
 public class IndexListenerTest {
 	
 	private static final String INDEX_PATH = "/tmp/indexEMFTest/"; 

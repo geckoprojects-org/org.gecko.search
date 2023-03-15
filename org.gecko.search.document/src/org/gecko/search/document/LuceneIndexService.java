@@ -56,15 +56,17 @@ public interface LuceneIndexService<D extends DocumentIndexContextObject<?>> {
 
 	/**
 	 * Adds the given {@link DocumentIndexContextObject} to the queue to be indexed according to the configuration
-	 * @param context
+	 * @param context the {@link DocumentIndexContextObject}
+	 * @return a {@link Promise} that resolves, if the indexing finished or with the error 
 	 */
-	void handleContext(D context);
+	Promise<Void> handleContext(D context);
 
 	/**
 	 * Adds the given {@link Collection} of DocumentIndexContextObject}s to the queue to be indexed according to the configuration
-	 * @param contexts
+	 * @param context the {@link DocumentIndexContextObject}
+	 * @return a {@link Promise} that resolves, if the indexing finished or with the error 
 	 */
-	void handleContexts(Collection<D> contexts);
+	Promise<Void> handleContexts(Collection<D> contexts);
 
 	/**
 	 * Immediately handles the given the given {@link Collection} of DocumentIndexContextObject}s and commits the index.

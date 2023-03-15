@@ -13,13 +13,11 @@
  */
 package org.gecko.emf.search.impl;
 
-import java.util.concurrent.ArrayBlockingQueue;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
 import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
-import org.gecko.search.document.index.LucenePushStreamIndexImpl;
+import org.gecko.search.document.index.LuceneIndexImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
@@ -29,10 +27,6 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.util.pushstream.PushEvent;
-import org.osgi.util.pushstream.PushStreamProvider;
-import org.osgi.util.pushstream.QueuePolicyOption;
-import org.osgi.util.pushstream.SimplePushEventSource;
 
 /**
  * EMF implementation of the {@link LucenePushStreamIndexImpl}
@@ -40,7 +34,7 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  * @since 08.03.2023
  */
 @Component(name = "EMFLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
-public class EObjectLuceneIndex extends LucenePushStreamIndexImpl<EObjectDocumentIndexObjectContext> {
+public class EObjectLuceneIndex extends LuceneIndexImpl<EObjectDocumentIndexObjectContext> {
 
 	/* 
 	 * (non-Javadoc)
@@ -48,7 +42,7 @@ public class EObjectLuceneIndex extends LucenePushStreamIndexImpl<EObjectDocumen
 	 */
 	@Override
 	@Activate
-	protected void activate(Config serviceConfig, BundleContext context) throws ConfigurationException {
+	public void activate(IndexConfig serviceConfig, BundleContext context) throws ConfigurationException {
 		super.activate(serviceConfig, context);
 	}
 	
@@ -58,7 +52,7 @@ public class EObjectLuceneIndex extends LucenePushStreamIndexImpl<EObjectDocumen
 	 */
 	@Override
 	@Deactivate
-	protected void deactivate() {
+	public void deactivate() {
 		super.deactivate();
 	}
 
@@ -91,14 +85,14 @@ public class EObjectLuceneIndex extends LucenePushStreamIndexImpl<EObjectDocumen
 		super.removeIndexListener(listener);
 	}
 	
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.search.document.impl.LuceneIndexImpl#createSimplePushEventSource()
-	 */
-	@Override
-	protected SimplePushEventSource<EObjectDocumentIndexObjectContext> createSimplePushEventSource() {
-		PushStreamProvider psp = getPushStreamProvider();
-		return psp.buildSimpleEventSource(EObjectDocumentIndexObjectContext.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends EObjectDocumentIndexObjectContext>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
-	}
+//	/* 
+//	 * (non-Javadoc)
+//	 * @see org.gecko.search.document.impl.LuceneIndexImpl#createSimplePushEventSource()
+//	 */
+//	@Override
+//	protected SimplePushEventSource<EObjectDocumentIndexObjectContext> createSimplePushEventSource() {
+//		PushStreamProvider psp = getPushStreamProvider();
+//		return psp.buildSimpleEventSource(EObjectDocumentIndexObjectContext.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends EObjectDocumentIndexObjectContext>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
+//	}
 
 }

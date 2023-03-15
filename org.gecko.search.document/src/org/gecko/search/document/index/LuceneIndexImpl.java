@@ -16,6 +16,7 @@ package org.gecko.search.document.index;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -303,9 +304,10 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @see org.gecko.search.document.LuceneIndexService#handleContext(org.gecko.search.document.DocumentIndexContextObject)
 	 */
 	@Override
-	public void handleContext(D context) {
+	public Promise<Void> handleContext(D context) {
 		requireNonNull(context);
-		getPromiseFactory().submit(()->internalHandleContext(context, true));
+		requireNonNull(getPromiseFactory());
+		return internalHandleContext(context, true);
 	}
 
 	/* 
@@ -314,7 +316,14 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 */
 	@Override
 	public void handleContextSync(D context) {
-		internalHandleContext(context, true);
+		try {
+			internalHandleContext(context, true).getValue();
+		} catch (InvocationTargetException e) {
+			throw new IllegalStateException("Handling internalHandleContext caused an invocation target exception", e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Handling internalHandleContext caused an interrupted exception", e);
+		}
 	}
 
 	/* 
@@ -322,9 +331,9 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @see org.gecko.search.document.LuceneIndexService#handleContexts(java.util.Collection)
 	 */
 	@Override
-	public void handleContexts(Collection<D> contexts) {
+	public Promise<Void> handleContexts(Collection<D> contexts) {
 		requireNonNull(contexts);
-		getPromiseFactory().submit(()-> internalHandleContexts(contexts, true));
+		return internalHandleContexts(contexts, true);
 	}
 
 	/* 
@@ -333,7 +342,14 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 */
 	@Override
 	public void handleContextsSync(Collection<D> contexts) {
-		internalHandleContexts(contexts, true);
+		try {
+			internalHandleContexts(contexts, true).getValue();
+		} catch (InvocationTargetException e) {
+			throw new IllegalStateException("Handling internalHandleContexts caused an invocation target exception", e);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("Handling internalHandleContexts caused an interrupted exception", e);
+		}
 	}
 
 	/* 
