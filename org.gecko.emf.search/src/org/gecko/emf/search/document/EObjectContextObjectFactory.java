@@ -14,7 +14,7 @@
 package org.gecko.emf.search.document;
 
 import org.eclipse.emf.ecore.EObject;
-import org.gecko.search.api.ContextObjectFactory;
+import org.gecko.search.ContextObjectFactory;
 
 /**
  * Interface for {@link EObjectContextObjectFactory}

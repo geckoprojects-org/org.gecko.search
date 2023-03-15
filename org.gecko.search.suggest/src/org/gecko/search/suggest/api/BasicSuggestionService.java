@@ -40,7 +40,7 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
-import org.gecko.search.api.IndexActionType;
+import org.gecko.search.IndexActionType;
 import org.gecko.search.suggest.context.ContextIteratorImpl;
 import org.gecko.search.suggest.context.IndexContext;
 import org.gecko.search.suggest.context.SuggestionContext;

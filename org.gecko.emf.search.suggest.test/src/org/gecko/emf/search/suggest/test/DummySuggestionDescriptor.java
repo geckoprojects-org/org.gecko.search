@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.emf.osgi.example.model.basic.Person;
-import org.gecko.search.api.IndexType;
+import org.gecko.search.IndexType;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.emf.search.suggest.api.EObjectSuggestionDescriptor;
 import org.osgi.service.component.annotations.Activate;

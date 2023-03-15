@@ -46,7 +46,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.NRTCachingDirectory;
-import org.gecko.search.api.IndexListener;
+import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.framework.Bundle;

@@ -11,20 +11,18 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.api;
+package org.gecko.search;
 
 /**
- * Defines supported index types
+ * Action types for the index
  * @author Mark Hoffmann
- * @since 08.12.2018
+ * @since 29.11.2018
  */
-public enum IndexType {
+public enum IndexActionType {
 	
-	/** Used for ordinary indexing */
-	INDEX,
-	/** Used for faceted indexing */
-	FACETTED,
-	/** Used for auto-proposal, suggestion indexing */
-	SUGGEST
+	ADD,
+	MODIFY,
+	REMOVE,
+	SEARCH
 
 }

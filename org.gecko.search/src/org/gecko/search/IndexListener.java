@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.api;
+package org.gecko.search;
 
 /**
  * Interface to get informed when indexing

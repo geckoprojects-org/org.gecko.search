@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
-import org.gecko.search.api.IndexContextObject;
+import org.gecko.search.IndexContextObject;
 import org.gecko.search.document.CommitCallback;
 
 /**

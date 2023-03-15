@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.gecko.search.api.IndexDescriptor;
+import org.gecko.search.IndexDescriptor;
 
 /**
  * Descriptor interface for the suggestion API

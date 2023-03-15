@@ -13,7 +13,7 @@
  */
 package org.gecko.search.suggest.context;
 
-import org.gecko.search.api.IndexContextObject;
+import org.gecko.search.IndexContextObject;
 
 /**
  * Context object for one suggest element to be indexed

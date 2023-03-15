@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
-import org.gecko.search.api.IndexActionType;
+import org.gecko.search.IndexActionType;
 import org.gecko.search.document.CommitCallback;
 
 /**

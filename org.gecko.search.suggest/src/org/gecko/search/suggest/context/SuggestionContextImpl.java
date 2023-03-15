@@ -16,7 +16,7 @@ package org.gecko.search.suggest.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gecko.search.api.IndexActionType;
+import org.gecko.search.IndexActionType;
 
 /**
  * This class defines the main parameters for the auto completion search, namely:

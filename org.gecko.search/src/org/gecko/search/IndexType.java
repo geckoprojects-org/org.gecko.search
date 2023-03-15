@@ -11,6 +11,20 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-@org.osgi.annotation.versioning.Version("1.0.0")
-@org.osgi.annotation.bundle.Export
-package org.gecko.search.api;
+package org.gecko.search;
+
+/**
+ * Defines supported index types
+ * @author Mark Hoffmann
+ * @since 08.12.2018
+ */
+public enum IndexType {
+	
+	/** Used for ordinary indexing */
+	INDEX,
+	/** Used for faceted indexing */
+	FACETTED,
+	/** Used for auto-proposal, suggestion indexing */
+	SUGGEST
+
+}

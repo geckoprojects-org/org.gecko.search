@@ -35,7 +35,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.gecko.search.api.IndexActionType;
+import org.gecko.search.IndexActionType;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextBuilder;
 import org.gecko.search.document.context.ObjectContextObject;

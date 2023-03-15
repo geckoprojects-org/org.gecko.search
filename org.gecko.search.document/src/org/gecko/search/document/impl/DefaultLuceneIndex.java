@@ -16,7 +16,7 @@ package org.gecko.search.document.impl;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.gecko.search.api.IndexListener;
+import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextObject;
 import org.gecko.search.document.index.LucenePushStreamIndexImpl;

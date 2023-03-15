@@ -17,8 +17,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.gecko.search.api.IndexContextObject;
-import org.gecko.search.api.IndexListener;
+import org.gecko.search.IndexContextObject;
+import org.gecko.search.IndexListener;
 import org.gecko.search.document.context.ObjectContextObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;

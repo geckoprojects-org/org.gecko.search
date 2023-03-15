@@ -11,18 +11,6 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.api;
-
-/**
- * Action types for the index
- * @author Mark Hoffmann
- * @since 29.11.2018
- */
-public enum IndexActionType {
-	
-	ADD,
-	MODIFY,
-	REMOVE,
-	SEARCH
-
-}
+@org.osgi.annotation.versioning.Version("1.0.0")
+@org.osgi.annotation.bundle.Export
+package org.gecko.search;

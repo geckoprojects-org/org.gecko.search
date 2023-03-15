@@ -15,13 +15,8 @@ package org.gecko.search.document.index;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -29,8 +24,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -42,12 +35,9 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.NIOFSDirectory;
-import org.apache.lucene.store.NRTCachingDirectory;
-import org.gecko.search.api.IndexListener;
+import org.gecko.search.BasicLuceneImpl;
+import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.framework.Bundle;
@@ -57,7 +47,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.osgi.util.promise.Promise;
-import org.osgi.util.promise.PromiseFactory;
 
 /**
  * Service implementation using a {@link SearcherManager} to enable NRT search.
@@ -68,23 +57,14 @@ import org.osgi.util.promise.PromiseFactory;
  * @author Juergen Albert, Mark Hoffmann
  * @since 08.03.2023
  */
-public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> implements LuceneIndexService<D>{
-
-	/** BASE_PATH */
-	private static final String BASE_PATH = "base.path";
+public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> extends BasicLuceneImpl implements LuceneIndexService<D>{
 
 	private static final Logger LOGGER = Logger.getLogger(LuceneIndexImpl.class.getName());
 
-	private ExecutorService commitExecutors = null;
-	private PromiseFactory pf = null;
 	private final List<IndexListener> indexListeners = new LinkedList<>();
-	private Analyzer analyzer = null;
-	private Directory directory;
 	private IndexWriter indexWriter;
 	private SearcherManager searcherManager;
-
 	private ServiceRegistration<IndexSearcher> searcherRegistration;
-	private int threadCount = 0;
 
 	private IndexConfig configuration;
 
@@ -98,22 +78,6 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		long windowSize() default 500;
 		int indexThreads() default 4;
 	}	
-
-	/**
-	 * Sets the analyzer.
-	 * @param analyzer the analyzer to set
-	 */
-	public void setAnalyzer(Analyzer analyzer) {
-		this.analyzer = analyzer;
-	}
-
-	/**
-	 * Returns the analyzer.
-	 * @return the analyzer
-	 */
-	protected Analyzer getAnalyzer() {
-		return analyzer;
-	}
 
 	/**
 	 * Adds an index listener
@@ -132,28 +96,69 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		requireNonNull(listener);
 		indexListeners.remove(listener);
 	}
-
-	protected void activate(IndexConfig configuration, BundleContext context) throws ConfigurationException {
-		requireNonNull(configuration);
-		requireNonNull(context);
-		this.configuration = configuration;
-
-		requireNonNull(analyzer);
-		IndexWriterConfig config = new IndexWriterConfig(analyzer);
-		try {
-			directory = initializeDirectory(configuration);
-			directory = new NRTCachingDirectory(directory, 5.0, 60.0);
-			indexWriter = new IndexWriter(directory, config);
-			searcherManager = new SearcherManager(indexWriter, null);
-			initializeExecutors(configuration);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(String.format("Could not open index directory for %s with message %s", configuration.base_path(), e.getMessage()), e);
-		}
-
-		registerIndexSearcher(configuration, context);
+	
+	/**
+	 * Returns the indexListeners.
+	 * @return the indexListeners
+	 */
+	protected List<IndexListener> getIndexListeners() {
+		return indexListeners;
 	}
 
-	protected void deactivate() {
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.index.BasicLuceneIndexImpl#createConfiguration()
+	 */
+	@Override
+	public Configuration createConfiguration() {
+		return new Configuration() {
+
+			@Override
+			public String getIndexName() {
+				return configuration.id();
+			}
+
+			@Override
+			public String getDirectoryType() {
+				return configuration.directory_type();
+			}
+
+			@Override
+			public String getBasePath() {
+				return configuration.base_path();
+			}
+		};
+	}
+
+	public void activate(IndexConfig configuration, BundleContext context) throws ConfigurationException {
+		String basePath = "<no-base.path>";
+		try {
+			requireNonNull(configuration);
+			requireNonNull(context);
+			this.configuration = configuration;
+			basePath = configuration.base_path();
+
+			super.activate();
+
+			Analyzer analyzer = getAnalyzer();
+			requireNonNull(analyzer);
+			IndexWriterConfig config = new IndexWriterConfig(analyzer);
+
+			Directory directory = getDirectory();
+			requireNonNull(directory);
+			indexWriter = new IndexWriter(directory, config);
+			searcherManager = new SearcherManager(indexWriter, null);
+			registerIndexSearcher(configuration, context);
+		} catch (ConfigurationException e) {
+			throw e;
+		} catch (IOException e) {
+			throw new ConfigurationException("configuration", String.format("Cannot not open index directory for '%s' with message %s", basePath, e.getMessage()), e);
+		} catch (Exception e) {
+			throw new ConfigurationException("configuration", String.format("Cannot create index setup for '%s' with message %s", basePath, e.getMessage()), e);
+		}
+	}
+
+	public void deactivate() {
 		if (searcherRegistration != null) {
 			searcherRegistration.unregister();
 		}
@@ -171,88 +176,11 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 				LOGGER.log(Level.SEVERE, e, ()->"Failed to close index writer");
 			}
 		}
-		if (directory != null) {
-			try {
-				directory.close();
-			} catch (IOException e) {
-				LOGGER.log(Level.SEVERE, e, ()->"Failed to close index directory");
-			}
-		}
-	}
-
-	/**
-	 * Create the index creation location
-	 * @param configuration the index configuration
-	 * @throws ConfigurationException
-	 */
-	protected File initializeIndexLocation(IndexConfig configuration) throws ConfigurationException {
-		URL url = null;
-		if(configuration.base_path().length() > 0) {
-			try {
-				url = new File(configuration.base_path()).toURI().toURL();
-			} catch (MalformedURLException e) {
-				throw new ConfigurationException(BASE_PATH, "Base path has an invalid format ", e);
-			}
-		}
-		if(url == null) {
-			throw new ConfigurationException(BASE_PATH, "The property is required");
-		}
 		try {
-			URI uri = url.toURI();
-	
-			if(uri.getAuthority() != null && uri.getAuthority().length() > 0) {
-				// Hack for UNC Path
-				uri = (new URL("file://" + url.toString().substring("file:".length()))).toURI();
-			}
-			return new File(new File(uri), configuration.id());
-		} catch (URISyntaxException | MalformedURLException e) {
-			//Should not happen. It was already checked multiple times
-			throw new ConfigurationException(BASE_PATH, "The given path.path format is invalid '" + url.toString() + "'", e);
+			basicDeactivate();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, e, ()->"Failed to deactivate implementation");
 		}
-	}
-
-	/**
-	 * Creates a Lucene {@link Directory} dependent on the configuration
-	 * @param configuration the service configuration
-	 * @return the directory instance
-	 * @throws IOException thrown on errors during directory creation
-	 * @throws ConfigurationException 
-	 */
-	protected Directory initializeDirectory(IndexConfig configuration) throws IOException, ConfigurationException {
-		File indexFolder = initializeIndexLocation(configuration);
-		switch(configuration.directory_type()) {
-		case "NRT":
-			directory = FSDirectory.open(indexFolder.toPath());
-			break;
-		case "ByteBuffer":
-			directory = new ByteBuffersDirectory();
-			break;
-		case "FS":
-			directory = FSDirectory.open(indexFolder.toPath());
-			break;
-		case "NIOFS":
-			directory = new NIOFSDirectory(indexFolder.toPath());
-			break;
-		case "MMap":
-		default:
-			LOGGER.warning("Unrecognized directory format: " + configuration.directory_type() + "; Falling back to system defaults");
-			directory = FSDirectory.open(indexFolder.toPath());
-			break;
-		}
-		return directory;
-	}
-	
-	/**
-	 * Creates the setup for {@link ExecutorService} and {@link PromiseFactory}
-	 * @param serviceConfig the configuration
-	 */
-	protected void initializeExecutors(IndexConfig serviceConfig) {
-		commitExecutors = Executors.newFixedThreadPool(2, (r)->{
-			Thread t = new Thread(r, "Index+Commit-" + threadCount++);
-			t.setDaemon(true);
-			return t;
-		});
-		pf = new PromiseFactory(commitExecutors);
 	}
 
 	/**
@@ -285,7 +213,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	 * @param commit
 	 */
 	protected Promise<Void> internalHandleContext(D context, boolean commit) {
-		return pf.
+		return getPromiseFactory().
 				submit(()-> {
 					requireNonNull(context);
 					requireNonNull(indexWriter);
@@ -318,7 +246,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		requireNonNull(contexts);
 		// We are batching here, so we do not
 		List<Promise<Void>> promises = contexts.parallelStream().map(partial(this::internalHandleContext, false)).collect(Collectors.toList());
-		return pf.all(promises).onResolve(()->doCommitWithCommitCallbacks(contexts, commit)).map(null);
+		return getPromiseFactory().all(promises).onResolve(()->doCommitWithCommitCallbacks(contexts, commit)).map(null);
 	}
 
 	/**
@@ -327,7 +255,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	 */
 	protected Promise<Void> doCommit() {
 		requireNonNull(indexWriter);
-		return pf.submit(()->{
+		return getPromiseFactory().submit(()->{
 			if(indexWriter.hasUncommittedChanges()) {
 				try {
 					indexWriter.commit();
@@ -361,17 +289,17 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 		if(commit) {
 			return doCommit().then((c)->{
 				contexts.forEach(ctx -> 
-					Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
-						commitExecutors.submit(() -> callback.commited(ctx))));
+				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
+				getIndexExecutors().submit(() -> callback.commited(ctx))));
 				return c;
 			}).onFailure((t)->{
 				contexts.forEach(ctx -> 
-					Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
-						commitExecutors.submit(() -> callback.error(ctx, t))));
+				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
+				getIndexExecutors().submit(() -> callback.error(ctx, t))));
 			});
 		} else  {
 			LOGGER.log(Level.FINE, ()->"No commit needed for contexts");
-			return pf.resolved(null);
+			return getPromiseFactory().resolved(null);
 		}
 	}
 
@@ -381,7 +309,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	 */
 	protected void notifyIndexListener(D context) {
 		// Trigger listeners asynchronous
-		commitExecutors.submit(()->{
+		getIndexExecutors().submit(()->{
 			synchronized (indexListeners) {
 				indexListeners.stream().
 				filter(l->l.canHandle(context)).
@@ -402,7 +330,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	@Override
 	public void handleContext(D context) {
 		requireNonNull(context);
-		pf.submit(()->internalHandleContext(context, true));
+		getPromiseFactory().submit(()->internalHandleContext(context, true));
 	}
 
 	/* 
@@ -421,7 +349,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> i
 	@Override
 	public void handleContexts(Collection<D> contexts) {
 		requireNonNull(contexts);
-		pf.submit(()-> internalHandleContexts(contexts, true));
+		getPromiseFactory().submit(()-> internalHandleContexts(contexts, true));
 	}
 
 	/* 

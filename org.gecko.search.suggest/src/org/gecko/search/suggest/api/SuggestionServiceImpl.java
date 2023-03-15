@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
-import org.gecko.search.api.IndexActionType;
+import org.gecko.search.IndexActionType;
 import org.gecko.search.suggest.context.SuggestionContext;
 import org.osgi.service.cm.ConfigurationException;
 

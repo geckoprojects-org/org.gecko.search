@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
-import org.gecko.search.api.IndexType;
+import org.gecko.search.IndexType;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;

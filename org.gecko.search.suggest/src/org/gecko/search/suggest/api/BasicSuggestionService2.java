@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.apache.lucene.util.BytesRef;
-import org.gecko.search.api.IndexActionType;
-import org.gecko.search.document.index.BasicLuceneIndexImpl;
+import org.gecko.search.BasicLuceneImpl;
+import org.gecko.search.IndexActionType;
 import org.gecko.search.suggest.context.ContextIteratorImpl;
 import org.gecko.search.suggest.context.IndexContext;
 import org.gecko.search.suggest.context.SuggestionContext;
@@ -50,7 +50,7 @@ import org.osgi.util.promise.Promise;
  * @author Ilenia Salvadori, Mark Hoffmann
  * @since 03.03.2023
  */
-public abstract class BasicSuggestionService2<O, F> extends BasicLuceneIndexImpl implements SuggestionService {
+public abstract class BasicSuggestionService2<O, F> extends BasicLuceneImpl implements SuggestionService {
 
 	private static final Logger LOGGER = Logger.getLogger(BasicSuggestionService2.class.getName());
 	protected SuggestionDescriptor<O, F> suggestionDescriptor;
@@ -83,6 +83,32 @@ public abstract class BasicSuggestionService2<O, F> extends BasicLuceneIndexImpl
 		}
 		return displayRes;
 	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.index.BasicLuceneIndexImpl#createConfiguration()
+	 */
+	@Override
+	public Configuration createConfiguration() {
+		return new Configuration() {
+			
+			@Override
+			public String getIndexName() {
+				return configuration.suggestionName();
+			}
+			
+			@Override
+			public String getDirectoryType() {
+				return configuration.directory_type();
+			}
+			
+			@Override
+			public String getBasePath() {
+				return configuration.base_path();
+			}
+		};
+	}
+	
 	/**
 	 * Does the lookup
 	 * @param string string to lookup
@@ -108,13 +134,13 @@ public abstract class BasicSuggestionService2<O, F> extends BasicLuceneIndexImpl
 	protected void activate(ComponentContext ctx , SuggestionConfiguration configuration) throws ConfigurationException {
 		this.configuration = configuration;
 		super.activate();
-		suggesterPromise = getPromiseFactory().submit(this::initializeSuggester);
+		suggesterPromise = getPromiseFactory().submit(()->new AnalyzingInfixSuggester(getDirectory(), getAnalyzer()));
 	}
 
 	/**
 	 * Called on component de-activation
 	 */
-	protected void deactivate() {
+	public void deactivate() {
 		try (AnalyzingInfixSuggester value = suggesterPromise.getValue()) {
 			if (value != null) {
 				LOGGER.log(Level.FINE, ()->"Closing suggester " + value.toString());
@@ -125,7 +151,7 @@ public abstract class BasicSuggestionService2<O, F> extends BasicLuceneIndexImpl
 			}
 			LOGGER.log(Level.SEVERE, "Error closing suggester", e);
 		}
-		super.deactivate();
+		basicDeactivate();
 	}
 
 	/**
@@ -136,19 +162,6 @@ public abstract class BasicSuggestionService2<O, F> extends BasicLuceneIndexImpl
 		this.suggestionDescriptor = suggestionDescriptor;
 	}
 
-	/**
-	 * This method opens a FSDirectory and creates a StandardAnalyzer and a Suggester which are then needed
-	 * for the data indexing and searching.
-	 * @throws ConfigurationException
-	 */
-	protected AnalyzingInfixSuggester initializeSuggester() throws ConfigurationException {
-		try {
-			return new AnalyzingInfixSuggester(getDirectory(), getAnalyzer());
-		} catch (IOException e) {
-			throw new ConfigurationException("base.path", String.format("Error opening suggestion index for the given path '%s'", getConfiguration().getBasePath()));
-		} 
-	}
-	
 	/**
 	 * This method creates the list of content we want to make the auto completion against. 
 	 * It loops over the list of input data and provides for each entry the payload, the filed against with we
