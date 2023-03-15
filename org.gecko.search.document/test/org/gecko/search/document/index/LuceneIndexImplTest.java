@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -33,13 +34,22 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.gecko.search.BasicLuceneImpl;
 import org.gecko.search.BasicLuceneImpl.Configuration;
@@ -405,6 +415,23 @@ public class LuceneIndexImplTest {
 		verify(listener02, times(1)).canHandle(any());
 		verify(listener01, times(1)).onIndex(any());
 		verify(listener02, never()).onIndex(any());
+		
+		indexService.removeIndexListener(listener01);
+		indexService.removeIndexListener(listener02);
+
+		// test long running listener
+		IndexListener listener03 = mock(IndexListener.class);
+		when(listener03.canHandle(any())).thenReturn(Boolean.TRUE);
+		doAnswer(i->{
+			Thread.sleep(1000l);
+			return null;
+		}).when(listener03).onIndex(any());
+		indexService.addIndexListener(listener03);
+		p = indexService.notifyIndexListener(dico);
+		p.getValue();
+		assertNull(p.getFailure());
+		verify(listener03, times(1)).canHandle(any());
+		verify(listener03, times(1)).onIndex(any());
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -1041,15 +1068,172 @@ public class LuceneIndexImplTest {
 		verify(listener, never()).onIndex(any());
 	}
 	
-	@SuppressWarnings("unchecked")
-//	@Test
-	public void testHandleContext() throws ConfigurationException {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testHandleContext() throws ConfigurationException, InterruptedException, InvocationTargetException {
 		assertThrows(NullPointerException.class, ()->indexService.handleContext(null));
 		
 		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
 		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
 		indexService.setAnalyzer(analyzer);
 		indexService.activate(config, ctx);
+		
+		DocumentIndexContextObject dico01 = mock(DocumentIndexContextObject.class);
+		CommitCallback cc01 = mock(CommitCallback.class);
+		when(dico01.getCommitCallback()).thenReturn(cc01);
+		when(dico01.getActionType()).thenReturn(IndexActionType.ADD);
+		List<Document> docs = new ArrayList<>(10);
+		for (int i = 0; i < 10; i++) {
+			docs.add(createTestDocument(i));
+		}
+		when(dico01.getDocuments()).thenReturn(docs);
+		
+		Promise<Void> p = indexService.handleContext(dico01);
+		assertNull(p.getFailure());
+		p.getValue();
+		
+		IndexSearcher searcher = indexService.aquireSearch();
+		assertNotNull(searcher);
+		
+		Query query = new MatchAllDocsQuery();
+		try {
+			TopDocs search = searcher.search(query, 10);
+			assertEquals(10, search.scoreDocs.length);
+		} catch (IOException e) {
+			fail("Unexpected exception while searching");
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testHandleContextSync() throws ConfigurationException, InterruptedException, InvocationTargetException {
+		assertThrows(NullPointerException.class, ()->indexService.handleContext(null));
+		
+		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
+		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
+		indexService.setAnalyzer(analyzer);
+		indexService.activate(config, ctx);
+		
+		DocumentIndexContextObject dico01 = mock(DocumentIndexContextObject.class);
+		CommitCallback cc01 = mock(CommitCallback.class);
+		when(dico01.getCommitCallback()).thenReturn(cc01);
+		when(dico01.getActionType()).thenReturn(IndexActionType.ADD);
+		List<Document> docs = new ArrayList<>(10);
+		for (int i = 0; i < 10; i++) {
+			docs.add(createTestDocument(i));
+		}
+		when(dico01.getDocuments()).thenReturn(docs);
+		
+		indexService.handleContextSync(dico01);
+		
+		IndexSearcher searcher = indexService.aquireSearch();
+		assertNotNull(searcher);
+		
+		Query query = new MatchAllDocsQuery();
+		try {
+			TopDocs search = searcher.search(query, 10);
+			assertEquals(10, search.scoreDocs.length);
+		} catch (IOException e) {
+			fail("Unexpected exception while searching");
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testHandleContexts() throws ConfigurationException, InterruptedException, InvocationTargetException {
+		assertThrows(NullPointerException.class, ()->indexService.handleContext(null));
+		
+		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
+		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
+		indexService.setAnalyzer(analyzer);
+		indexService.activate(config, ctx);
+		
+		DocumentIndexContextObject dico01 = mock(DocumentIndexContextObject.class);
+		when(dico01.getActionType()).thenReturn(IndexActionType.ADD);
+		DocumentIndexContextObject dico02 = mock(DocumentIndexContextObject.class);
+		when(dico02.getActionType()).thenReturn(IndexActionType.ADD);
+		DocumentIndexContextObject dico03 = mock(DocumentIndexContextObject.class);
+		when(dico03.getActionType()).thenReturn(IndexActionType.ADD);
+		
+		List<Document> docs01 = new ArrayList<>(10);
+		for (int i = 0; i < 10; i++) {
+			docs01.add(createTestDocument(i));
+		}
+		when(dico01.getDocuments()).thenReturn(docs01);
+		List<Document> docs02 = new ArrayList<>(10);
+		for (int i = 0; i < 20; i++) {
+			docs02.add(createTestDocument(i));
+		}
+		when(dico02.getDocuments()).thenReturn(docs02);
+		List<Document> docs03 = new ArrayList<>(10);
+		for (int i = 0; i < 15; i++) {
+			docs03.add(createTestDocument(i));
+		}
+		when(dico03.getDocuments()).thenReturn(docs03);
+		List<DocumentIndexContextObject> dicos = List.of(dico01, dico02, dico03);
+		
+		Promise<Void> p = indexService.handleContexts(dicos);
+		assertNull(p.getFailure());
+		p.getValue();
+		
+		IndexSearcher searcher = indexService.aquireSearch();
+		assertNotNull(searcher);
+		
+		Query query = new MatchAllDocsQuery();
+		try {
+			TopDocs search = searcher.search(query, 45);
+			assertEquals(45, search.scoreDocs.length);
+		} catch (IOException e) {
+			fail("Unexpected exception while searching");
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testHandleContextsSync() throws ConfigurationException, InterruptedException, InvocationTargetException {
+		assertThrows(NullPointerException.class, ()->indexService.handleContext(null));
+		
+		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
+		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
+		indexService.setAnalyzer(analyzer);
+		indexService.activate(config, ctx);
+		
+		DocumentIndexContextObject dico01 = mock(DocumentIndexContextObject.class);
+		when(dico01.getActionType()).thenReturn(IndexActionType.ADD);
+		DocumentIndexContextObject dico02 = mock(DocumentIndexContextObject.class);
+		when(dico02.getActionType()).thenReturn(IndexActionType.ADD);
+		DocumentIndexContextObject dico03 = mock(DocumentIndexContextObject.class);
+		when(dico03.getActionType()).thenReturn(IndexActionType.ADD);
+		
+		List<Document> docs01 = new ArrayList<>(10);
+		for (int i = 0; i < 10; i++) {
+			docs01.add(createTestDocument(i));
+		}
+		when(dico01.getDocuments()).thenReturn(docs01);
+		List<Document> docs02 = new ArrayList<>(10);
+		for (int i = 0; i < 20; i++) {
+			docs02.add(createTestDocument(i));
+		}
+		when(dico02.getDocuments()).thenReturn(docs02);
+		List<Document> docs03 = new ArrayList<>(10);
+		for (int i = 0; i < 15; i++) {
+			docs03.add(createTestDocument(i));
+		}
+		when(dico03.getDocuments()).thenReturn(docs03);
+		List<DocumentIndexContextObject> dicos = List.of(dico01, dico02, dico03);
+		
+		indexService.handleContextsSync(dicos);
+		
+		IndexSearcher searcher = indexService.aquireSearch();
+		assertNotNull(searcher);
+		
+		Query query = new MatchAllDocsQuery();
+		try {
+			TopDocs search = searcher.search(query, 45);
+			assertEquals(45, search.scoreDocs.length);
+		} catch (IOException e) {
+			fail("Unexpected exception while searching");
+		}
 	}
 	
 	public <T> T createAbstractMock(Class<T> mockClass) {
@@ -1057,6 +1241,14 @@ public class LuceneIndexImplTest {
 				Mockito.withSettings().
 				useConstructor().
 				defaultAnswer(Mockito.CALLS_REAL_METHODS));
+	}
+	
+	private Document createTestDocument(int i) {
+		Document d = new Document();
+		d.add(new StoredField("id_stored", i));
+		d.add(new IntPoint("id", i));
+		d.add(new StringField("test", "test", Store.YES));
+		return d;
 	}
 	
 }
