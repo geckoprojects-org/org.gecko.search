@@ -235,7 +235,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 					return null;
 				}).
 				then(v->commitWithCommitCallbacks(Collections.singleton(context), commit).
-						then((c)->notifyIndexListener(context)));
+						then(c->notifyIndexListener(context)));
 	}
 
 	/**
@@ -250,7 +250,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 		List<Promise<Void>> promises = contexts.stream().map(partial(this::internalHandleContext, false)).collect(Collectors.toList());
 		return getPromiseFactory().
 				all(promises).
-				then((p)->commitWithCommitCallbacks(contexts, commit).then(null));
+				then(p->commitWithCommitCallbacks(contexts, commit).then(null));
 	}
 
 	/**
@@ -263,14 +263,14 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	protected Promise<Void> commitWithCommitCallbacks(Collection<D> contexts, boolean commit) {
 		requireNonNull(contexts);
 		if(commit) {
-			return commit().then((c)->{
+			return commit().then(c->{
 				contexts.forEach(ctx -> 
 				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> callback.commited(ctx)));
 				return c;
-			}).onFailure((t)->{
+			}).onFailure(t->
 				contexts.forEach(ctx -> 
-				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback ->  callback.error(ctx, t)));
-			});
+				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback ->  callback.error(ctx, t)))
+			);
 		} else  {
 			LOGGER.log(Level.FINE, ()->"No commit needed for contexts " + contexts.size());
 			return getPromiseFactory().resolved((Void)null);

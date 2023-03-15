@@ -151,6 +151,7 @@ public abstract class BasicLuceneImpl {
 					indexExecutors.shutdownNow();// $COVERAGE-IGNORE$
 				} 
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				indexExecutors.shutdownNow();// $COVERAGE-IGNORE$
 			} finally {
 				pf = null;
