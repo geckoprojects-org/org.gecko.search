@@ -20,6 +20,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
 import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.util.promise.Promise;
 
 /**
  * Index service for Lucene
@@ -49,8 +50,9 @@ public interface LuceneIndexService<D extends DocumentIndexContextObject<?>> {
 	/**
 	 * Commits the underlying {@link IndexWriter} and refreshes the {@link SearcherManager}.
 	 * Note that commits directly on the obtained {@link IndexWriter} will not be reflected to the {@link SearcherManager}  
+	 * @return the {@link Promise} that resolves if commit succeeded or an error
 	 */
-	void commit();
+	Promise<Void> commit();
 
 	/**
 	 * Adds the given {@link DocumentIndexContextObject} to the queue to be indexed according to the configuration

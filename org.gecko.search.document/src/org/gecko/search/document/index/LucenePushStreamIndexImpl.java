@@ -55,6 +55,8 @@ import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
+import org.osgi.util.promise.Promise;
+import org.osgi.util.promise.PromiseFactory;
 import org.osgi.util.pushstream.PushEvent;
 import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.pushstream.PushStreamProvider;
@@ -281,14 +283,16 @@ public abstract class LucenePushStreamIndexImpl<D extends DocumentIndexContextOb
 			default:
 				throw new UnsupportedOperationException("SEARCH is currerntly not supported");
 			}
+			if(commit) {
+				LOGGER.log(Level.FINE, ()->"Handle commit from internalHandleContext");
+				commit().getValue();
+			} else {
+				LOGGER.log(Level.FINE, ()->"Handle NO commit from internalHandleContext");
+			}
 		} catch (IOException e) {
 			throw new IllegalStateException(String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage()), e);
-		}
-		if(commit) {
-			LOGGER.log(Level.FINE, ()->"Handle commit from internalHandleContext");
-			commit();
-		} else {
-			LOGGER.log(Level.FINE, ()->"Handle NO commit from internalHandleContext");
+		} catch (Exception e) {
+			throw new IllegalStateException(String.format("Could not handle %s with error %s",  context.getActionType().name(), e.getMessage()), e);
 		}
 		// Trigger listeners asynchronous
 		commitExecutors.submit(()->{
@@ -305,7 +309,7 @@ public abstract class LucenePushStreamIndexImpl<D extends DocumentIndexContextOb
 		contexts.forEach(partial(this::internalHandleContext, false));
 		if(commit) {
 			try {
-				commit();
+				commit().getValue();
 				contexts.forEach(ctx -> Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
 					commitExecutors.submit(() -> callback.commited(ctx))
 				));
@@ -403,27 +407,30 @@ public abstract class LucenePushStreamIndexImpl<D extends DocumentIndexContextOb
 	 * @see org.gecko.search.document.LuceneIndexService#commit()
 	 */
 	@Override
-	public void commit()  {
-		requireNonNull(indexWriter);
-		if(indexWriter.hasUncommittedChanges()) {
-			try {
-				indexWriter.commit();
-			} catch (IOException e) {
-				throw new IllegalStateException("Could not commit indexer", e);
-			}
-		}
-		if(searcherManager != null) {
-			commitExecutors.submit(()-> {
+	public Promise<Void> commit()  {
+		PromiseFactory pf = new PromiseFactory(Executors.newSingleThreadExecutor());
+		return pf.submit(()->{
+			requireNonNull(indexWriter);
+			if(indexWriter.hasUncommittedChanges()) {
 				try {
-					if(searcherManager != null && !searcherManager.maybeRefresh()) {
-						LOGGER.log(Level.FINE, "Refreshing did not work, because it was called from a wrong thread");
-					}
+					indexWriter.commit();
 				} catch (IOException e) {
-					LOGGER.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage()), e);
-				} 
-			});
-		}
-
+					throw new IllegalStateException("Could not commit indexer", e);
+				}
+			}
+			if(searcherManager != null) {
+				commitExecutors.submit(()-> {
+					try {
+						if(searcherManager != null && !searcherManager.maybeRefresh()) {
+							LOGGER.log(Level.FINE, "Refreshing did not work, because it was called from a wrong thread");
+						}
+					} catch (IOException e) {
+						LOGGER.log(Level.SEVERE, String.format("Could not update SearcherManager for path %s, because %s", indexFolder.toString(), e.getMessage()), e);
+					} 
+				});
+			}
+			return null;
+		});
 	}
 
 	/* 

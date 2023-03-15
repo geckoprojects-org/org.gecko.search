@@ -16,7 +16,6 @@ package org.gecko.search.document.index;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -213,9 +212,11 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @param commit
 	 */
 	protected Promise<Void> internalHandleContext(D context, boolean commit) {
+		requireNonNull(getPromiseFactory());
 		return getPromiseFactory().
 				submit(()-> {
 					requireNonNull(context);
+					requireNonNull(context.getActionType());
 					requireNonNull(indexWriter);
 					switch (context.getActionType()) {
 					case ADD:
@@ -228,11 +229,11 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 						indexWriter.deleteDocuments(context.getIdentifyingTerm());
 						break;
 					default:
-						throw new UnsupportedOperationException("SEARCH is currerntly not supported");
+						throw new UnsupportedOperationException("Currently not supported index type");
 					}
 					return null;
 				}).
-				then(v->doCommitWithCommitCallbacks(Collections.singleton(context), commit).
+				then(v->commitWithCommitCallbacks(Collections.singleton(context), commit).
 						onResolve(()->notifyIndexListener(context)));
 	}
 
@@ -245,37 +246,10 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	protected Promise<Void> internalHandleContexts(Collection<D> contexts, boolean commit) {
 		requireNonNull(contexts);
 		// We are batching here, so we do not
-		List<Promise<Void>> promises = contexts.parallelStream().map(partial(this::internalHandleContext, false)).collect(Collectors.toList());
-		return getPromiseFactory().all(promises).onResolve(()->doCommitWithCommitCallbacks(contexts, commit)).map(null);
-	}
-
-	/**
-	 * Commit index changes an refresh the searcher manager
-	 * @return {@link Promise} that resolves when searcher manager is refreshed
-	 */
-	protected Promise<Void> doCommit() {
-		requireNonNull(indexWriter);
-		return getPromiseFactory().submit(()->{
-			if(indexWriter.hasUncommittedChanges()) {
-				try {
-					indexWriter.commit();
-				} catch (IOException e) {
-					throw new IllegalStateException(String.format("Could not commit indexer for index path '%s', because: '%s'", configuration.base_path(), e.getMessage()), e);
-				}
-			}
-			if(searcherManager != null) {
-				try {
-					if(searcherManager != null && !searcherManager.maybeRefresh()) {
-						LOGGER.log(Level.FINE, ()->"Refreshing did not work, because it was called from a wrong thread");
-					}
-				} catch (IOException e) {
-					throw new IllegalStateException(String.format("Could not update SearcherManager for index path '%s', because: '%s'", configuration.base_path(), e.getMessage()), e);
-				}
-			} else {
-				LOGGER.log(Level.WARNING, ()->"No searcher manager is available yet to be updated. Just committed the index");
-			}
-			return null;
-		});
+		List<Promise<Void>> promises = contexts.stream().map(partial(this::internalHandleContext, false)).collect(Collectors.toList());
+		return getPromiseFactory().
+				all(promises).
+				then((p)->commitWithCommitCallbacks(contexts, commit).then(null));
 	}
 
 	/**
@@ -285,21 +259,20 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @param commit <code>true</code>, if a commit is needed, otherwise <code>false</code>
 	 * @return Promise that resolved with <code>true</code> on successful action
 	 */
-	protected Promise<Void> doCommitWithCommitCallbacks(Collection<D> contexts, boolean commit) {
+	protected Promise<Void> commitWithCommitCallbacks(Collection<D> contexts, boolean commit) {
+		requireNonNull(contexts);
 		if(commit) {
-			return doCommit().then((c)->{
+			return commit().then((c)->{
 				contexts.forEach(ctx -> 
-				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
-				getIndexExecutors().submit(() -> callback.commited(ctx))));
+				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> callback.commited(ctx)));
 				return c;
 			}).onFailure((t)->{
 				contexts.forEach(ctx -> 
-				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> 
-				getIndexExecutors().submit(() -> callback.error(ctx, t))));
+				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback ->  callback.error(ctx, t)));
 			});
 		} else  {
-			LOGGER.log(Level.FINE, ()->"No commit needed for contexts");
-			return getPromiseFactory().resolved(null);
+			LOGGER.log(Level.FINE, ()->"No commit needed for contexts " + contexts.size());
+			return getPromiseFactory().resolved((Void)null);
 		}
 	}
 
@@ -307,13 +280,15 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * Notify all index listeners 
 	 * @param context the document context
 	 */
-	protected void notifyIndexListener(D context) {
+	protected Promise<Void> notifyIndexListener(D context) {
+		requireNonNull(getPromiseFactory());
 		// Trigger listeners asynchronous
-		getIndexExecutors().submit(()->{
+		return getPromiseFactory().submit(()->{
 			synchronized (indexListeners) {
 				indexListeners.stream().
 				filter(l->l.canHandle(context)).
 				forEach(l->l.onIndex(context));
+				return null;
 			}
 		});
 	}
@@ -367,7 +342,16 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 */
 	@Override
 	public IndexWriter getIndexWriter() {
+		requireNonNull(indexWriter);
 		return indexWriter;
+	}
+	
+	/**
+	 * Returns the searcherManager.
+	 * @return the searcherManager
+	 */
+	public SearcherManager getSearcherManager() {
+		return searcherManager;
 	}
 
 	/* 
@@ -376,9 +360,9 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 */
 	@Override
 	public IndexSearcher aquireSearch() {
-		requireNonNull(searcherManager);
+		requireNonNull(getSearcherManager());
 		try {
-			return searcherManager.acquire();
+			return getSearcherManager().acquire();
 		} catch (IOException e) {
 			throw new IllegalStateException("Could not aquire searcher", e);
 		}
@@ -390,11 +374,11 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 */
 	@Override
 	public void releaseSearcher(IndexSearcher searcher) {
-		requireNonNull(searcherManager);
 		requireNonNull(searcher);
+		requireNonNull(getSearcherManager());
 		try {
-			searcherManager.release(searcher);
-		} catch (IOException e) {
+			getSearcherManager().release(searcher);
+		} catch (Exception e) {
 			throw new IllegalStateException("Could not release searcher", e);
 		}
 	}
@@ -404,15 +388,32 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @see org.gecko.search.document.LuceneIndexService#commit()
 	 */
 	@Override
-	public void commit()  {
-		try {
-			doCommit().getValue();
-		} catch (InvocationTargetException e) {
-			LOGGER.log(Level.SEVERE, "Commit failed with invocation target exception", e);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			LOGGER.log(Level.SEVERE, "Commit failed with interrupted exception", e);
-		}
+	public Promise<Void> commit()  {
+		requireNonNull(getPromiseFactory());
+		return getPromiseFactory().submit(()->{
+			IndexWriter writer = getIndexWriter();
+			requireNonNull(writer);
+			if(writer.hasUncommittedChanges()) {
+				try {
+					writer.commit();
+				} catch (IOException e) {
+					throw new IllegalStateException(String.format("Could not commit indexer for index path '%s', because: '%s'", configuration.base_path(), e.getMessage()), e);
+				}
+			}
+			SearcherManager manager = getSearcherManager();
+			if(manager != null) {
+				try {
+					if(manager != null && !manager.maybeRefresh()) {
+						LOGGER.log(Level.FINE, ()->"Refreshing did not work, because it was called from a wrong thread");
+					}
+				} catch (IOException e) {
+					throw new IllegalStateException(String.format("Could not update SearcherManager for index path '%s', because: '%s'", configuration.base_path(), e.getMessage()), e);
+				}
+			} else {
+				LOGGER.log(Level.WARNING, ()->"No searcher manager is available yet to be updated. Just committed the index");
+			}
+			return null;
+		});
 	}
 
 }
