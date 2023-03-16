@@ -195,7 +195,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 
 			@Override
 			public IndexSearcher getService(Bundle bundle, ServiceRegistration<IndexSearcher> registration) {
-				return aquireSearch();
+				return aquireSearcher();
 			}
 
 			@Override
@@ -375,7 +375,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @see org.gecko.search.document.LuceneIndexService#aquireSearch()
 	 */
 	@Override
-	public IndexSearcher aquireSearch() {
+	public IndexSearcher aquireSearcher() {
 		requireNonNull(getSearcherManager());
 		try {
 			return getSearcherManager().acquire();

@@ -24,9 +24,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -42,9 +41,8 @@ import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextBuilder;
 import org.gecko.search.document.context.ObjectContextObject;
-import org.junit.jupiter.api.AfterEach;
+import org.gecko.search.document.test.CDLCommitCallback;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
@@ -62,17 +60,15 @@ import org.osgi.test.common.service.ServiceAware;
 import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
-import org.gecko.search.document.test.CDLCommitCallback;
+import org.osgi.util.promise.Promise;
 
 @Testable
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(ServiceExtension.class)
 @ExtendWith(ConfigurationExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Disabled
 public class IndexListenerTest {
 	
-	private static final String INDEX_PATH = "/tmp/indexEMFTest/"; 
 	private BundleContext ctx;
 	@Mock
 	private IndexListener listenerMock;
@@ -80,12 +76,6 @@ public class IndexListenerTest {
 	@BeforeEach
 	public void doBeforeEach(@InjectBundleContext BundleContext ctx) {
 		this.ctx = ctx;
-	}
-
-	@AfterEach() 
-	public void doAfterEach() {
-		File tempFolder = new File(INDEX_PATH);
-		delete(tempFolder);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -96,12 +86,11 @@ public class IndexListenerTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "ByteBuffer"),
-					@Property(key = "base.path", value = INDEX_PATH)
+					@Property(key = "directory.type", value = "ByteBuffer")
 			})
 	public void basicTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
 			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException {
+			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -125,7 +114,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
@@ -147,7 +137,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
@@ -163,12 +154,11 @@ public class IndexListenerTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "ByteBuffer"),
-					@Property(key = "base.path", value = INDEX_PATH)
+					@Property(key = "directory.type", value = "ByteBuffer")
 			})
 	public void noHandlingTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
 			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException {
+			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 		
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -192,7 +182,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
@@ -216,7 +207,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, times(1)).onIndex(any(IndexContextObject.class));
@@ -231,6 +223,7 @@ public class IndexListenerTest {
 	 * @param listenerAware
 	 * @throws InterruptedException
 	 * @throws IOException
+	 * @throws InvocationTargetException 
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
@@ -241,12 +234,11 @@ public class IndexListenerTest {
 			properties = {
 					@Property(key = "id", value = "test"),
 					@Property(key = "indexListener.target", value = "(type=test)"),
-					@Property(key = "directory.type", value = "ByteBuffer"),
-					@Property(key = "base.path", value = INDEX_PATH)
+					@Property(key = "directory.type", value = "ByteBuffer")
 			})
 	public void bindTargetTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
 			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException {
+			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 		
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -271,7 +263,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
@@ -294,7 +287,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
@@ -319,7 +313,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
@@ -334,12 +329,4 @@ public class IndexListenerTest {
 		return d;
 	}
 
-	private void delete(File file) {
-		if(file.exists()) {
-			if(!file.isFile()) {
-				Arrays.asList(file.listFiles()).forEach(this::delete);
-			}
-			file.delete();
-		}
-	}
 }

@@ -18,10 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +38,6 @@ import org.gecko.search.IndexActionType;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextBuilder;
 import org.gecko.search.document.context.ObjectContextObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +52,7 @@ import org.osgi.test.common.service.ServiceAware;
 import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
+import org.osgi.util.promise.Promise;
 
 @Testable
 @ExtendWith(BundleContextExtension.class)
@@ -61,18 +60,11 @@ import org.osgi.test.junit5.service.ServiceExtension;
 @ExtendWith(ConfigurationExtension.class)
 public class IndexTest {
 	
-	private static final String INDEX_PATH = "/tmp/indexTest/"; 
 	private BundleContext ctx;
 
 	@BeforeEach
 	public void doBeforeEach(@InjectBundleContext BundleContext ctx) {
 		this.ctx = ctx;
-	}
-
-	@AfterEach() 
-	public void doAfterEach() {
-		File tempFolder = new File(INDEX_PATH);
-		delete(tempFolder);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -83,10 +75,9 @@ public class IndexTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "ByteBuffer"),
-					@Property(key = "base.path", value = INDEX_PATH)
+					@Property(key = "directory.type", value = "ByteBuffer")
 			})
-	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
+	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -100,11 +91,11 @@ public class IndexTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		long start = System.currentTimeMillis();
-		indexService.handleContext(indexContextObjectImpl);
+		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
-		Thread.sleep(500);
 
 		assertThat(searcherAware).isNotNull();
 		ServiceObjects<IndexSearcher> searcherSO = ctx.getServiceObjects(searcherAware.getServiceReference());
@@ -127,11 +118,10 @@ public class IndexTest {
 			name = "test",
 			properties = {
 					@Property(key = "id", value = "test"),
-					@Property(key = "directory.type", value = "ByteBuffer"),
-					@Property(key = "base.path", value =  INDEX_PATH)
+					@Property(key = "directory.type", value = "ByteBuffer")
 			})
 	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,
-			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException {
+			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -153,7 +143,8 @@ public class IndexTest {
 		}
 
 		long start = System.currentTimeMillis();
-		indexService.handleContexts(docs);
+		Promise<Void> p = indexService.handleContexts(docs);
+		p.getValue();
 		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
@@ -179,12 +170,4 @@ public class IndexTest {
 		return d;
 	}
 
-	private void delete(File file) {
-		if(file.exists()) {
-			if(!file.isFile()) {
-				Arrays.asList(file.listFiles()).forEach(this::delete);
-			}
-			file.delete();
-		}
-	}
 }

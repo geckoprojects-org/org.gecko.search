@@ -261,12 +261,12 @@ public class LuceneIndexImplTest {
 	
 	@Test
 	public void testAquireSearcher() throws ConfigurationException {
-		assertThrows(NullPointerException.class, ()->indexService.aquireSearch());
+		assertThrows(NullPointerException.class, ()->indexService.aquireSearcher());
 		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
 		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
 		indexService.setAnalyzer(analyzer);
 		indexService.activate(config, ctx);
-		assertNotNull(indexService.aquireSearch());
+		assertNotNull(indexService.aquireSearcher());
 		
 	}
 	
@@ -277,7 +277,7 @@ public class LuceneIndexImplTest {
 		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
 		indexService.setAnalyzer(analyzer);
 		indexService.activate(config, ctx);
-		IndexSearcher aquiredSearcher = indexService.aquireSearch();
+		IndexSearcher aquiredSearcher = indexService.aquireSearcher();
 		assertNotNull(aquiredSearcher);
 		try {
 			indexService.releaseSearcher(aquiredSearcher);
@@ -1092,7 +1092,7 @@ public class LuceneIndexImplTest {
 		assertNull(p.getFailure());
 		p.getValue();
 		
-		IndexSearcher searcher = indexService.aquireSearch();
+		IndexSearcher searcher = indexService.aquireSearcher();
 		assertNotNull(searcher);
 		
 		Query query = new MatchAllDocsQuery();
@@ -1126,7 +1126,7 @@ public class LuceneIndexImplTest {
 		
 		indexService.handleContextSync(dico01);
 		
-		IndexSearcher searcher = indexService.aquireSearch();
+		IndexSearcher searcher = indexService.aquireSearcher();
 		assertNotNull(searcher);
 		
 		Query query = new MatchAllDocsQuery();
@@ -1176,7 +1176,7 @@ public class LuceneIndexImplTest {
 		assertNull(p.getFailure());
 		p.getValue();
 		
-		IndexSearcher searcher = indexService.aquireSearch();
+		IndexSearcher searcher = indexService.aquireSearcher();
 		assertNotNull(searcher);
 		
 		Query query = new MatchAllDocsQuery();
@@ -1224,7 +1224,7 @@ public class LuceneIndexImplTest {
 		
 		indexService.handleContextsSync(dicos);
 		
-		IndexSearcher searcher = indexService.aquireSearch();
+		IndexSearcher searcher = indexService.aquireSearcher();
 		assertNotNull(searcher);
 		
 		Query query = new MatchAllDocsQuery();
