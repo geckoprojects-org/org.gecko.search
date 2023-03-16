@@ -13,12 +13,9 @@
  */
 package org.gecko.search.suggest.api;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Objects;
 
-import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.util.pushstream.PushStream;
 
 /**
@@ -28,22 +25,20 @@ import org.osgi.util.pushstream.PushStream;
  * @author Mark Hoffmann
  * @since Nov 9, 2018
  */
-public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionService<O, F> {
+public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionImpl<O, F> {
 
-	private static final Logger logger = Logger.getLogger(StreamSuggestionServiceImpl.class.getName());
 	private PushStream<O> contextStream;
 
 	/**
 	 * Called on component activation
-	 * @param ctx the component context
+	 * @param ctx the bundle context
 	 * @throws ConfigurationException
 	 */
 	@Override
-	protected void activate(ComponentContext ctx , SuggestionConfiguration configuration) {
-		super.activate(ctx, configuration);
-		suggesterPromise.
-			onFailure(t->logger.log(Level.SEVERE, String.format("[%s] Error creating the suggester instance", configuration.suggestionName()), t)).
-			thenAccept(this::connectToPushStream);
+	protected void activate(SuggestionConfiguration configuration) throws ConfigurationException {
+		super.activate(configuration);
+		Objects.requireNonNull(getPromiseFactory());
+		connectToPushStream();
 	}
 	
 	/**
@@ -54,11 +49,12 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionS
 		this.contextStream = contextStream;
 	}
 
-	private void connectToPushStream(final AnalyzingInfixSuggester suggester) {
+	private void connectToPushStream() {
+		Objects.requireNonNull(getLookup());
 		contextStream.
 			map(this::createContext).
 			map(this::buildIndexContext).
-			forEach(cl->indexContexts(cl, suggester));
+			forEach(cl->indexContexts(cl));
 	}
 
 }

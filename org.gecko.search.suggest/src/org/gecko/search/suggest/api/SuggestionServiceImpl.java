@@ -13,6 +13,8 @@
  */
 package org.gecko.search.suggest.api;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,7 @@ import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.gecko.search.IndexActionType;
 import org.gecko.search.suggest.context.SuggestionContext;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.util.promise.Promise;
 
 /**
  * Service implementation of the suggestion service. To define the index location,
@@ -30,15 +33,15 @@ import org.osgi.service.cm.ConfigurationException;
  * @author Ilenia Salvadori, Mark Hoffmann
  * @since 03.03.2023
  */
-public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionService<O, F> {
+public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionImpl<O, F> {
 
 	/**
 	 * Sets the suggestionDescriptor.
 	 * @param suggestionDescriptor the suggestionDescriptor to set
 	 */
 	@Override
-	protected void setSuggestionDescriptor(SuggestionDescriptor<O, F> suggestionDescriptor) {
-		this.suggestionDescriptor = suggestionDescriptor;
+	protected void setDescriptor(SuggestionDescriptor<O, F> suggestionDescriptor) {
+		super.setDescriptor(suggestionDescriptor);
 	}
 	/**
 	 * Creates the initial index with data
@@ -46,11 +49,13 @@ public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionService
 	 * @throws ConfigurationException 
 	 */
 	@Override
-	protected AnalyzingInfixSuggester initializeSuggestionIndex() throws ConfigurationException {
-		//Initialize path and analyzer
-		AnalyzingInfixSuggester suggester = super.initializeSuggestionIndex();
-		indexContexts(buildIndexContext(createContext()), suggester);
-		return suggester;
+	protected Promise<Void> initializeSuggestionIndex()  {
+		requireNonNull(getPromiseFactory());
+		requireNonNull(getLookup());
+		return getPromiseFactory().submit(()->{
+			indexContexts(buildIndexContext(createContext()));
+			return null;
+		});
 	}
 
 	/**
@@ -61,10 +66,11 @@ public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionService
 	 * @return the list with contexts
 	 */
 	protected List<SuggestionContext<O, F>> createContext() {
-		Set<F> fields = suggestionDescriptor.getFields();
-		List<String> labels = suggestionDescriptor.getLabels();
+		SuggestionDescriptor<O,F> descriptor = getDescriptor();
+		Set<F> fields = descriptor.getFields();
+		List<String> labels = descriptor.getLabels();
 		final String[] labelsArray = labels.toArray(new String[labels.size()]);
-		Stream<O> objects = suggestionDescriptor.getObjectStream();
+		Stream<O> objects = descriptor.getObjectStream();
 		return objects.
 				map(object-> createContextsForFields(fields, object, IndexActionType.ADD, labelsArray, 4)).
 				flatMap(Collection::stream).

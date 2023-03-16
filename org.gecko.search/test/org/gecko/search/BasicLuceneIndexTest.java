@@ -75,7 +75,7 @@ public class BasicLuceneIndexTest {
 	public void testActivate() throws IOException {
 		assertNull(basicService.getPromiseFactory());
 		assertNull(basicService.getIndexExecutors());
-		assertNull(basicService.getConfiguration());
+		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getDirectory());
 		assertNull(basicService.getAnalyzer());
 		// no analyzer, no config
@@ -85,16 +85,16 @@ public class BasicLuceneIndexTest {
 		assertEquals(analyzer, basicService.getAnalyzer());
 		
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
-		assertNull(basicService.getConfiguration());
+		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getDirectory());
 		assertNull(basicService.getPromiseFactory());
 		assertNull(basicService.getIndexExecutors());
 		assertEquals(analyzer, basicService.getAnalyzer());
 		
 		// we have a analyzer and config; but the config will return nothing in its methods
-		when(basicService.createConfiguration()).thenReturn(config);
+		when(basicService.createInternalConfiguration()).thenReturn(config);
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
-		assertNull(basicService.getConfiguration());
+		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getPromiseFactory());
 		assertNull(basicService.getDirectory());
 		assertNull(basicService.getIndexExecutors());
@@ -103,7 +103,7 @@ public class BasicLuceneIndexTest {
 		// return config id
 		when(config.getIndexName()).thenReturn("foo");
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
-		assertNull(basicService.getConfiguration());
+		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getPromiseFactory());
 		assertNull(basicService.getDirectory());
 		assertNull(basicService.getIndexExecutors());
@@ -112,7 +112,7 @@ public class BasicLuceneIndexTest {
 		// return config path
 		when(config.getBasePath()).thenReturn("foo/bar");
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
-		assertNull(basicService.getConfiguration());
+		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getPromiseFactory());
 		assertNull(basicService.getDirectory());
 		assertNull(basicService.getIndexExecutors());
@@ -132,7 +132,7 @@ public class BasicLuceneIndexTest {
 		assertNotNull(basicService.getPromiseFactory());
 		assertNotNull(basicService.getIndexExecutors());
 		assertEquals(analyzer, basicService.getAnalyzer());
-		assertEquals(config, basicService.getConfiguration());
+		assertEquals(config, basicService.getInternalConfiguration());
 		
 		// Test IOException handling
 		when(basicService.doInitializeDirectory(any(Configuration.class), any(Directory.class))).thenThrow(new IOException());
@@ -146,12 +146,12 @@ public class BasicLuceneIndexTest {
 	public void testDoCallbacks() throws IOException {
 		assertNull(basicService.getPromiseFactory());
 		assertNull(basicService.getIndexExecutors());
-		assertNull(basicService.getConfiguration());
+		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getDirectory());
 		assertNull(basicService.getAnalyzer());
 		
 		basicService.setAnalyzer(analyzer);
-		when(basicService.createConfiguration()).thenReturn(config);
+		when(basicService.createInternalConfiguration()).thenReturn(config);
 		when(config.getIndexName()).thenReturn("foo");
 		lenient().when(config.getBasePath()).thenReturn("foo/bar");
 		when(config.getDirectoryType()).thenReturn("ByteBuffer");
@@ -170,7 +170,7 @@ public class BasicLuceneIndexTest {
 		assertNotNull(basicService.getPromiseFactory());
 		assertNotNull(basicService.getIndexExecutors());
 		assertEquals(analyzer, basicService.getAnalyzer());
-		assertEquals(config, basicService.getConfiguration());
+		assertEquals(config, basicService.getInternalConfiguration());
 		
 		verify(basicService, times(1)).doInitializeDirectory(any(Configuration.class), any(Directory.class));
 		verify(basicService, times(1)).doInitializeExecutors(any(Configuration.class));
@@ -184,7 +184,7 @@ public class BasicLuceneIndexTest {
 			basicService.setAnalyzer(analyzer);
 			basicService.basicDeactivate();
 
-			when(basicService.createConfiguration()).thenReturn(config);
+			when(basicService.createInternalConfiguration()).thenReturn(config);
 			when(config.getIndexName()).thenReturn("foo");
 			lenient().when(config.getBasePath()).thenReturn("foo/bar");
 			when(config.getDirectoryType()).thenReturn("ByteBuffer");
@@ -195,11 +195,11 @@ public class BasicLuceneIndexTest {
 			assertNotNull(basicService.getPromiseFactory());
 			assertNotNull(basicService.getIndexExecutors());
 			assertEquals(analyzer, basicService.getAnalyzer());
-			assertEquals(config, basicService.getConfiguration());
+			assertEquals(config, basicService.getInternalConfiguration());
 			
 			basicService.basicDeactivate();
 			
-			assertNull(basicService.getConfiguration());
+			assertNull(basicService.getInternalConfiguration());
 			assertNull(basicService.getPromiseFactory());
 			assertNull(basicService.getDirectory());
 			assertNull(basicService.getIndexExecutors());
@@ -219,13 +219,18 @@ public class BasicLuceneIndexTest {
 		lenient().when(config.getIndexName()).thenReturn("foo");
 		assertThrows(NullPointerException.class, ()->basicService.initializeIndexLocation(config));
 		when(config.getBasePath()).thenReturn("foo/bar");
+		File location = null;
 		try {
-			File location = basicService.initializeIndexLocation(config);
+			location = basicService.initializeIndexLocation(config);
 			assertNotNull(location);
 			String path = location.getAbsolutePath();
 			assertTrue(path.endsWith("foo/bar/foo"));
 		} catch (ConfigurationException e) {
 			fail("unexpected exception in initializing location");
+		} finally {
+			if (location != null) {
+				location.delete();
+			}
 		}
 		
 	}
@@ -254,9 +259,9 @@ public class BasicLuceneIndexTest {
 	}
 	
 	@Test
-	public void testDirectories() throws ConfigurationException {
+	public void testDirectories() throws ConfigurationException, IOException {
 		basicService.setAnalyzer(analyzer);
-		when(basicService.createConfiguration()).thenReturn(config);
+		when(basicService.createInternalConfiguration()).thenReturn(config);
 		when(config.getIndexName()).thenReturn("foo");
 		when(config.getDirectoryType()).thenReturn("ByteBuffer");
 		basicService.activate();
@@ -269,21 +274,39 @@ public class BasicLuceneIndexTest {
 		d = basicService.getDirectory();
 		assertNotNull(d);
 		assertInstanceOf(NIOFSDirectory.class, d);
+		
+		d.close();
 		when(config.getDirectoryType()).thenReturn("niofs");
 		basicService.activate();
 		d = basicService.getDirectory();
 		assertNotNull(d);
 		assertInstanceOf(NIOFSDirectory.class, d);
+		d.close();
 		when(config.getDirectoryType()).thenReturn("mmap");
 		basicService.activate();
 		d = basicService.getDirectory();
 		assertNotNull(d);
 		assertInstanceOf(MMapDirectory.class, d);
+		d.close();
 		when(config.getDirectoryType()).thenReturn("foo");
 		basicService.activate();
 		d = basicService.getDirectory();
 		assertNotNull(d);
 		assertTrue(d instanceof MMapDirectory || d instanceof NIOFSDirectory);
+		d.close();
+		when(config.getBasePath()).thenReturn("");
+		assertThrows(ConfigurationException.class, ()->basicService.activate());
+		
+	}
+	
+	@Test
+	public void testAnalyzer() {
+		assertNull(basicService.getAnalyzer());
+		basicService.setAnalyzer(null);
+		assertNull(basicService.getAnalyzer());
+		basicService.setAnalyzer(analyzer);
+		assertNotNull(basicService.getAnalyzer());
+		assertEquals(analyzer, basicService.getAnalyzer());
 	}
 	
 	public <T> T createAbstractMock(Class<T> mockClass) {
@@ -291,6 +314,16 @@ public class BasicLuceneIndexTest {
 				Mockito.withSettings().
 				useConstructor().
 				defaultAnswer(Mockito.CALLS_REAL_METHODS));
+	}
+	
+	boolean deleteDirectory(File directoryToBeDeleted) {
+	    File[] allContents = directoryToBeDeleted.listFiles();
+	    if (allContents != null) {
+	        for (File file : allContents) {
+	            deleteDirectory(file);
+	        }
+	    }
+	    return directoryToBeDeleted.delete();
 	}
 	
 }

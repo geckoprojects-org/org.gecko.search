@@ -79,7 +79,7 @@ public abstract class BasicLuceneImpl {
 	 * Creates a configuration, that is used for the setup. Must not be <code>null</code>
 	 * @return a configuration, that is used for the setup
 	 */
-	abstract public Configuration createConfiguration();
+	abstract public Configuration createInternalConfiguration();
 
 	/**
 	 * Returns the analyzer.
@@ -101,7 +101,7 @@ public abstract class BasicLuceneImpl {
 	 * Returns the configuration.
 	 * @return the configuration
 	 */
-	protected Configuration getConfiguration() {
+	protected Configuration getInternalConfiguration() {
 		return configuration;
 	}
 
@@ -127,7 +127,7 @@ public abstract class BasicLuceneImpl {
 	 */
 	public final void activate() throws ConfigurationException {
 		try {
-			Configuration c = createConfiguration();
+			Configuration c = createInternalConfiguration();
 			requireNonNull(c);
 			requireNonNull(analyzer);
 			directory = initializeDirectory(c);

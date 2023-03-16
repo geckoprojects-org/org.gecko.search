@@ -13,6 +13,9 @@
  */
 package org.gecko.search.suggest.context;
 
+import java.util.Objects;
+
+import org.gecko.search.IndexActionType;
 import org.gecko.search.IndexContextObject;
 
 /**
@@ -51,5 +54,22 @@ public interface SuggestionContext<O, F> extends IndexContextObject<O> {
 	 * @return the source object's field
 	 */
 	F getField();
+	
+	static <O, F> SuggestionContext<O, F> createAddContext(O object, F field, IndexActionType indexType, String payload, String content, String[] labels, long weight) {
+		Objects.requireNonNull(object);
+		Objects.requireNonNull(field);
+		Objects.requireNonNull(indexType);
+		Objects.requireNonNull(content);
+		Objects.requireNonNull(labels);
+		SuggestionContextImpl<O, F> sci = new SuggestionContextImpl<>(indexType, payload, content, labels, weight);
+		sci.setField(field);
+		sci.setObject(object);
+		return sci;
+	}
+	
+	static <O, F> SuggestionContextWrapper<O, F> toIndexContext(SuggestionContext<O, F> context) {
+		Objects.requireNonNull(context);
+		return new SuggestionContextWrapper<>(context);
+	}
 
 }

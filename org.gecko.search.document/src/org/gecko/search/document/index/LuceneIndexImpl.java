@@ -73,7 +73,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	public @interface IndexConfig {
 		String id();
 		String directory_type();
-		String base_path() default "";
+		String base_path();
 		int batchSize() default 500;
 		long windowSize() default 500;
 		int indexThreads() default 4;
@@ -110,7 +110,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	 * @see org.gecko.search.document.index.BasicLuceneIndexImpl#createConfiguration()
 	 */
 	@Override
-	public Configuration createConfiguration() {
+	public Configuration createInternalConfiguration() {
 		return new Configuration() {
 
 			@Override
@@ -131,12 +131,12 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	}
 
 	public void activate(IndexConfig configuration, BundleContext context) throws ConfigurationException {
-		String basePath = "<no-base.path>";
+		String id = "<no-id>";
 		try {
 			requireNonNull(configuration);
 			requireNonNull(context);
 			this.configuration = configuration;
-			basePath = configuration.base_path();
+			id = configuration.id();
 
 			super.activate();
 
@@ -152,9 +152,9 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 		} catch (ConfigurationException e) {
 			throw e;
 		} catch (IOException e) {
-			throw new ConfigurationException("configuration", String.format("Cannot not open index directory for '%s' with message %s", basePath, e.getMessage()), e);
+			throw new ConfigurationException("configuration", String.format("Cannot not open index directory for '%s' with message %s", id, e.getMessage()), e);
 		} catch (Exception e) {
-			throw new ConfigurationException("configuration", String.format("Cannot create index setup for '%s' with message %s", basePath, e.getMessage()), e);
+			throw new ConfigurationException("configuration", String.format("Cannot create index setup for '%s' with message %s", id, e.getMessage()), e);
 		}
 	}
 

@@ -22,7 +22,6 @@ import org.gecko.search.suggest.api.SuggestionConfiguration;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.search.suggest.api.SuggestionService;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -47,8 +46,8 @@ public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<
 	 */
 	@Activate
 	@Override
-	public void activate(ComponentContext ctx , SuggestionConfiguration configuration) {
-		super.activate(ctx, configuration);
+	public void activate(SuggestionConfiguration configuration) throws ConfigurationException {
+		super.activate(configuration);
 	}
 
 	/**
@@ -66,8 +65,8 @@ public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<
 	 */
 	@Override
 	@Reference(name = "descriptor")
-	protected void setSuggestionDescriptor(SuggestionDescriptor<EObject, EStructuralFeature> suggestionDescriptor) {
-		super.setSuggestionDescriptor(suggestionDescriptor);
+	protected void setDescriptor(SuggestionDescriptor<EObject, EStructuralFeature> suggestionDescriptor) {
+		super.setDescriptor(suggestionDescriptor);
 	}
 	
 	/* 

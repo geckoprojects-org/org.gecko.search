@@ -85,14 +85,4 @@ public class EObjectLuceneIndex extends LuceneIndexImpl<EObjectDocumentIndexObje
 		super.removeIndexListener(listener);
 	}
 	
-//	/* 
-//	 * (non-Javadoc)
-//	 * @see org.gecko.search.document.impl.LuceneIndexImpl#createSimplePushEventSource()
-//	 */
-//	@Override
-//	protected SimplePushEventSource<EObjectDocumentIndexObjectContext> createSimplePushEventSource() {
-//		PushStreamProvider psp = getPushStreamProvider();
-//		return psp.buildSimpleEventSource(EObjectDocumentIndexObjectContext.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends EObjectDocumentIndexObjectContext>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
-//	}
-
 }

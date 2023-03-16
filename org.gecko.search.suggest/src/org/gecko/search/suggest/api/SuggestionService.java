@@ -33,7 +33,9 @@ public interface SuggestionService {
 	 * string we want to auto complete and an array of strings in which we can specify whether we want to look
 	 * only among data of some particular category. 
 	 * It returns a map with the proposed auto-completed string as key and the payload as value. 
-	 * 
+	 * @param string the string to be completed
+	 * @param label the labels to look into
+	 * @return a {@link Map} with proposed values and the payload as value
 	 */
 	public Map<String, String> getAutoCompletion(String string, String[] label);
 	

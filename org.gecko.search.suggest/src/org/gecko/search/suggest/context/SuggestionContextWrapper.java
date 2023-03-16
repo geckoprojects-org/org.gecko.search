@@ -24,14 +24,14 @@ import org.apache.lucene.util.BytesRef;
  * @author Mark Hoffmann
  * @since 24.11.2018
  */
-public class IndexContext<O, F> {
+public class SuggestionContextWrapper<O, F> {
 
 	private final SuggestionContext<O, F> context;
 
 	/**
 	 * Creates a new instance.
 	 */
-	public IndexContext(SuggestionContext<O, F> context) {
+	SuggestionContextWrapper(SuggestionContext<O, F> context) {
 		this.context = context;
 	}
 	

@@ -122,11 +122,24 @@ public class LuceneIndexImplTest {
 	}
 	
 	@Test
+	public void testActivateFailNoIdConfig() throws ConfigurationException, IOException {
+		indexService = mock(LuceneIndexImpl.class);
+		doCallRealMethod().when(indexService).activate(any(), any());
+		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
+		indexService.setAnalyzer(analyzer);
+		Map<String, String> properties = Map.of("directory.type", "bytebuffer");
+		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
+		// npe createConfiguration
+		assertThrows(ConfigurationException.class, ()->indexService.activate(config, ctx));
+		verify(indexService, never()).registerIndexSearcher(any(), any());
+	}
+	
+	@Test
 	public void testActivateFailCreateConfig() throws ConfigurationException, IOException {
 		indexService = mock(LuceneIndexImpl.class);
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
-		when(indexService.createConfiguration()).thenThrow(NullPointerException.class);
+		when(indexService.createInternalConfiguration()).thenThrow(NullPointerException.class);
 		indexService.setAnalyzer(analyzer);
 		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
 		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
@@ -141,7 +154,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenThrow(NullPointerException.class);
 		indexService.setAnalyzer(analyzer);
 		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
@@ -156,7 +169,7 @@ public class LuceneIndexImplTest {
 		indexService = mock(LuceneIndexImpl.class);
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
-		when(indexService.createConfiguration()).thenThrow(NullPointerException.class);
+		when(indexService.createInternalConfiguration()).thenThrow(NullPointerException.class);
 		indexService.setAnalyzer(analyzer);
 		Map<String, String> properties = Map.of("id", "1234", "directory.type", "bytebuffer");
 		final IndexConfig config = converter.convert(properties).to(IndexConfig.class); 
@@ -171,7 +184,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenThrow(NullPointerException.class);
 		indexService.setAnalyzer(analyzer);
@@ -188,7 +201,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		doThrow(RuntimeException.class).when(indexService).registerIndexSearcher(any(), any());
@@ -223,7 +236,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		doThrow(IllegalStateException.class).when((BasicLuceneImpl)indexService).basicDeactivate();
@@ -331,7 +344,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		when(indexService.getPromiseFactory()).thenCallRealMethod();
@@ -360,7 +373,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		when(indexService.getPromiseFactory()).thenCallRealMethod();
@@ -522,7 +535,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		when(indexService.commitWithCommitCallbacks(any(), anyBoolean())).thenCallRealMethod();
@@ -721,7 +734,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		when(indexService.getPromiseFactory()).thenCallRealMethod();
@@ -994,7 +1007,7 @@ public class LuceneIndexImplTest {
 		doCallRealMethod().when(indexService).activate(any(), any());
 		doCallRealMethod().when(indexService).setAnalyzer(analyzer);
 		when(indexService.doInitializeDirectory(any(), any())).thenCallRealMethod();
-		when(indexService.createConfiguration()).thenCallRealMethod();
+		when(indexService.createInternalConfiguration()).thenCallRealMethod();
 		when(indexService.getAnalyzer()).thenCallRealMethod();
 		when(indexService.getDirectory()).thenCallRealMethod();
 		when(indexService.getPromiseFactory()).thenCallRealMethod();

@@ -44,7 +44,7 @@ public class SuggestionContextImpl<O, F> implements SuggestionContext<O, F>{
 		private O sourceObject;
 		private F field;
 		
-		public SuggestionContextImpl(IndexActionType action, String payload, String content, String[] labels, long weight) {
+		SuggestionContextImpl(IndexActionType action, String payload, String content, String[] labels, long weight) {
 			this.payload = payload;
 			this.content = content;
 			this.action = action;
