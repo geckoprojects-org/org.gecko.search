@@ -34,18 +34,25 @@ import java.util.stream.Stream;
 
 import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.BytesRef;
 import org.gecko.search.BasicLuceneImpl;
 import org.gecko.search.IndexActionType;
 import org.gecko.search.suggest.context.ContextIteratorImpl;
-import org.gecko.search.suggest.context.SuggestionContextWrapper;
 import org.gecko.search.suggest.context.SuggestionContext;
+import org.gecko.search.suggest.context.SuggestionContextWrapper;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.util.promise.Promise;
 
 /**
  * Service implementation of the suggestion service. To define the index location,
- * the corresponding configuration property must be provided
+ * the corresponding configuration property must be provided.
+ * 
+ * ATTENTION: 
+ * This implementation does not warm up the suggester. Executing a lookup before something was indexed will fail!
+ * Especially when using an in memory {@link Directory}. The SearcherManager is activated lazily, when indexing something
+ * Implementors should care about this.
+ * 
  * @author Ilenia Salvadori, Mark Hoffmann
  * @since 03.03.2023
  */
@@ -120,8 +127,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 		Set<BytesRef> contextSet = convertLabels(label);
 		try {
 			       
-			Promise<Map<String, String>> result = getPromiseFactory().
-					submit(()->doLookup(stringToComplete, contextSet)).
+			Promise<Map<String, String>> result = getPromiseFactory().submit(()->doLookup(stringToComplete, contextSet)).
 					map(lrl->lrl.stream().
 							collect(Collectors.toMap(lr->lr.key.toString(), lr->{
 								BytesRef payload = lr.payload;
@@ -195,6 +201,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 			this.configuration = configuration;
 			super.activate();
 			lookup = createLookup(configuration);
+			indexIteratorContext(Collections.emptyList());
 		} catch (Exception e) {
 			this.configuration = null;
 			throw new ConfigurationException(configName, "Cannot setup suggestor for this configuration", e);
@@ -216,7 +223,8 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 	}
 	
 	/**
-	 * Initializes the suggestion index
+	 * Initializes the suggestion index.
+	 * We pre-configure the suggester, to deal with lookups before we indexed something
 	 * @return a Promise that resolved when the initialization is done or an error occurred
 	 */
 	protected Promise<Void> initializeSuggestionIndex() {

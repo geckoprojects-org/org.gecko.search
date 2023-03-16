@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -41,6 +40,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.gecko.search.BasicLuceneImpl.Configuration;
 import org.gecko.search.IndexActionType;
@@ -66,8 +66,7 @@ import org.osgi.util.promise.Promise;
 @ExtendWith(MockitoExtension.class)
 public class BasicSuggestionImplTest {
 
-	@Mock
-	private Analyzer analyzer;
+	private Analyzer analyzer = new StandardAnalyzer();
 	@Mock
 	private Configuration configuration;
 	@SuppressWarnings("rawtypes")
@@ -442,7 +441,7 @@ public class BasicSuggestionImplTest {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void testIndexContextLookup() throws ConfigurationException {
+	public void testIndexContext() throws ConfigurationException {
 		assertThrows(NullPointerException.class, ()->suggestionService.indexContext(null));
 		SuggestionContext sctx = mock(SuggestionContext.class);
 		SuggestionContextWrapper wrapper = SuggestionContext.toIndexContext(sctx);
@@ -460,10 +459,43 @@ public class BasicSuggestionImplTest {
 		when(sctx.getContent()).thenReturn("test");
 		when(sctx.getPayload()).thenReturn("foo");
 		suggestionService.indexContext(wrapper);
-		
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public void testIndexContexts() throws ConfigurationException, IOException, InvocationTargetException, InterruptedException {
+		assertThrows(NullPointerException.class, ()->suggestionService.indexContexts(null));
+		SuggestionContext sctx01 = mock(SuggestionContext.class);
+		SuggestionContextWrapper wrapper01 = SuggestionContext.toIndexContext(sctx01);
+		SuggestionContext sctx02 = mock(SuggestionContext.class);
+		SuggestionContextWrapper wrapper02 = SuggestionContext.toIndexContext(sctx02);
+		assertThrows(NullPointerException.class, ()->suggestionService.indexContexts(List.of(wrapper01, wrapper02)));
+		// bo lookup
+		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
+		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
+		// no analyzer
+		suggestionService.setAnalyzer(analyzer);
+		suggestionService.activate(config);
+		when(sctx01.getActionType()).thenReturn(null);
+		when(sctx02.getActionType()).thenReturn(IndexActionType.ADD);
+		suggestionService.indexContexts(List.of(wrapper01, wrapper02));
+		verify(suggestionService, times(2)).indexContext(any());
+		
+		when(sctx01.getActionType()).thenReturn(IndexActionType.ADD);
+		when(sctx02.getActionType()).thenReturn(IndexActionType.ADD);
+		when(sctx01.getContent()).thenReturn("test");
+		when(sctx01.getContent()).thenReturn("test-2");
+		when(sctx01.getPayload()).thenReturn("foo");
+		when(sctx02.getPayload()).thenReturn("foo-2");
+		suggestionService.indexContexts(List.of(wrapper01, wrapper02));
+		
+		verify(suggestionService, times(4)).indexContext(any());
+		
+		// this is just a simulation because we use mocked data. Lucene throws the ISE here
+		suggestionService.doLookup("te", suggestionService.convertLabels(new String[] {"tag"}));
+	}
+	
+	@SuppressWarnings({ "unchecked" })
 	@Test
 	public void testDoLookup() throws ConfigurationException, IOException {
 		assertThrows(NullPointerException.class, ()->suggestionService.doLookup(null, null));
@@ -475,8 +507,8 @@ public class BasicSuggestionImplTest {
 		suggestionService.setAnalyzer(analyzer);
 		suggestionService.activate(config);
 		assertNotNull(suggestionService.getLookup());
-		// suggester must be build first
-		assertThrows(IllegalStateException.class, ()->suggestionService.doLookup("te", suggestionService.convertLabels(new String[] {"tag"})));
+		// this is just a simulation because we use mocked data. Lucene throws the ISE here
+		suggestionService.doLookup("te", suggestionService.convertLabels(new String[] {"tag"}));
 	}
 
 	public <T> T createAbstractMock(Class<T> mockClass) {
