@@ -62,6 +62,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 	private SuggestionDescriptor<O, F> descriptor;
 	private AnalyzingInfixSuggester lookup;
 	private SuggestionConfiguration configuration;
+	private Promise<Void> initPromise;
 	
 	SuggestionDescriptor<O, F> getDescriptor() {
 		return descriptor;
@@ -79,6 +80,16 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 	public AnalyzingInfixSuggester getLookup() {
 		requireNonNull(lookup);
 		return lookup;
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.suggest.api.SuggestionService#getInitializationPromise()
+	 */
+	@Override
+	public Promise<Void> getInitializationPromise() {
+		requireNonNull(initPromise);
+		return initPromise;
 	}
 	
 	/**
@@ -203,6 +214,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 			super.activate();
 			lookup = createLookup(configuration);
 			indexIteratorContext(Collections.emptyList());
+			initPromise = initializeSuggestionIndex();
 		} catch (Exception e) {
 			this.configuration = null;
 			throw new ConfigurationException(configName, "Cannot setup suggestor for this configuration", e);

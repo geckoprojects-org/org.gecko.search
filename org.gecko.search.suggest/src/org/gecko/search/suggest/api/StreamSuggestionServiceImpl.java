@@ -13,7 +13,7 @@
  */
 package org.gecko.search.suggest.api;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.util.pushstream.PushStream;
@@ -36,11 +36,19 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 	 */
 	@Override
 	protected void activate(SuggestionConfiguration configuration) throws ConfigurationException {
-		super.activate(configuration);
-		Objects.requireNonNull(getPromiseFactory());
-		connectToPushStream();
+		try {
+			super.activate(configuration);
+			requireNonNull(getPromiseFactory());
+			requireNonNull(contextStream);
+			connectToPushStream();
+		} catch (Exception e) {
+			if (e instanceof ConfigurationException) {
+				throw e;
+			}
+			throw new ConfigurationException("configuration", "Error activating StreamSuggestionServiceimpl", e);
+		}
 	}
-	
+
 	/**
 	 * Sets the contextStream.
 	 * @param contextStream the contextStream to set
@@ -50,7 +58,8 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 	}
 
 	private void connectToPushStream() {
-		Objects.requireNonNull(getLookup());
+		requireNonNull(getLookup());
+		requireNonNull(getDescriptor());
 		contextStream.
 			map(this::createContext).
 			map(this::buildIndexContext).

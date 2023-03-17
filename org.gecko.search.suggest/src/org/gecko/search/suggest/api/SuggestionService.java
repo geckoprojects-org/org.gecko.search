@@ -15,6 +15,8 @@ package org.gecko.search.suggest.api;
 
 import java.util.Map;
 
+import org.osgi.util.promise.Promise;
+
 /**
  * Service that provides auto completion proposals
  * @author Ilenia Salvadori
@@ -38,5 +40,12 @@ public interface SuggestionService {
 	 * @return a {@link Map} with proposed values and the payload as value
 	 */
 	public Map<String, String> getAutoCompletion(String string, String[] label);
+	
+	
+	/**
+	 * Resolves, when the initialization is done or otherwise with an error
+	 * @return Promise that resolves when the initialization is done or otherwise with an error
+	 */
+	public Promise<Void> getInitializationPromise();
 	
 }

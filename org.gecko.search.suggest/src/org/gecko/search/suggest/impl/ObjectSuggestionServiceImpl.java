@@ -17,6 +17,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.lang.reflect.Field;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.gecko.search.suggest.api.SuggestionConfiguration;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.search.suggest.api.SuggestionService;
@@ -55,6 +56,16 @@ public class ObjectSuggestionServiceImpl extends SuggestionServiceImpl<Object, F
 	@Deactivate
 	public void deactivate() {
 		super.deactivate();
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.impl.LuceneIndexImpl#setAnalyzer(org.apache.lucene.analysis.Analyzer)
+	 */
+	@Override
+	@Reference(name="analyzer", target="(type=standard)")
+	public void setAnalyzer(Analyzer analyzer) {
+		super.setAnalyzer(analyzer);
 	}
 	
 	/* 

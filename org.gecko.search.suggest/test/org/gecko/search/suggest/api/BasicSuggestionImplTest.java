@@ -157,6 +157,24 @@ public class BasicSuggestionImplTest {
 			fail("Unexpected exception");
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testGetInitializePromise() throws ConfigurationException, InvocationTargetException, InterruptedException {
+		assertThrows(NullPointerException.class, ()->suggestionService.getInitializationPromise());
+		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
+		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
+		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
+		suggestionService.activate(config);
+		
+		try {
+			Promise<Void> p = suggestionService.getInitializationPromise();
+			p.getValue();
+		} catch (Exception e) {
+			fail("Unexpected exception");
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test

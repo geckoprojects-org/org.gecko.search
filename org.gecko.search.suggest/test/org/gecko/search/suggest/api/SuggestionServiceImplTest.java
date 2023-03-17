@@ -119,7 +119,7 @@ public class SuggestionServiceImplTest {
 		AnalyzingInfixSuggester lookup = suggestionService.getLookup();
 		assertNotNull(lookup);
 		
-		Promise<Void> p = suggestionService.initializeSuggestionIndex();
+		Promise<Void> p = suggestionService.getInitializationPromise();
 		p.getValue();
 		verify(suggestionService, times(1)).indexContexts(anyCollection());;
 		verify(suggestionService, times(1)).buildIndexContext(anyList());
@@ -130,6 +130,12 @@ public class SuggestionServiceImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testInitializeSuggestionIndex() throws ConfigurationException, InvocationTargetException, InterruptedException {
+		when(descriptor.getObjectStream()).thenReturn(Stream.of("foo", "bar"));
+		when(descriptor.getFields()).thenReturn(Set.of("fizz", "buzz"));
+		when(descriptor.getLabels()).thenReturn(List.of("tag1", "tag2"));
+		when(suggestionService.getPayload(any(), any())).thenAnswer(i->i.getArgument(0).toString() + "-id");
+		when(suggestionService.getFieldValue(any(), any())).thenAnswer(i->"test" + i.getArgument(0).toString() + "-" + i.getArgument(1).toString());
+
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		// no analyzer
@@ -139,13 +145,8 @@ public class SuggestionServiceImplTest {
 		AnalyzingInfixSuggester lookup = suggestionService.getLookup();
 		assertNotNull(lookup);
 		
-		when(descriptor.getObjectStream()).thenReturn(Stream.of("foo", "bar"));
-		when(descriptor.getFields()).thenReturn(Set.of("fizz", "buzz"));
-		when(descriptor.getLabels()).thenReturn(List.of("tag1", "tag2"));
-		when(suggestionService.getPayload(any(), any())).thenAnswer(i->i.getArgument(0).toString() + "-id");
-		when(suggestionService.getFieldValue(any(), any())).thenAnswer(i->"test" + i.getArgument(0).toString() + "-" + i.getArgument(1).toString());
 		
-		Promise<Void> p = suggestionService.initializeSuggestionIndex();
+		Promise<Void> p = suggestionService.getInitializationPromise();
 		p.getValue();
 		verify(suggestionService, times(1)).indexContexts(anyCollection());;
 		verify(suggestionService, times(1)).buildIndexContext(anyList());
@@ -157,6 +158,12 @@ public class SuggestionServiceImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAutoCompletion() throws ConfigurationException, InvocationTargetException, InterruptedException {
+		when(descriptor.getObjectStream()).thenReturn(Stream.of("foo", "bar", "fooz", "bazz"));
+		when(descriptor.getFields()).thenReturn(Set.of("fizz", "buzz"));
+		when(descriptor.getLabels()).thenReturn(List.of("tag1", "tag2"));
+		when(suggestionService.getPayload(any(), any())).thenAnswer(i->i.getArgument(0).toString() + "-id");
+		when(suggestionService.getFieldValue(any(), any())).thenAnswer(i->i.getArgument(0).toString() + "-" + i.getArgument(1).toString());
+
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		// no analyzer
@@ -164,13 +171,7 @@ public class SuggestionServiceImplTest {
 		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		
-		when(descriptor.getObjectStream()).thenReturn(Stream.of("foo", "bar", "fooz", "bazz"));
-		when(descriptor.getFields()).thenReturn(Set.of("fizz", "buzz"));
-		when(descriptor.getLabels()).thenReturn(List.of("tag1", "tag2"));
-		when(suggestionService.getPayload(any(), any())).thenAnswer(i->i.getArgument(0).toString() + "-id");
-		when(suggestionService.getFieldValue(any(), any())).thenAnswer(i->i.getArgument(0).toString() + "-" + i.getArgument(1).toString());
-		
-		Promise<Void> p = suggestionService.initializeSuggestionIndex();
+		Promise<Void> p = suggestionService.getInitializationPromise();
 		p.getValue();
 		verify(suggestionService, times(1)).indexContexts(anyCollection());;
 		verify(suggestionService, times(1)).buildIndexContext(anyList());
