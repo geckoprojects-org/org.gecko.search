@@ -43,6 +43,7 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			super.activate(configuration);
 			requireNonNull(getPromiseFactory());
 			requireNonNull(contextStream);
+			System.out.println("CONNECT TO PUSHSTREAM");
 			connectToPushStream();
 		} catch (ConfigurationException e) {
 			throw e;
@@ -57,6 +58,7 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 	 */
 	@Override
 	protected Promise<Void> initializeSuggestionIndex() {
+		System.out.println("CREATE INIT PROMISE");
 		requireNonNull(getPromiseFactory());
 		initDeferred = getPromiseFactory().deferred();
 		return initDeferred.getPromise();
@@ -67,6 +69,7 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 	 * @param contextStream the contextStream to set
 	 */
 	protected void setContextStream(PushStream<O> contextStream) {
+		System.out.println("SET PUSH STREAM");
 		this.contextStream = contextStream;
 	}
 
@@ -77,7 +80,10 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			map(this::createContext).
 			map(this::buildIndexContext).
 			forEach(cl->indexContexts(cl)).
-			onResolve(()->initDeferred.resolve(null)).
+			onResolve(()->{
+				System.err.println("CLOSING PUSH STREAM AND RESOLVING INITIAIZATION");
+				initDeferred.resolve(null);
+			}).
 			onFailure(initDeferred::fail);
 	}
 
