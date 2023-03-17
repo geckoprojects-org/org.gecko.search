@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import org.gecko.search.IndexType;
@@ -28,7 +27,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.util.promise.PromiseFactory;
 
 
 /**
@@ -38,23 +36,19 @@ import org.osgi.util.promise.PromiseFactory;
  */
 @Component(name = "ObjectSuggestionDescriptor", service = SuggestionDescriptor.class, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class DummySuggestionDescriptor implements SuggestionDescriptor<Object, Field> {
-	
+
 	public static class Person {
 		public String firstName;
 		public String lastName;
 		public long id;
 	}
 
-	private PromiseFactory factory = new PromiseFactory(Executors.newFixedThreadPool(4));
 	List<Object> persons = new ArrayList<>();
 
 	@Activate
 	public void activate() {
-		factory.submit(() -> {
-			initialize();
-			return true;
-		}).onSuccess(t -> System.out.println("Finished!"))
-		.onFailure(t -> t.printStackTrace());	
+		initialize();
+		System.out.println("Finished!");
 	}
 
 	private void initialize() {
