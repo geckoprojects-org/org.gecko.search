@@ -102,6 +102,7 @@ public class SuggestionStreamIntegrationTest {
 		
 		Promise<Void> initializationPromise = suggestionService.getInitializationPromise();
 		initializationPromise.delay(500l).getValue();
+		System.err.println("RESOLVED INITIALIZATION");
 				
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});
 		assertNotNull(suggestResult);
