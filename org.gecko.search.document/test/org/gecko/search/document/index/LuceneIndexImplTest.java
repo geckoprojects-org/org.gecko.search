@@ -116,7 +116,7 @@ public class LuceneIndexImplTest {
 		}
 		verify(indexService, times(1)).registerIndexSearcher(any(), any());
 		
-		when(indexService.doInitializeDirectory(any(Configuration.class), any(Directory.class))).thenThrow(new IOException());
+		when(indexService.doInitializeDirectory(any(Configuration.class), any(Directory.class))).thenThrow(new IllegalStateException());
 		assertThrows(ConfigurationException.class, ()->indexService.activate(config, ctx));
 		
 	}

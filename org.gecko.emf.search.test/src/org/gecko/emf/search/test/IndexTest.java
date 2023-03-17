@@ -94,7 +94,6 @@ public class IndexTest {
 		long start = System.currentTimeMillis();
 		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
 		p.getValue();
-		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
 		Thread.sleep(500);
@@ -147,7 +146,6 @@ public class IndexTest {
 		long start = System.currentTimeMillis();
 		Promise<Void> p = indexService.handleContexts(docs);
 		p.getValue();
-		System.out.println("Adding took: " + (System.currentTimeMillis() - start));
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		System.out.println("Indexing took: " + (System.currentTimeMillis() - start));
 

@@ -17,9 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -28,8 +26,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
 import org.gecko.search.suggest.api.SuggestionService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.BundleContext;
@@ -44,6 +40,7 @@ import org.osgi.test.common.service.ServiceAware;
 import org.osgi.test.junit5.cm.ConfigurationExtension;
 import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.service.ServiceExtension;
+import org.osgi.util.promise.Promise;
 import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.pushstream.PushStreamProvider;
 
@@ -52,25 +49,8 @@ import org.osgi.util.pushstream.PushStreamProvider;
 @ExtendWith(ConfigurationExtension.class)
 public class SuggestionStreamIntegrationTest {
 	
-	private static final String INDEX_PATH = "/tmp/indexEMFSuggestStreamTest/"; 
-
 	@InjectBundleContext
 	BundleContext ctx;
-	
-	File indexPath;
-	
-	@BeforeEach
-	public void doBefore() throws InterruptedException, IOException {	
-		indexPath = new File(INDEX_PATH);
-		if (!indexPath.exists()) {
-			indexPath.mkdirs();
-		}
-	}
-
-	@AfterEach
-	public void doAfter() {
-		delete(indexPath);
-	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
@@ -87,7 +67,6 @@ public class SuggestionStreamIntegrationTest {
 			location = "?", 
 			name = "suggService",
 			properties = {
-					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "suggestionName", value = "testIdxSug"),
 					@Property(key = "directory.type", value = "ByteBuffer"),
@@ -96,7 +75,7 @@ public class SuggestionStreamIntegrationTest {
 	public void testSuggestStream(@InjectService ServiceAware<BasicPackage> basicPackageAware,
 			@InjectService ServiceAware<SuggestionDescriptor> suggDescAware,
 			@InjectService(cardinality = 0) ServiceAware<SuggestionService> suggestionServiceAware,
-			@InjectService(cardinality = 0) ServiceAware<PushStream> psAware) throws InterruptedException {
+			@InjectService(cardinality = 0) ServiceAware<PushStream> psAware) throws InterruptedException, InvocationTargetException {
 		
 		assertThat(basicPackageAware).isNotNull();
 		BasicPackage basicPackage = basicPackageAware.getService();
@@ -121,7 +100,8 @@ public class SuggestionStreamIntegrationTest {
 		SuggestionService suggestionService = suggestionServiceAware.waitForService(500l);
 		assertThat(suggestionService).isNotNull();
 		
-		Thread.sleep(5000l);
+		Promise<Void> initializationPromise = suggestionService.getInitializationPromise();
+		initializationPromise.getValue();
 				
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});
 		assertNotNull(suggestResult);
@@ -143,7 +123,6 @@ public class SuggestionStreamIntegrationTest {
 			location = "?", 
 			name = "suggService2",
 			properties = {
-					@Property(key = "base.path", value = INDEX_PATH),
 					@Property(key = "descriptor.target", value = "(name=dummy)"),
 					@Property(key = "contextStream.target", value = "(name=myStream)"),
 					@Property(key = "directory.type", value = "ByteBuffer"),
@@ -153,7 +132,7 @@ public class SuggestionStreamIntegrationTest {
 	public void testSuggestBinding(@InjectService ServiceAware<BasicPackage> basicPackageAware,
 			@InjectService ServiceAware<SuggestionDescriptor> suggDescAware,
 			@InjectService(cardinality = 0) ServiceAware<SuggestionService> suggestionServiceAware,
-			@InjectService(cardinality = 0) ServiceAware<PushStream> psAware) throws InterruptedException {
+			@InjectService(cardinality = 0) ServiceAware<PushStream> psAware) throws InterruptedException, InvocationTargetException {
 		
 		assertThat(basicPackageAware).isNotNull();
 		BasicPackage basicPackage = basicPackageAware.getService();
@@ -182,7 +161,8 @@ public class SuggestionStreamIntegrationTest {
 		suggestionService = suggestionServiceAware.waitForService(500l);
 		assertThat(suggestionService).isNotNull();
 		
-		Thread.sleep(5000l);
+		Promise<Void> initializationPromise = suggestionService.getInitializationPromise();
+		initializationPromise.getValue();
 		
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});
 		assertNotNull(suggestResult);
@@ -196,12 +176,4 @@ public class SuggestionStreamIntegrationTest {
 		assertThat(ps).isNull();
 	}
 	
-	private void delete(File file) {
-		if(file.exists()) {
-			if(!file.isFile()) {
-				Arrays.asList(file.listFiles()).forEach(this::delete);
-			}
-			file.delete();
-		}
-	}
 }

@@ -15,6 +15,7 @@ package org.gecko.emf.search.suggest.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.search.suggest.api.StreamSuggestionServiceImpl;
@@ -57,6 +58,16 @@ public class EObjectStreamSuggestionService extends StreamSuggestionServiceImpl<
 	@Override
 	public void deactivate() {
 		super.deactivate();
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.impl.LuceneIndexImpl#setAnalyzer(org.apache.lucene.analysis.Analyzer)
+	 */
+	@Override
+	@Reference(name="analyzer", target="(type=standard)")
+	public void setAnalyzer(Analyzer analyzer) {
+		super.setAnalyzer(analyzer);
 	}
 	
 	/* 

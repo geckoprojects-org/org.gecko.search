@@ -13,6 +13,7 @@
  */
 package org.gecko.emf.search.suggest.impl;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.search.suggest.api.SuggestionConfiguration;
@@ -53,6 +54,16 @@ public class EObjectSuggestionServiceImpl extends SuggestionServiceImpl<EObject,
 	@Deactivate
 	public void deactivate() {
 		super.deactivate();
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.document.impl.LuceneIndexImpl#setAnalyzer(org.apache.lucene.analysis.Analyzer)
+	 */
+	@Override
+	@Reference(name="analyzer", target="(type=standard)")
+	public void setAnalyzer(Analyzer analyzer) {
+		super.setAnalyzer(analyzer);
 	}
 	
 	/* 

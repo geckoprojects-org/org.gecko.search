@@ -79,7 +79,7 @@ public abstract class BasicLuceneImpl {
 	 * Creates a configuration, that is used for the setup. Must not be <code>null</code>
 	 * @return a configuration, that is used for the setup
 	 */
-	abstract public Configuration createInternalConfiguration();
+	public abstract Configuration createInternalConfiguration();
 
 	/**
 	 * Returns the analyzer.
@@ -175,9 +175,8 @@ public abstract class BasicLuceneImpl {
 	/**
 	 * Create the index creation location
 	 * @param configuration the index configuration
-	 * @throws ConfigurationException
 	 */
-	protected File initializeIndexLocation(Configuration configuration) throws ConfigurationException {
+	protected File initializeIndexLocation(Configuration configuration) {
 		requireNonNull(configuration);
 		requireNonNull(configuration.getBasePath());
 		requireNonNull(configuration.getIndexName());
@@ -212,7 +211,7 @@ public abstract class BasicLuceneImpl {
 	 * @param directory the pre-created directory
 	 * @return the directory
 	 */
-	public Directory doInitializeDirectory(Configuration configuration, Directory directory) throws IOException {
+	public Directory doInitializeDirectory(Configuration configuration, Directory directory) {
 		return directory;
 	}
 
@@ -261,7 +260,7 @@ public abstract class BasicLuceneImpl {
 	private void initializeExecutors(Configuration configuration) {
 		requireNonNull(configuration);
 		requireNonNull(configuration.getIndexName());
-		indexExecutors = Executors.newFixedThreadPool(2, (r)->{
+		indexExecutors = Executors.newFixedThreadPool(2, r->{
 			Thread t = new Thread(r, "Index-" + configuration.getIndexName() + "-" + threadCount++);
 			t.setDaemon(true);
 			return t;

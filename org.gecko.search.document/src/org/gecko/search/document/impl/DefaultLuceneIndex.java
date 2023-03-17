@@ -85,14 +85,4 @@ public class DefaultLuceneIndex extends LuceneIndexImpl<ObjectContextObject> {
 		super.removeIndexListener(listener);
 	}
 
-//	/* 
-//	 * (non-Javadoc)
-//	 * @see org.gecko.search.document.impl.LuceneIndexImpl#createSimplePushEventSource()
-//	 */
-//	@Override
-//	protected SimplePushEventSource<ObjectContextObject> createSimplePushEventSource() {
-//		PushStreamProvider psp = getPushStreamProvider();
-//		return psp.buildSimpleEventSource(ObjectContextObject.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends ObjectContextObject>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
-//	}
-
 }

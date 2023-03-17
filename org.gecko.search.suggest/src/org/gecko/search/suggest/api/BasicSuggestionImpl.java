@@ -372,7 +372,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 	protected void indexContexts(Collection<SuggestionContextWrapper<O, F>> contexts) {
 		requireNonNull(contexts);
 		requireNonNull(getLookup());
-		contexts.forEach(c->indexContext(c));
+		contexts.forEach(this::indexContext);
 	}
 
 	/**

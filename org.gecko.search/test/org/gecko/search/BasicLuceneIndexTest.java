@@ -110,7 +110,6 @@ public class BasicLuceneIndexTest {
 		assertEquals(analyzer, basicService.getAnalyzer());
 		
 		// return config path
-		when(config.getBasePath()).thenReturn("foo/bar");
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
 		assertNull(basicService.getInternalConfiguration());
 		assertNull(basicService.getPromiseFactory());
@@ -135,7 +134,7 @@ public class BasicLuceneIndexTest {
 		assertEquals(config, basicService.getInternalConfiguration());
 		
 		// Test IOException handling
-		when(basicService.doInitializeDirectory(any(Configuration.class), any(Directory.class))).thenThrow(new IOException());
+		when(basicService.doInitializeDirectory(any(Configuration.class), any(Directory.class))).thenThrow(new IllegalStateException());
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
 		when(basicService.doInitializeDirectory(any(Configuration.class), any(Directory.class))).thenThrow(new RuntimeException());
 		assertThrows(ConfigurationException.class, ()->basicService.activate());
@@ -225,7 +224,7 @@ public class BasicLuceneIndexTest {
 			assertNotNull(location);
 			String path = location.getAbsolutePath();
 			assertTrue(path.endsWith("foo/bar/foo"));
-		} catch (ConfigurationException e) {
+		} catch (Exception e) {
 			fail("unexpected exception in initializing location");
 		} finally {
 			if (location != null) {

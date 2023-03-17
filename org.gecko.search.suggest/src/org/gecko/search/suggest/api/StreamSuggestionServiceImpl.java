@@ -41,10 +41,9 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			requireNonNull(getPromiseFactory());
 			requireNonNull(contextStream);
 			connectToPushStream();
+		} catch (ConfigurationException e) {
+			throw e;
 		} catch (Exception e) {
-			if (e instanceof ConfigurationException) {
-				throw e;
-			}
 			throw new ConfigurationException("configuration", "Error activating StreamSuggestionServiceimpl", e);
 		}
 	}
