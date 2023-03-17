@@ -89,7 +89,7 @@ public class IndexListenerTest {
 			})
 	public void basicTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
 			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException {
+			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -112,7 +112,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		Thread.sleep(200l);
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
@@ -134,7 +135,8 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		verify(listenerMock, never()).onIndex(any(IndexContextObject.class));
@@ -178,7 +180,9 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		indexService.handleContext(indexContextObjectImpl);
+		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p.getValue();
+		
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
 		
 		ArgumentCaptor<IndexContextObject<?>> captor = ArgumentCaptor.forClass(IndexContextObject.class);
@@ -202,7 +206,7 @@ public class IndexListenerTest {
 				.withCommitCallback(commitCallback)
 				.build();
 		
-		Promise<Void> p = indexService.handleContext(indexContextObjectImpl);
+		p = indexService.handleContext(indexContextObjectImpl);
 		p.getValue();
 		
 		assertTrue(commitCallback.getLatch().await(5, TimeUnit.SECONDS));
