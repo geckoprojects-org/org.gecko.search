@@ -31,8 +31,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -49,6 +47,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
+import org.osgi.util.promise.Promise;
 import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.pushstream.PushStreamProvider;
 
@@ -151,12 +150,11 @@ public class StreamSuggestionServiceImplTest {
 		PushStreamProvider psp = new PushStreamProvider();
 		PushStream<Object> pushStream = psp.streamOf(Stream.of("foo", "bar", "fooz", "bazz"));
 		suggestionService.setContextStream(pushStream);
-		CountDownLatch latch = new CountDownLatch(1);
-		pushStream.onClose(latch::countDown);
 		suggestionService.activate(config);
 		
+		Promise<Void> initializationPromise = suggestionService.getInitializationPromise();
+		initializationPromise.getValue();
 		
-		assertTrue(latch.await(5, TimeUnit.SECONDS));
 		verify(suggestionService, times(4)).indexContexts(anyCollection());;
 		verify(suggestionService, times(4)).buildIndexContext(anyList());
 		verify(suggestionService, times(4)).createContext(any());

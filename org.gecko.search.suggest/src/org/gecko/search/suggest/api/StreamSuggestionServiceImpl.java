@@ -16,6 +16,8 @@ package org.gecko.search.suggest.api;
 import static java.util.Objects.requireNonNull;
 
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.util.promise.Deferred;
+import org.osgi.util.promise.Promise;
 import org.osgi.util.pushstream.PushStream;
 
 /**
@@ -28,6 +30,7 @@ import org.osgi.util.pushstream.PushStream;
 public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionImpl<O, F> {
 
 	private PushStream<O> contextStream;
+	private Deferred<Void> initDeferred;
 
 	/**
 	 * Called on component activation
@@ -47,6 +50,17 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			throw new ConfigurationException("configuration", "Error activating StreamSuggestionServiceimpl", e);
 		}
 	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.search.suggest.api.BasicSuggestionImpl#initializeSuggestionIndex()
+	 */
+	@Override
+	protected Promise<Void> initializeSuggestionIndex() {
+		requireNonNull(getPromiseFactory());
+		initDeferred = getPromiseFactory().deferred();
+		return initDeferred.getPromise();
+	}
 
 	/**
 	 * Sets the contextStream.
@@ -62,7 +76,9 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 		contextStream.
 			map(this::createContext).
 			map(this::buildIndexContext).
-			forEach(cl->indexContexts(cl));
+			forEach(cl->indexContexts(cl)).
+			onResolve(()->initDeferred.resolve(null)).
+			onFailure(initDeferred::fail);
 	}
 
 }
