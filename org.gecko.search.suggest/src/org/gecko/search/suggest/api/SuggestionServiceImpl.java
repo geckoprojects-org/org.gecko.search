@@ -16,12 +16,12 @@ package org.gecko.search.suggest.api;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.lucene.search.suggest.analyzing.AnalyzingInfixSuggester;
 import org.gecko.search.IndexActionType;
 import org.gecko.search.suggest.context.SuggestionContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -35,14 +35,6 @@ import org.osgi.util.promise.Promise;
  */
 public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionImpl<O, F> {
 
-	/**
-	 * Sets the suggestionDescriptor.
-	 * @param suggestionDescriptor the suggestionDescriptor to set
-	 */
-	@Override
-	protected void setDescriptor(SuggestionDescriptor<O, F> suggestionDescriptor) {
-		super.setDescriptor(suggestionDescriptor);
-	}
 	/**
 	 * Creates the initial index with data
 	 * @return the suggester;
@@ -66,11 +58,15 @@ public abstract class SuggestionServiceImpl<O, F> extends BasicSuggestionImpl<O,
 	 * @return the list with contexts
 	 */
 	protected List<SuggestionContext<O, F>> createContext() {
+		requireNonNull(getDescriptor());
 		SuggestionDescriptor<O,F> descriptor = getDescriptor();
 		Set<F> fields = descriptor.getFields();
 		List<String> labels = descriptor.getLabels();
-		final String[] labelsArray = labels.toArray(new String[labels.size()]);
+		final String[] labelsArray = labels == null ? new String[0] : labels.toArray(new String[labels.size()]);
 		Stream<O> objects = descriptor.getObjectStream();
+		if (objects == null) {
+			return Collections.emptyList();
+		}
 		return objects.
 				map(object-> createContextsForFields(fields, object, IndexActionType.ADD, labelsArray, 4)).
 				flatMap(Collection::stream).

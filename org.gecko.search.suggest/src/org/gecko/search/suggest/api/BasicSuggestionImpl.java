@@ -197,6 +197,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 		String configName= "<no-config>";
 		try {
 			requireNonNull(configuration);
+			requireNonNull(getDescriptor());
 			configName = configuration.suggestionName();
 			this.configuration = configuration;
 			super.activate();
@@ -293,7 +294,7 @@ public abstract class BasicSuggestionImpl<O, F> extends BasicLuceneImpl implemen
 	 */
 	protected List<SuggestionContext<O, F>> createContext(O object) {
 		requireNonNull(object);
-		requireNonNull(descriptor);
+		requireNonNull(getDescriptor());
 		Set<F> fields = descriptor.getFields();
 		List<String> labels = descriptor.getLabels();
 		final String[] labelsArray = labels == null ? new String[0] : labels.toArray(new String[labels.size()]);

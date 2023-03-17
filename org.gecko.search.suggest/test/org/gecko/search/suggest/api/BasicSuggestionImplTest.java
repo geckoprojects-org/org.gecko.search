@@ -70,6 +70,9 @@ public class BasicSuggestionImplTest {
 	@Mock
 	private Configuration configuration;
 	@SuppressWarnings("rawtypes")
+	@Mock
+	private SuggestionDescriptor descriptor;
+	@SuppressWarnings("rawtypes")
 	private BasicSuggestionImpl suggestionService;
 	private final Converter converter = Converters.standardConverter();
 
@@ -113,6 +116,7 @@ public class BasicSuggestionImplTest {
 		assertEquals(descriptor, suggestionService.getDescriptor());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testLookup() throws ConfigurationException {
 		assertThrows(NullPointerException.class, ()->suggestionService.getLookup());
@@ -120,6 +124,7 @@ public class BasicSuggestionImplTest {
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 
 		assertNotNull(suggestionService.getLookup());
@@ -142,6 +147,7 @@ public class BasicSuggestionImplTest {
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 
 		try {
@@ -152,6 +158,7 @@ public class BasicSuggestionImplTest {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testActivate() throws IOException {
 		// null parameters
@@ -161,6 +168,9 @@ public class BasicSuggestionImplTest {
 		// no analyzer
 		assertThrows(ConfigurationException.class, ()->suggestionService.activate(config));
 		suggestionService.setAnalyzer(analyzer);
+		// no descriptor
+		assertThrows(ConfigurationException.class, ()->suggestionService.activate(config));
+		suggestionService.setDescriptor(descriptor);
 		try {
 			suggestionService.activate(config);
 		} catch (ConfigurationException e) {
@@ -185,13 +195,16 @@ public class BasicSuggestionImplTest {
 		verify(suggestionService, never()).createLookup(any());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testActivateFailLookup() throws IOException, ConfigurationException {
 		suggestionService = mock(BasicSuggestionImpl.class);
 		doCallRealMethod().when(suggestionService).activate(any());
 		doCallRealMethod().when(suggestionService).setAnalyzer(any());
+		doCallRealMethod().when(suggestionService).setDescriptor(any());
 		doCallRealMethod().when(suggestionService).doInitializeExecutors(any());
 		when(suggestionService.createInternalConfiguration()).thenCallRealMethod();
+		when(suggestionService.getDescriptor()).thenCallRealMethod();
 		when(suggestionService.doInitializeDirectory(any(), any())).thenCallRealMethod();
 		doThrow(IllegalStateException.class).when(suggestionService).createLookup(any());
 		// null parameters
@@ -202,8 +215,11 @@ public class BasicSuggestionImplTest {
 		assertThrows(ConfigurationException.class, ()->suggestionService.activate(config));
 		suggestionService.setAnalyzer(analyzer);
 		assertThrows(ConfigurationException.class, ()->suggestionService.activate(config));
+		suggestionService.setDescriptor(descriptor);
+		assertThrows(ConfigurationException.class, ()->suggestionService.activate(config));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeactivate() throws ConfigurationException {
 		try {
@@ -220,6 +236,7 @@ public class BasicSuggestionImplTest {
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		assertNotNull(suggestionService.getLookup());
 		try {
@@ -230,12 +247,14 @@ public class BasicSuggestionImplTest {
 		assertThrows(NullPointerException.class, ()-> suggestionService.getLookup());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testInternalConfiguration() throws ConfigurationException {
 		assertThrows(NullPointerException.class, ()->suggestionService.createInternalConfiguration());
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		Configuration c = suggestionService.createInternalConfiguration();
 		assertNotNull(c);
@@ -244,6 +263,7 @@ public class BasicSuggestionImplTest {
 		assertEquals("", c.getBasePath());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfiguration() throws ConfigurationException {
 		assertNull(suggestionService.getConfiguration());
@@ -252,6 +272,7 @@ public class BasicSuggestionImplTest {
 		assertThrows(ConfigurationException.class, ()->suggestionService.activate(config));
 		assertNull(suggestionService.getConfiguration());
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		assertNotNull(suggestionService.getConfiguration());
 		assertEquals(config, suggestionService.getConfiguration());
@@ -404,6 +425,7 @@ public class BasicSuggestionImplTest {
 		
 		SuggestionDescriptor descriptor = mock(SuggestionDescriptor.class);
 		suggestionService.setDescriptor(descriptor);
+		assertThrows(NullPointerException.class, ()->suggestionService.createContext(null));
 		when(descriptor.getFields()).thenReturn(null);
 		when(descriptor.getLabels()).thenReturn(null);
 		
@@ -428,6 +450,7 @@ public class BasicSuggestionImplTest {
 		
 		suggestionService = mock(BasicSuggestionImpl.class);
 		doCallRealMethod().when(suggestionService).setDescriptor(any());
+		when(suggestionService.getDescriptor()).thenCallRealMethod();
 		when(suggestionService.createContext(any())).thenCallRealMethod();
 		when(suggestionService.createContextsForFields(any(), any(), any(), any(), anyInt())).thenThrow(IllegalStateException.class);
 		
@@ -451,6 +474,7 @@ public class BasicSuggestionImplTest {
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		// no analyzer
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		when(sctx.getActionType()).thenReturn(null);
 		suggestionService.indexContext(wrapper);
@@ -475,6 +499,7 @@ public class BasicSuggestionImplTest {
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		// no analyzer
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		when(sctx01.getActionType()).thenReturn(null);
 		when(sctx02.getActionType()).thenReturn(IndexActionType.ADD);
@@ -505,6 +530,7 @@ public class BasicSuggestionImplTest {
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
 		// no analyzer
 		suggestionService.setAnalyzer(analyzer);
+		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
 		assertNotNull(suggestionService.getLookup());
 		// this is just a simulation because we use mocked data. Lucene throws the ISE here
