@@ -223,7 +223,7 @@ public class BasicLuceneIndexTest {
 			location = basicService.initializeIndexLocation(config);
 			assertNotNull(location);
 			String path = location.getAbsolutePath();
-			assertTrue(path.endsWith("foo/bar/foo"));
+			assertTrue(path.endsWith("foo/bar/foo") || path.endsWith("foo\bar\foo"));
 		} catch (Exception e) {
 			fail("unexpected exception in initializing location");
 		} finally {

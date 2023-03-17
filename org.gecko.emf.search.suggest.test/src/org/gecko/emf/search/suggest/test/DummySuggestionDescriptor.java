@@ -49,7 +49,7 @@ public class DummySuggestionDescriptor implements EObjectSuggestionDescriptor {
 	@Activate
 	public void activate() {
 		initialize();
-		System.out.println("FINISHED CREATION!");	
+		System.out.println("Finished!");	
 	}
 
 	private void initialize() {
@@ -93,7 +93,6 @@ public class DummySuggestionDescriptor implements EObjectSuggestionDescriptor {
 	 */
 	@Override
 	public Stream<EObject> getObjectStream() {
-		System.out.println("GET OBJECT STREAM !" + persons.size());	
 		return persons.stream();
 	}
 
