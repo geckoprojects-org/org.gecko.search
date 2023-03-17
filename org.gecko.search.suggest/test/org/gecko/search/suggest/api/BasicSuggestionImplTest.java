@@ -512,6 +512,8 @@ public class BasicSuggestionImplTest {
 		SuggestionContext sctx02 = mock(SuggestionContext.class);
 		SuggestionContextWrapper wrapper02 = SuggestionContext.toIndexContext(sctx02);
 		assertThrows(NullPointerException.class, ()->suggestionService.indexContexts(List.of(wrapper01, wrapper02)));
+		when(sctx01.getActionType()).thenReturn(null);
+		when(sctx02.getActionType()).thenReturn(IndexActionType.ADD);
 		// bo lookup
 		Map<String, String> properties = Map.of("suggestionName", "1234", "directory.type", "bytebuffer");
 		final SuggestionConfiguration config = converter.convert(properties).to(SuggestionConfiguration.class);
@@ -519,8 +521,6 @@ public class BasicSuggestionImplTest {
 		suggestionService.setAnalyzer(analyzer);
 		suggestionService.setDescriptor(descriptor);
 		suggestionService.activate(config);
-		when(sctx01.getActionType()).thenReturn(null);
-		when(sctx02.getActionType()).thenReturn(IndexActionType.ADD);
 		suggestionService.indexContexts(List.of(wrapper01, wrapper02));
 		verify(suggestionService, times(2)).indexContext(any());
 		

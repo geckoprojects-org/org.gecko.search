@@ -78,7 +78,6 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			map(this::buildIndexContext).
 			forEach(cl->indexContexts(cl)).
 			onResolve(()->{
-				System.err.println("CLOSING PUSH STREAM AND RESOLVING INITIAIZATION");
 				initDeferred.resolve(null);
 			}).
 			onFailure(initDeferred::fail);

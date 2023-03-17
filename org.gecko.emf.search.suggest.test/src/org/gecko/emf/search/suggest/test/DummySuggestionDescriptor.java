@@ -18,22 +18,20 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
 import org.gecko.emf.osgi.example.model.basic.Person;
+import org.gecko.emf.search.suggest.api.EObjectSuggestionDescriptor;
 import org.gecko.search.IndexType;
 import org.gecko.search.suggest.api.SuggestionDescriptor;
-import org.gecko.emf.search.suggest.api.EObjectSuggestionDescriptor;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.util.promise.PromiseFactory;
 
 /**
  * 
@@ -46,16 +44,13 @@ public class DummySuggestionDescriptor implements EObjectSuggestionDescriptor {
 	@Reference
 	BasicPackage basicPackage;	
 
-	private PromiseFactory factory = new PromiseFactory(Executors.newFixedThreadPool(4));
 	List<EObject> persons = new ArrayList<>();
+
 
 	@Activate
 	public void activate() {
-		factory.submit(() -> {
-			initialize();
-			return true;
-		}).onSuccess(t -> System.out.println("Finished!"))
-		.onFailure(t -> t.printStackTrace());	
+		initialize();
+		System.out.println("Finished!");	
 	}
 
 	private void initialize() {
