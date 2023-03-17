@@ -76,6 +76,8 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 		contextStream.
 			map(this::createContext).
 			map(this::buildIndexContext).
+			onClose(()->initDeferred.resolve(null)).
+			onError(initDeferred::fail).
 			forEach(cl->indexContexts(cl)).
 			onResolve(()->initDeferred.resolve(null)).
 			onFailure(initDeferred::fail);

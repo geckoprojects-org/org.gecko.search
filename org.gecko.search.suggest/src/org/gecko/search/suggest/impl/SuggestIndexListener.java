@@ -13,15 +13,21 @@
  */
 package org.gecko.search.suggest.impl;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+
+import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.gecko.search.IndexContextObject;
 import org.gecko.search.IndexListener;
-import org.gecko.search.document.context.ObjectContextObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -39,49 +45,89 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  */
 @Component(name = "SuggestionIndexListener", configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class SuggestIndexListener implements IndexListener {
-	
+
+	public static final String PROP_SUGGEST_LISTENER_NAME = "sl.name";
+	public static final String PROP_SUGGEST_LISTENER_OBJ_TYPE = "sl.objType";
+	private static final Logger LOGGER = Logger.getLogger(SuggestIndexListener.class.getName());
 	private final PushStreamProvider psp = new PushStreamProvider();
-	private SimplePushEventSource<ObjectContextObject> eventSource;
-	@SuppressWarnings("rawtypes")
-	private ServiceRegistration<PushStream> serviceRegistration;
+	private SimplePushEventSource<Object> eventSource;
+	private ServiceRegistration<?> serviceRegistration;
+
+	@interface SuggestListenerConfig {
+		String slName();
+		String slObjectType() default "java.lang.Object";
+	}
 
 	@Activate
-	public void activate(Map<String, Object> properties, BundleContext context) {
-		eventSource = psp.buildSimpleEventSource(ObjectContextObject.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends ObjectContextObject>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
-		PushStream<ObjectContextObject> stream = psp.buildStream(eventSource)
-				.withPushbackPolicy( q -> Math.max(0, q.size() - 50))
-				.withQueuePolicy(QueuePolicyOption.BLOCK)
-				.withBuffer(new ArrayBlockingQueue<PushEvent<? extends ObjectContextObject>>(50))
-				.build();
-		serviceRegistration = context.registerService(PushStream.class, stream, new Hashtable<>(properties));
+	public void activate(SuggestListenerConfig configuration, BundleContext context) throws ConfigurationException {
+		try {
+			requireNonNull(context);
+			requireNonNull(configuration);
+			requireNonNull(configuration.slName());
+			eventSource = psp.buildSimpleEventSource(Object.class).withBuffer(new ArrayBlockingQueue<PushEvent<? extends Object>>(100)).withQueuePolicy(QueuePolicyOption.BLOCK).build();
+			PushStream<Object> stream = psp.buildStream(eventSource)
+					.withPushbackPolicy( q -> Math.max(0, q.size() - 50))
+					.withQueuePolicy(QueuePolicyOption.BLOCK)
+					.withBuffer(new ArrayBlockingQueue<PushEvent<? extends Object>>(50))
+					.build();
+			serviceRegistration = context.registerService(PushStream.class.getName(), stream, createProperties(configuration));
+		} catch (Exception e) {
+			throw new ConfigurationException("configuration", "Cannot activate component without propert configuration", e);
+		}
 	}
-	
+
+	/**
+	 * Creates the service properties
+	 * @param configuration the configuration
+	 * @return the properties {@link Dictionary}
+	 */
+	private Dictionary<String, ?> createProperties(SuggestListenerConfig configuration) {
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(PROP_SUGGEST_LISTENER_NAME, configuration.slName());
+		properties.put(PROP_SUGGEST_LISTENER_OBJ_TYPE, configuration.slObjectType());
+		return properties;
+	}
+
 	@Deactivate
 	public void deactivate() {
-		if (serviceRegistration != null) {
+		if (nonNull(serviceRegistration)) {
 			serviceRegistration.unregister();
 		}
-		if (eventSource != null && eventSource.isConnected()) {
-			eventSource.close();
+		if (nonNull(eventSource)) {
+			if (eventSource.isConnected()) {
+				eventSource.close();
+			}
+			eventSource = null;
 		}
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.api.IndexListener#canHandle(org.gecko.search.api.IndexContextObject)
 	 */
 	@Override
 	public boolean canHandle(IndexContextObject<?> context) {
-		return context instanceof ObjectContextObject;
+		if (isNull(context) || isNull(eventSource)) {
+			return false;
+		}
+		return nonNull(context) && nonNull(context.getObject());
 	}
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.search.api.IndexListener#onIndex(org.gecko.search.api.IndexContextObject)
 	 */
 	@Override
 	public void onIndex(IndexContextObject<?> context) {
-		if (eventSource != null && context instanceof ObjectContextObject) {
-			eventSource.publish((ObjectContextObject) context);
+		if (isNull(context) || isNull(eventSource)) {
+			return;
+		}
+		if (nonNull(context.getObject())) {
+			try {
+				eventSource.publish(context.getObject());
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, e, ()->"Exception during publishing the object");
+			}
 		}
 	}
 

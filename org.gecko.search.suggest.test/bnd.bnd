@@ -8,8 +8,9 @@
 	org.osgi.util.promise;version=latest,\
 	org.osgi.util.function;version=latest,\
 	org.osgi.test.junit5.cm;version=latest,\
-	org.gecko.search;version=snapshot,\
-	org.gecko.search.suggest;version=snapshot
+	org.gecko.search;version=project,\
+	org.gecko.search.suggest;version=project,\
+	org.gecko.search.document;version=project
 
 Private-Package: org.gecko.search.suggest.test
 
