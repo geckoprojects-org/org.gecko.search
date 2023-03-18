@@ -183,6 +183,12 @@ public class SuggestionListenerIntegrationTest {
 		assertThat(ps).isNotNull();
 		final Stream<Object> objectStream = suggDescService.getObjectStream();
 		final IndexListener listenerService = suggestionListenerAware.getService();
+
+		SuggestionService suggestionService = suggestionServiceAware.waitForService(500l);
+		assertThat(suggestionService).isNotNull();
+
+		Promise<Void> initializationPromise = suggestionService.getInitializationPromise();
+		
 		Promise<Void> producer = pf.submit(()-> {
 			objectStream.forEach(o->{
 				ObjectContextObject oco = mock(ObjectContextObject.class);
@@ -199,10 +205,7 @@ public class SuggestionListenerIntegrationTest {
 			return null;
 		});
 		
-		SuggestionService suggestionService = suggestionServiceAware.waitForService(500l);
-		assertThat(suggestionService).isNotNull();
 		
-		Promise<Void> initializationPromise = suggestionService.getInitializationPromise();
 		pf.all(List.of(initializationPromise, producer)).getValue();
 		
 		Map<String, String> suggestResult = suggestionService.getAutoCompletion("Tester", new String[] {"person"});

@@ -28,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.gecko.search.document.context.ObjectContextObject;
@@ -45,7 +44,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
-import org.osgi.util.promise.PromiseFactory;
 import org.osgi.util.pushstream.PushStream;
 
 /**
@@ -55,7 +53,7 @@ import org.osgi.util.pushstream.PushStream;
  */
 @ExtendWith(MockitoExtension.class)
 public class SuggestIndexListnerTest {
-	
+
 	@Mock
 	private BundleContext context;
 	@SuppressWarnings("rawtypes")
@@ -72,7 +70,7 @@ public class SuggestIndexListnerTest {
 	@AfterEach
 	public void afterEach() {
 	}
-	
+
 	@Test
 	public void testActivateFail() {
 		assertThrows(ConfigurationException.class, ()->listenerService.activate(null, null));
@@ -84,7 +82,7 @@ public class SuggestIndexListnerTest {
 		when(context.registerService(anyString(), any(), any())).thenThrow(IllegalStateException.class);
 		assertThrows(ConfigurationException.class, ()->listenerService.activate(config, context));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testActivate() {
@@ -97,7 +95,7 @@ public class SuggestIndexListnerTest {
 			fail("Unexpected excpetion");
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeactivate() {
@@ -106,7 +104,7 @@ public class SuggestIndexListnerTest {
 		} catch (Exception e) {
 			fail("Unexpected excpetion");
 		}
-		
+
 		Map<String, String> properties = Map.of("slName", "1234");
 		final SuggestListenerConfig config = converter.convert(properties).to(SuggestListenerConfig.class);
 		when(context.registerService(anyString(), any(), any())).thenReturn(registration);
@@ -124,7 +122,7 @@ public class SuggestIndexListnerTest {
 			fail("Unexpected excpetion");
 		}
 	}
-	
+
 	@Test
 	public void testCanHandle() throws ConfigurationException {
 		ObjectContextObject oco = mock(ObjectContextObject.class);
@@ -139,118 +137,94 @@ public class SuggestIndexListnerTest {
 		listenerService.deactivate();
 		assertFalse(listenerService.canHandle(oco));
 	}
-	
+
 	@Test
 	public void testHandleContext() throws ConfigurationException, InvocationTargetException, InterruptedException {
 		Map<String, String> properties = Map.of("slName", "1234");
 		final SuggestListenerConfig config = converter.convert(properties).to(SuggestListenerConfig.class);
 		listenerService.activate(config, context);
-		
+
 		ArgumentCaptor<PushStream<?>> psCapturer = ArgumentCaptor.forClass(PushStream.class);
 		verify(context, times(1)).registerService(anyString(), psCapturer.capture(), any());
 		final PushStream<?> pushStream = psCapturer.getValue();
-		
-		PromiseFactory pf = new PromiseFactory(Executors.newFixedThreadPool(3));
+
 		final int count = 10;
 		final CountDownLatch latch = new CountDownLatch(count);
-		pf.submit(()-> {
-			for(int i = 0; i < count; i++) {
-				String o = "value-" + i;
-				ObjectContextObject oco = mock(ObjectContextObject.class);
-				when(oco.getObject()).thenReturn(o);
-				System.out.println("Put: " + o);
-				listenerService.onIndex(oco);
-				Thread.sleep(50l);
-			}
-			return true;
+		pushStream.forEach(o->{
+			latch.countDown();
+			System.out.println("Object " + latch.getCount() + " - '" + o + "'");
 		});
-		pf.submit(()->{
-			pushStream.forEach(o->{
-				latch.countDown();
-				System.out.println("Object " + latch.getCount() + " - '" + o + "'");
-			});
-			return true;
-		});
+		for(int i = 0; i < count; i++) {
+			String o = "value-" + i;
+			ObjectContextObject oco = mock(ObjectContextObject.class);
+			when(oco.getObject()).thenReturn(o);
+			System.out.println("Put: " + o);
+			listenerService.onIndex(oco);
+		}
 		assertTrue(latch.await(5000l, TimeUnit.MILLISECONDS));
 		pushStream.close();
-		
+
 	}
-	
+
 	@Test
 	public void testHandleContextNull() throws ConfigurationException, InvocationTargetException, InterruptedException {
 		Map<String, String> properties = Map.of("slName", "1234");
 		final SuggestListenerConfig config = converter.convert(properties).to(SuggestListenerConfig.class);
 		listenerService.activate(config, context);
-		
+
 		ArgumentCaptor<PushStream<?>> psCapturer = ArgumentCaptor.forClass(PushStream.class);
 		verify(context, times(1)).registerService(anyString(), psCapturer.capture(), any());
 		final PushStream<?> pushStream = psCapturer.getValue();
-		
-		PromiseFactory pf = new PromiseFactory(Executors.newFixedThreadPool(3));
+
 		final int count = 10;
 		final CountDownLatch latch = new CountDownLatch(count / 2);
-		pf.submit(()-> {
-			for(int i = 0; i < count; i++) {
-				String o = "value-" + i;
-				ObjectContextObject oco = mock(ObjectContextObject.class);
+		pushStream.forEach(o->{
+			latch.countDown();
+			System.out.println("Object " + latch.getCount() + " - '" + o + "'");
+		});
+		for(int i = 0; i < count; i++) {
+			String o = "value-" + i;
+			ObjectContextObject oco = mock(ObjectContextObject.class);
+			if (i % 2 == 0) {
+				System.out.println("Put: null");
+				listenerService.onIndex(null);
+			} else {
+				System.out.println("Put: " + o);
 				when(oco.getObject()).thenReturn(o);
-				if (i % 2 == 0) {
-					System.out.println("Put: null");
-					listenerService.onIndex(null);
-				} else {
-					System.out.println("Put: " + o);
-					listenerService.onIndex(oco);
-				}
-				Thread.sleep(50l);
+				listenerService.onIndex(oco);
 			}
-			return true;
-		});
-		pf.submit(()->{
-			pushStream.forEach(o->{
-				latch.countDown();
-				System.out.println("Object " + latch.getCount() + " - '" + o + "'");
-			});
-			return true;
-		});
+		}
 		assertTrue(latch.await(5000l, TimeUnit.MILLISECONDS));
 		pushStream.close();
-		
+
 	}
-	
+
 	@Test
 	public void testHandleContextNullObject() throws ConfigurationException, InvocationTargetException, InterruptedException {
 		Map<String, String> properties = Map.of("slName", "1234");
 		final SuggestListenerConfig config = converter.convert(properties).to(SuggestListenerConfig.class);
 		listenerService.activate(config, context);
-		
+
 		ArgumentCaptor<PushStream<?>> psCapturer = ArgumentCaptor.forClass(PushStream.class);
 		verify(context, times(1)).registerService(anyString(), psCapturer.capture(), any());
 		final PushStream<?> pushStream = psCapturer.getValue();
-		
-		PromiseFactory pf = new PromiseFactory(Executors.newFixedThreadPool(3));
+
 		final int count = 10;
 		final CountDownLatch latch = new CountDownLatch(count / 2);
-		pf.submit(()-> {
-			for(int i = 0; i < count; i++) {
-				String o = i % 2 == 0 ? "value-" + i : null;
-				ObjectContextObject oco = mock(ObjectContextObject.class);
-				when(oco.getObject()).thenReturn(o);
-				System.out.println("Put: " + o);
-				listenerService.onIndex(oco);
-				Thread.sleep(50l);
-			}
-			return true;
+		pushStream.forEach(o->{
+			latch.countDown();
+			System.out.println("Object " + latch.getCount() + " - '" + o + "'");
 		});
-		pf.submit(()->{
-			pushStream.forEach(o->{
-				latch.countDown();
-				System.out.println("Object " + latch.getCount() + " - '" + o + "'");
-			});
-			return true;
-		});
+		for(int i = 0; i < count; i++) {
+			String o = i % 2 == 0 ? "value-" + i : null;
+			ObjectContextObject oco = mock(ObjectContextObject.class);
+			when(oco.getObject()).thenReturn(o);
+			System.out.println("Put: " + o);
+			listenerService.onIndex(oco);
+		}
 		assertTrue(latch.await(5000l, TimeUnit.MILLISECONDS));
 		pushStream.close();
-		
+
 	}
-	
+
 }
