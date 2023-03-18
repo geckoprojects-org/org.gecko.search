@@ -5,8 +5,7 @@
 -runrequires: \
 	bnd.identity;id='org.gecko.emf.search.suggest.test',\
 	bnd.identity;id='org.gecko.emf.search.suggest',\
-	bnd.identity;id='org.apache.felix.configadmin',\
-	bnd.identity;id='org.gecko.search.document'
+	bnd.identity;id='org.apache.felix.configadmin'
 -runbundles: \
 	junit-jupiter-api;version='[5.9.1,5.9.2)',\
 	junit-jupiter-params;version='[5.9.1,5.9.2)',\
@@ -35,5 +34,4 @@
 	org.gecko.emf.search.suggest;version=snapshot,\
 	org.gecko.emf.search.suggest.test;version=snapshot,\
 	org.gecko.search.suggest;version=snapshot,\
-	org.osgi.util.pushstream;version='[1.1.0,1.1.1)',\
-	org.gecko.search.document;version=snapshot
+	org.osgi.util.pushstream;version='[1.1.0,1.1.1)'

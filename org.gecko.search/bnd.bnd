@@ -14,3 +14,4 @@ Export-Package: org.gecko.search
 	
 Bundle-Name: Gecko Search
 Bundle-Description: Gecko Lucene Search Framework for OSGi 
+-privatepackage: org.gecko.search.impl

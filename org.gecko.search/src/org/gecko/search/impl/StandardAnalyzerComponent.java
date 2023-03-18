@@ -11,7 +11,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.search.document.impl;
+package org.gecko.search.impl;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
