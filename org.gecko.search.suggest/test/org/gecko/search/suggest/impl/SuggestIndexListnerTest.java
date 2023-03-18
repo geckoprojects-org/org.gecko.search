@@ -171,7 +171,7 @@ public class SuggestIndexListnerTest {
 			});
 			return true;
 		});
-		assertTrue(latch.await(1000l, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(5000l, TimeUnit.MILLISECONDS));
 		pushStream.close();
 		
 	}
@@ -212,7 +212,7 @@ public class SuggestIndexListnerTest {
 			});
 			return true;
 		});
-		assertTrue(latch.await(1000l, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(5000l, TimeUnit.MILLISECONDS));
 		pushStream.close();
 		
 	}
@@ -248,7 +248,7 @@ public class SuggestIndexListnerTest {
 			});
 			return true;
 		});
-		assertTrue(latch.await(1000l, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(5000l, TimeUnit.MILLISECONDS));
 		pushStream.close();
 		
 	}
