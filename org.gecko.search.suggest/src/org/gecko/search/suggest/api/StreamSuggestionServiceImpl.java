@@ -69,6 +69,13 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 	protected void setContextStream(PushStream<O> contextStream) {
 		this.contextStream = contextStream;
 	}
+	
+	protected void doInitFinished() {
+		if (getInitializationPromise() != null && 
+				!getInitializationPromise().isDone()) {
+			initDeferred.resolve(null);
+		}
+	}
 
 	private void connectToPushStream() {
 		requireNonNull(getLookup());
@@ -77,8 +84,12 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			map(this::createContext).
 			map(this::buildIndexContext).
 			forEach(cl->indexContexts(cl)).
-			onResolve(()->initDeferred.resolve(null)).
-			onFailure(initDeferred::fail);
+			onFailure(initDeferred::fail).
+			onResolve(()->{
+				if (!getInitializationPromise().isDone()) {
+					doInitFinished();
+				}
+			});
 	}
 
 }

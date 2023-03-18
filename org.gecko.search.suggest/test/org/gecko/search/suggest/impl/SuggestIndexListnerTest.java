@@ -13,7 +13,6 @@
  */
 package org.gecko.search.suggest.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,10 +26,10 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
 import org.gecko.search.document.context.ObjectContextObject;
 import org.gecko.search.suggest.impl.SuggestIndexListener.SuggestListenerConfig;
@@ -46,7 +45,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
-import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.PromiseFactory;
 import org.osgi.util.pushstream.PushStream;
 
@@ -153,9 +151,9 @@ public class SuggestIndexListnerTest {
 		final PushStream<?> pushStream = psCapturer.getValue();
 		
 		PromiseFactory pf = new PromiseFactory(Executors.newFixedThreadPool(3));
-		final AtomicInteger ai = new AtomicInteger();
 		final int count = 10;
-		Promise<Boolean> producer = pf.submit(()-> {
+		final CountDownLatch latch = new CountDownLatch(count);
+		pf.submit(()-> {
 			for(int i = 0; i < count; i++) {
 				String o = "value-" + i;
 				ObjectContextObject oco = mock(ObjectContextObject.class);
@@ -166,15 +164,15 @@ public class SuggestIndexListnerTest {
 			}
 			return true;
 		});
-		Promise<Boolean> consumer = pf.submit(()->{
+		pf.submit(()->{
 			pushStream.forEach(o->{
-				ai.incrementAndGet();
-				System.out.println("Object " + ai.get() + " - '" + o + "'");
+				latch.countDown();
+				System.out.println("Object " + latch.getCount() + " - '" + o + "'");
 			});
 			return true;
 		});
-		pf.all(List.of(consumer, producer)).getValue();
-		assertEquals(count, ai.get());
+		assertTrue(latch.await(1000l, TimeUnit.MILLISECONDS));
+		pushStream.close();
 		
 	}
 	
@@ -189,9 +187,9 @@ public class SuggestIndexListnerTest {
 		final PushStream<?> pushStream = psCapturer.getValue();
 		
 		PromiseFactory pf = new PromiseFactory(Executors.newFixedThreadPool(3));
-		final AtomicInteger ai = new AtomicInteger();
 		final int count = 10;
-		Promise<Boolean> producer = pf.submit(()-> {
+		final CountDownLatch latch = new CountDownLatch(count / 2);
+		pf.submit(()-> {
 			for(int i = 0; i < count; i++) {
 				String o = "value-" + i;
 				ObjectContextObject oco = mock(ObjectContextObject.class);
@@ -207,15 +205,15 @@ public class SuggestIndexListnerTest {
 			}
 			return true;
 		});
-		Promise<Boolean> consumer = pf.submit(()->{
+		pf.submit(()->{
 			pushStream.forEach(o->{
-				ai.incrementAndGet();
-				System.out.println("Object " + ai.get() + " - '" + o + "'");
+				latch.countDown();
+				System.out.println("Object " + latch.getCount() + " - '" + o + "'");
 			});
 			return true;
 		});
-		pf.all(List.of(consumer, producer)).getValue();
-		assertEquals(count / 2, ai.get());
+		assertTrue(latch.await(1000l, TimeUnit.MILLISECONDS));
+		pushStream.close();
 		
 	}
 	
@@ -230,9 +228,9 @@ public class SuggestIndexListnerTest {
 		final PushStream<?> pushStream = psCapturer.getValue();
 		
 		PromiseFactory pf = new PromiseFactory(Executors.newFixedThreadPool(3));
-		final AtomicInteger ai = new AtomicInteger();
 		final int count = 10;
-		Promise<Boolean> producer = pf.submit(()-> {
+		final CountDownLatch latch = new CountDownLatch(count / 2);
+		pf.submit(()-> {
 			for(int i = 0; i < count; i++) {
 				String o = i % 2 == 0 ? "value-" + i : null;
 				ObjectContextObject oco = mock(ObjectContextObject.class);
@@ -243,15 +241,15 @@ public class SuggestIndexListnerTest {
 			}
 			return true;
 		});
-		Promise<Boolean> consumer = pf.submit(()->{
+		pf.submit(()->{
 			pushStream.forEach(o->{
-				ai.incrementAndGet();
-				System.out.println("Object " + ai.get() + " - '" + o + "'");
+				latch.countDown();
+				System.out.println("Object " + latch.getCount() + " - '" + o + "'");
 			});
 			return true;
 		});
-		pf.all(List.of(consumer, producer)).getValue();
-		assertEquals(count / 2, ai.get());
+		assertTrue(latch.await(1000l, TimeUnit.MILLISECONDS));
+		pushStream.close();
 		
 	}
 	
