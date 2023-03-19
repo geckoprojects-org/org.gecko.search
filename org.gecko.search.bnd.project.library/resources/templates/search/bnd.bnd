@@ -1,5 +1,5 @@
 -library: \
-	enableGeckoSearch
+	enableSearch
 
 Bundle-Version: 1.0.0.SNAPSHOT
 Private-Package: \
@@ -12,8 +12,9 @@ Private-Package: \
 Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
 
 -buildpath: \
-	org.osgi.service.component,\
-	org.gecko.search,\
-	org.gecko.search.util,\
-	org.gecko.search.document.api,\
-	org.apache.lucene.core;version=latest
+	org.osgi.util.promise;version=latest,\
+	org.osgi.framework;version=latest,\
+	org.osgi.service.component;version=latest,\
+	org.apache.lucene.core;version=latest,\
+	org.gecko.search;version=latest,\
+	org.gecko.search.document;version=latest

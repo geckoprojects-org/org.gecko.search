@@ -1,0 +1,11 @@
+-require-bnd: "(version>=6.4.0)"
+
+-buildpath.search: ${search.lib}
+
+-library: enableEMF
+
+search.lib: \
+	org.gecko.search,\
+	org.gecko.emf.search,\
+	org.gecko.search.util,\
+	org.gecko.search.document

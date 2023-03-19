@@ -3,7 +3,7 @@
 -buildpath.search: ${search.lib}
 
 search.lib: \
-	org.gecko.search,\
-	org.gecko.search.util,\
-	org.gecko.search.document.api,\
-	org.gecko.search.suggest.api
+	org.gecko.search;version=latest,\
+	org.gecko.search.util;version=latest,\
+	org.gecko.search.document;version=latest,\
+	org.gecko.search.suggest;version=latest

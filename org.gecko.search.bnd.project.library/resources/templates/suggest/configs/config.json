@@ -1,0 +1,11 @@
+{
+  ":configurator:resource-version": 1,
+  
+	"ObjectStreamSuggestionService~test": 
+  	{
+  	    "suggestionName": "test",
+  	    "descriptor.target": "(descriptor=Person)",
+  	    "contextStream.target": "(streamName=personStream)",
+  	    "directory.type": "ByteBuffer"
+	}
+}

@@ -78,7 +78,7 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 			map(this::buildIndexContext).
 			onClose(this::resolve).
 			forEach(cl->indexContexts(cl)).
-			onFailure(initDeferred::fail).
+			onFailure(this::fail).
 			onResolve(this::resolve);
 	}
 	
@@ -86,6 +86,14 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 		if (getInitializationPromise() != null 
 				&& !getInitializationPromise().isDone()) {
 			initDeferred.resolve(null);
+		}
+	}
+	
+	private void fail(Throwable t) {
+		if (getInitializationPromise() != null 
+				&& !getInitializationPromise().isDone()) {
+			t.printStackTrace();
+			initDeferred.fail(t);
 		}
 	}
 

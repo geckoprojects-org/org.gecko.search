@@ -18,9 +18,9 @@ package {{basePackageName}}.pojo;
  */
 public class Person {
 	
-	private String id;
-	private String firstName;
-	private String lastName;
+	public String id;
+	public String firstName;
+	public String lastName;
 	private int age;
 	
 	public void setId(String id) {

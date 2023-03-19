@@ -27,13 +27,14 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ServiceScope;
 
 /**
  * Default implemenation of the Lucene index that can handle Object
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
-@Component(name = "DefaultLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(name = "DefaultLuceneIndex", service = LuceneIndexService.class, immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, scope = ServiceScope.SINGLETON)
 public class DefaultLuceneIndex extends LuceneIndexImpl<ObjectContextObject> {
 
 	/* 

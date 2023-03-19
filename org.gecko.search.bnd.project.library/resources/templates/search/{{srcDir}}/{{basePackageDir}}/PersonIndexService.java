@@ -13,36 +13,35 @@
  */
 package {{basePackageName}};
 
-import org.gecko.search.api.IndexActionType;
-import org.gecko.search.document.DocumentIndexContextObject;
+import java.io.IOException;
+
+import org.gecko.search.IndexActionType;
 import org.gecko.search.document.LuceneIndexService;
+import org.gecko.search.document.context.ObjectContextObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 
+import {{basePackageName}}.PersonIndexService;
 import {{basePackageName}}.helper.PersonIndexHelper;
 import {{basePackageName}}.pojo.Person;
 
-
 /**
  * This is a sample Index Service to index objects.
- * 
- * @author ilenia
- * @since Feb 20, 2023
  */
-@Component(name = "PersonIndexService", service = PersonIndexService.class, scope = ServiceScope.SINGLETON)
+@Component(service = PersonIndexService.class, scope = ServiceScope.SINGLETON)
 public class PersonIndexService {
 
 	@Reference(target = "(id=test)")
-	private LuceneIndexService personIndex;
+	private LuceneIndexService<ObjectContextObject> personIndex;
 	
-	private PromiseFactory factory = new PromiseFactory(Executors.newFixedThreadPool(4));
-	
-	private AtomicInteger counter = new AtomicInteger(0);
-	
-	
-	public void indexPerson(Person person, boolean isFirstSave) {
-		if(isFirstSave) {
+	/**
+	 * Indexes a person as add, if paramter add is set to <code>true</code>
+	 * @param person the person to be added
+	 * @param add set to <code>true</code>, for adding, <code>false</code> for updating
+	 */
+	public void indexPerson(Person person, boolean add) {
+		if(add) {
 			indexPerson(person, IndexActionType.ADD);
 		}
 		else {
@@ -50,12 +49,17 @@ public class PersonIndexService {
 		}	
 	}
 
-
+	/**
+	 * Deletes a person from the index
+	 * @param person the peron to delete
+	 */
 	public void deletePerson(Person person) {
 		indexPerson(person, IndexActionType.REMOVE);		
 	}
 
-	
+	/**
+	 * Resets the whle index
+	 */
 	public void resetIndex() {
 		try {
 			personIndex.getIndexWriter().deleteAll();
@@ -67,9 +71,8 @@ public class PersonIndexService {
 	}
 	
 	private void indexPerson(Person person, IndexActionType actionType) {
-		DocumentIndexContextObject context = PersonIndexHelper.mapPerson(person, actionType, null);			
+		ObjectContextObject context = PersonIndexHelper.mapPerson(person, actionType);			
 		personIndex.handleContextSync(context);
 	}
-	
 
 }

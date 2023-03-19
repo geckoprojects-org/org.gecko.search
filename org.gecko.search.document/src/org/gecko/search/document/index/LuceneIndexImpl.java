@@ -96,7 +96,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 		requireNonNull(listener);
 		indexListeners.remove(listener);
 	}
-	
+
 	/**
 	 * Returns the indexListeners.
 	 * @return the indexListeners
@@ -184,26 +184,31 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 	}
 
 	/**
-	 * Registers the Index Searcher as {@link PrototypeServiceFactory}
+	 * Registers the Index Searcher as {@link PrototypeServiceFactory}.
+	 * We need to do the registration async to avoid circular reference problems in DS
 	 * @param configuration the index configuration
 	 * @param context the {@link BundleContext}
 	 */
 	protected void registerIndexSearcher(IndexConfig configuration, BundleContext context) {
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put("id", configuration.id());
-		searcherRegistration = context.registerService(IndexSearcher.class, new PrototypeServiceFactory<IndexSearcher>() {
-
-			@Override
-			public IndexSearcher getService(Bundle bundle, ServiceRegistration<IndexSearcher> registration) {
-				return aquireSearcher();
-			}
-
-			@Override
-			public void ungetService(Bundle bundle, ServiceRegistration<IndexSearcher> registration,
-					IndexSearcher service) {
-				releaseSearcher(service);
-			}
-		}, properties);
+		requireNonNull(getPromiseFactory());
+		getPromiseFactory().submit(()->{
+			Dictionary<String, Object> properties = new Hashtable<>();
+			properties.put("id", configuration.id());
+			
+			searcherRegistration = context.registerService(IndexSearcher.class, new PrototypeServiceFactory<IndexSearcher>() {
+				@Override
+				public IndexSearcher getService(Bundle bundle, ServiceRegistration<IndexSearcher> registration) {
+					return aquireSearcher();
+				}
+				
+				@Override
+				public void ungetService(Bundle bundle, ServiceRegistration<IndexSearcher> registration,
+						IndexSearcher service) {
+					releaseSearcher(service);
+				}
+			}, properties);
+			return searcherRegistration;
+		});
 	}
 
 	/**
@@ -268,9 +273,9 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback -> callback.commited(ctx)));
 				return c;
 			}).onFailure(t->
-				contexts.forEach(ctx -> 
-				Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback ->  callback.error(ctx, t)))
-			);
+			contexts.forEach(ctx -> 
+			Optional.ofNullable(ctx.getCommitCallback()).ifPresent(callback ->  callback.error(ctx, t)))
+					);
 		} else  {
 			LOGGER.log(Level.FINE, ()->"No commit needed for contexts " + contexts.size());
 			return getPromiseFactory().resolved((Void)null);
@@ -361,7 +366,7 @@ public abstract class LuceneIndexImpl<D extends DocumentIndexContextObject<?>> e
 		requireNonNull(indexWriter);
 		return indexWriter;
 	}
-	
+
 	/**
 	 * Returns the searcherManager.
 	 * @return the searcherManager

@@ -12,11 +12,19 @@ project-template-search:\
 		dir=templates/search;\
 		icon="${gecko-icon}";\
 		help=search.xml;\
+		engine=mustache,\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Suggest Example;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/suggest;\
+		icon="${gecko-icon}";\
+		help=suggest.xml;\
 		engine=mustache
 				
 gecko-project:\
     bnd.library;\
-        bnd.library     		= enableGeckoSearch; \
+        bnd.library     		= enableSearch; \
         path            		= library
 
 Provide-Capability: \

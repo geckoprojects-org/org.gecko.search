@@ -5,8 +5,8 @@ Bundle-Version: ${base-version}
 -resourceonly: true
 -sources: false
 
--includeresource: resources,\
-	{library/workspace/gecko-search.mvn=resources/library/workspace/gecko-search.mvn}
+-includeresource: \
+	resources
 
 Provide-Capability: \
 	${gecko-base}
