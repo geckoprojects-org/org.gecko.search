@@ -1,0 +1,39 @@
+icondata: data:image/gif;base64,${base64;icon.gif}
+category: ccc/Gecko OSGi Standard Templates
+
+dataurl: data:image/gif;base64
+gecko-icon: ${dataurl},${base64;icons/gecko.ico}
+
+project-template-search-emf:\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Search Example with EMF;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/search-emf;\
+		icon="${gecko-icon}";\
+		help=search-emf.xml;\
+		engine=mustache
+		
+project-template-search-emf-mongo:\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Search Example with EMF and mongodb;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/search-emf-mongo;\
+		icon="${gecko-icon}";\
+		help=search-emf-mongo.xml;\
+		engine=mustache
+				
+gecko-project:\
+    bnd.library;\
+        bnd.library     		= enableGeckoSearch; \
+        path            		= library
+
+Provide-Capability: \
+	${gecko-project},\
+	${project-template-search-emf},\
+	${project-template-search-emf-mongo}
+
+-resourceonly: true
+-includeresource: resources
+Bundle-Version: ${project-version}

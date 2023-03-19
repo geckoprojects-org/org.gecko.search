@@ -1,0 +1,9 @@
+-require-bnd: "(version>=6.4.0)"
+
+-buildpath.search: ${search.lib}
+
+search.lib: \
+	org.gecko.search,\
+	org.gecko.search.util,\
+	org.gecko.search.document.api,\
+	org.gecko.search.suggest.api
