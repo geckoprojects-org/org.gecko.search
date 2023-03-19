@@ -13,53 +13,52 @@
  */
 package {{basePackageName}};
 
-import org.gecko.emf.osgi.ResourceSetFactory;
+import java.io.IOException;
+
 import org.gecko.emf.osgi.example.model.basic.Person;
-import org.gecko.emf.osgi.example.model.basic.BasicPackage;
-import org.gecko.search.api.IndexActionType;
-import org.gecko.search.document.DocumentIndexContextObject;
+import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
+import org.gecko.search.IndexActionType;
 import org.gecko.search.document.LuceneIndexService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ServiceScope;
 
 import {{basePackageName}}.helper.PersonIndexHelper;
 
 /**
- * This is a sample Index Service to index EObjects. It references to an EMF model, which is the model from which the 
- * objects to be indexed come from.
- * 
- * @author ilenia
- * @since Feb 20, 2023
+ * This is a sample Index Service to index objects.
  */
-@Component(name = "PersonIndexService", service = PersonIndexService.class, 
-		scope = ServiceScope.SINGLETON, reference = {
-		@Reference(name = "modelCondition", service = ResourceSetFactory.class, target = "(emf.model.name=basic)", cardinality = ReferenceCardinality.MANDATORY)
-})
+@Component(service = PersonIndexService.class, scope = ServiceScope.SINGLETON)
 public class PersonIndexService {
 
 	@Reference(target = "(id=test)")
-	private LuceneIndexService personIndex;
+	private LuceneIndexService<EObjectDocumentIndexObjectContext> personIndex;
 	
-	@Reference
-	BasicPackage personPackage;
-
-	public void indexPerson(Person person, boolean isFirstSave) {
-		if(isFirstSave) {
+	/**
+	 * Indexes a person as add, if paramter add is set to <code>true</code>
+	 * @param person the person to be added
+	 * @param add set to <code>true</code>, for adding, <code>false</code> for updating
+	 */
+	public void indexPerson(Person person, boolean add) {
+		if(add) {
 			indexPerson(person, IndexActionType.ADD);
 		}
 		else {
 			indexPerson(person, IndexActionType.MODIFY);
 		}	
-		
 	}
 
+	/**
+	 * Deletes a person from the index
+	 * @param person the peron to delete
+	 */
 	public void deletePerson(Person person) {
 		indexPerson(person, IndexActionType.REMOVE);		
 	}
 
-	
+	/**
+	 * Resets the whle index
+	 */
 	public void resetIndex() {
 		try {
 			personIndex.getIndexWriter().deleteAll();
@@ -71,7 +70,7 @@ public class PersonIndexService {
 	}
 	
 	private void indexPerson(Person person, IndexActionType actionType) {
-		DocumentIndexContextObject context = PersonIndexHelper.mapPerson(person, actionType, null);			
+		EObjectDocumentIndexObjectContext context = PersonIndexHelper.mapPerson(person, actionType);			
 		personIndex.handleContextSync(context);
 	}
 	

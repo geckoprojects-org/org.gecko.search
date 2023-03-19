@@ -1,0 +1,21 @@
+-library: \
+	enableSearch,\
+	enable-emf
+
+Bundle-Version: 1.0.0.SNAPSHOT
+Private-Package: \
+	{{basePackageName}},\
+	{{basePackageName}}.helper
+	
+-includeresource: \
+	OSGI-INF/configurator/=configs/
+Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
+
+-buildpath: \
+	org.osgi.service.component;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.apache.lucene.core;version=latest,\
+	org.gecko.emf.osgi.example.model.basic;version=latest,\
+	org.gecko.search;version=latest,\
+	org.gecko.search.util;version=latest,\
+	org.gecko.emf.search;version=latest
