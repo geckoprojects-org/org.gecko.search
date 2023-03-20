@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
-@Component(name = "EMFLuceneIndex", service = LuceneIndexService.class, immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(name = "EMFLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class EObjectLuceneIndex extends LuceneIndexImpl<EObjectDocumentIndexObjectContext> {
 
 	/* 

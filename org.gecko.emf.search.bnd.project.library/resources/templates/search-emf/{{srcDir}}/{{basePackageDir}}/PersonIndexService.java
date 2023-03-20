@@ -21,14 +21,13 @@ import org.gecko.search.IndexActionType;
 import org.gecko.search.document.LuceneIndexService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 
 import {{basePackageName}}.helper.PersonIndexHelper;
 
 /**
  * This is a sample Index Service to index objects.
  */
-@Component(service = PersonIndexService.class, scope = ServiceScope.SINGLETON)
+@Component(service = PersonIndexService.class, immediate = true)
 public class PersonIndexService {
 
 	@Reference(target = "(id=test)")
