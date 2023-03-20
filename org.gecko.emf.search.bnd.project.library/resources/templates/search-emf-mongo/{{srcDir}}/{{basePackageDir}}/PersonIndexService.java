@@ -31,11 +31,12 @@ import org.gecko.emf.pushstream.EPushStreamProvider;
 import org.gecko.emf.repository.EMFRepository;
 import org.gecko.emf.repository.query.IQuery;
 import org.gecko.emf.repository.query.QueryRepository;
+import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
+import org.gecko.search.IndexActionType;
+import org.gecko.search.document.LuceneIndexService;
+import org.gecko.search.document.context.DocumentIndexContextObject;
 import org.gecko.emf.osgi.example.model.basic.Person;
 import org.gecko.emf.osgi.example.model.basic.BasicPackage;
-import org.gecko.search.api.IndexActionType;
-import org.gecko.search.document.DocumentIndexContextObject;
-import org.gecko.search.document.LuceneIndexService;
 import org.gecko.util.pushstreams.GeckoPushbackPolicyOption;
 import org.osgi.service.component.ComponentServiceObjects;
 import org.osgi.service.component.annotations.Activate;
@@ -57,11 +58,9 @@ import {{basePackageName}}.helper.PersonIndexHelper;
  * This is a sample Index Service to index EObjects. It references to both an EMF model, which is the model from which the 
  * objects to be indexed come from; and to a mongo repository, where such objects are also stored.
  * At the component activation, all objects of that type present in the mongodb will be re-indexed.
- * @author ilenia
- * @since Feb 20, 2023
  */
-@Component(name = "PersonIndexService", service = PersonIndexService.class, 
-		scope = ServiceScope.SINGLETON, reference = {
+@Component(service = PersonIndexService.class, 
+		scope = ServiceScope.SINGLETON, immediate = true, reference = {
 		@Reference(name = "mongoCondition", service = UriMapProvider.class, target = "(uri.map.src=mongodb://test/)", cardinality = ReferenceCardinality.MANDATORY),
 		@Reference(name = "modelCondition", service = ResourceSetFactory.class, target = "(emf.model.name=basic)", cardinality = ReferenceCardinality.MANDATORY)
 })
@@ -71,7 +70,7 @@ public class PersonIndexService {
 	private ComponentServiceObjects<EMFRepository> repositoryServiceObjects;
 
 	@Reference(target = "(id=test)")
-	private LuceneIndexService personIndex;
+	private LuceneIndexService<EObjectDocumentIndexObjectContext> personIndex;
 	
 	@Reference
 	BasicPackage personPackage;
@@ -117,7 +116,7 @@ public class PersonIndexService {
 				.withBuffer(new ArrayBlockingQueue<PushEvent<? extends EObject>>(100))
 				.build();
 		
-		List<DocumentIndexContextObject> contexts = new LinkedList<>();
+		List<EObjectDocumentIndexObjectContext> contexts = new LinkedList<>();
 		Promise<Void> resultPromise = indexNew
 				.map(eo -> (Person) eo)
 				.map(PersonIndexHelper::mapPersonNew)
@@ -176,7 +175,7 @@ public class PersonIndexService {
 	}
 	
 	private void indexPerson(Person person, IndexActionType actionType) {
-		DocumentIndexContextObject context = PersonIndexHelper.mapPerson(person, actionType, null);			
+		EObjectDocumentIndexObjectContext context = PersonIndexHelper.mapPerson(person, actionType);			
 		personIndex.handleContextSync(context);
 	}
 	

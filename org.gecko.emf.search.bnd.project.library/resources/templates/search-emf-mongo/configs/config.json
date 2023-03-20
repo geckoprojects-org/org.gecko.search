@@ -1,10 +1,9 @@
 {
   ":configurator:resource-version": 1,
   
-	"LuceneIndex~test": 
+	"EMFLuceneIndex~test": 
   	{
   	    "id": "test",
-  	    "directory.type": "MMAP",
-		"base.path" : "/tmp/indexTest/"
+  	    "directory.type": "ByteBuffer"
 	}
 }

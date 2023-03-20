@@ -32,24 +32,23 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import {{basePackageName}}.helper.PersonIndexHelper;
 import org.gecko.emf.osgi.example.model.basic.Person;
+import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.util.DocumentUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
+
+import {{basePackageName}}.helper.PersonIndexHelper;
 
 /**
  * This is a sample Search Service to retrieve the objects from the index
- * @author ilenia
- * @since Feb 20, 2023
  */
-@Component(name = "PersonSearchService", service = PersonSearchService.class)
+@Component(service = PersonSearchService.class, immediate = true)
 public class PersonSearchService {
 	
 	@Reference(target = "(id=test)")
-	private LuceneIndexService personIndex;
+	private LuceneIndexService<EObjectDocumentIndexObjectContext> personIndex;
 	
 	@Reference
 	private ResourceSet resourceSet;
@@ -86,7 +85,7 @@ public class PersonSearchService {
 	
 	private List<Person> executeTermSearch(Query query) {
 
-		IndexSearcher searcher = personIndex.aquireSearch();		
+		IndexSearcher searcher = personIndex.aquireSearcher();		
 		try {
 			TopDocs topDocs = searcher.search(query, Integer.MAX_VALUE);
 			if (topDocs.scoreDocs.length == 0) {
