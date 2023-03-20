@@ -92,7 +92,6 @@ public abstract class StreamSuggestionServiceImpl<O, F> extends BasicSuggestionI
 	private void fail(Throwable t) {
 		if (getInitializationPromise() != null 
 				&& !getInitializationPromise().isDone()) {
-			t.printStackTrace();
 			initDeferred.fail(t);
 		}
 	}
