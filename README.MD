@@ -1,3 +1,5 @@
+[![CI Build](https://github.com/geckoprojects-org/org.gecko.search/actions/workflows/build.yml/badge.svg)](https://github.com/geckoprojects-org/org.gecko.search/actions/workflows/build.yml)[![License](https://github.com/geckoprojects-org/org.gecko.search/actions/workflows/license.yml/badge.svg)](https://github.com/geckoprojects-org/org.gecko.search/actions/workflows/license.yml )[![Sonar](https://github.com/geckoprojects-org/org.gecko.search/actions/workflows/sonar.yml/badge.svg)](https://github.com/geckoprojects-org/org.gecko.search/actions/workflows/sonar.yml )[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=bugs)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=code_smells)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=coverage)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=alert_status)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=security_rating)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=sqale_index)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=geckoprojects-org_org.gecko.search&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=geckoprojects-org_org.gecko.search)
+
 # Gecko Search
 
 This is a simple search implementation that uses Apache Lucene [https://lucene.apache.org/](https://lucene.apache.org/).
@@ -26,7 +28,7 @@ You can find the releases at Maven Central:
 
 ```
 <dependency>
-    <groupId>org.geckoprojects.saerch</groupId>
+    <groupId>org.geckoprojects.search</groupId>
     <artifactId>org.apache.lucene.core</artifactId>
     <version>9.5.0</version>
 </dependency>
@@ -34,14 +36,59 @@ You can find the releases at Maven Central:
 
 We also provide:
 
+* org.apache.lucene.analysis.icu
+* org.apache.lucene.analysis.morfologik
+* org.apache.lucene.analysis.opennlp
+* org.apache.lucene.analysis.phonetic
+* org.apache.lucene.backward.codecs
+* org.apache.lucene.benchmark
+* org.apache.lucene.classification
 * org.apache.lucene.codecs
-* org.apache.lucene.core
+* org.apache.lucene.core (core - analysis-common)
+* org.apache.lucene.expressions
 * org.apache.lucene.facet
 * org.apache.lucene.grouping
+* org.apache.lucene.highlighter
+* org.apache.lucene.join
 * org.apache.lucene.memory
+* org.apache.lucene.misc
+* org.apache.lucene.monitor
 * org.apache.lucene.queries
 * org.apache.lucene.queryparser
+* org.apache.lucene.spatial (spatial3d + spatial-extras)
 * org.apache.lucene.suggest
+
+## Gecko Search Bnd Libraries
+
+For improved handling in bndtools, we provide as set of bnd libraries and project templates.
+
+To enable library support for Gecko Search you need:
+
+```
+<dependency>
+    <groupId>org.geckoprojects.search</groupId>
+    <artifactId>org.gecko.search.bnd.library</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
+In the *build.bnd* you can enable the library using the instruction:
+
+`-library: geckoSearch`
+
+You will find a new *Gecko Search* repository now, with all the dependencies, that are needed.
+
+On project level, you may need some dependencies for the Gecko Search. To ease this use, you can enable the build path addition by using:
+
+`-library: enableSearch`
+
+in the project *bnd.bnd*.
+
+Once the *geckoSearch* library is enabled, you also get somme project templates for *bndtools*, that show the usage of the *Gecko Search*:
+
+* Indexing
+* Suggest
+* Indexing with EMF
+* Indexing with EMF and the Gecko Mongo Repository framework
 
 ## Gecko Search Framework
 
@@ -57,18 +104,18 @@ To see how it runs, just take a look at the *org.gecko.search.document.test*. Yo
 	"DefaultLuceneIndex~demo": 
 	{
 		"id": "Test",
-		"directory.type": "MMAP",
+		"directory.type": "MMap",
 		"base.path": "/tmp/testIndex"
 	}
 }
 ```
 
-This creates a search component with a Lucene Index MMAP directory at location */tmp/testIndex*.
+This creates a search component with a Lucene Index *MMAP* directory at location */tmp/testIndex*.
 
 With that two services will get available:
 
-1. LuceneIndexService - Service to index business objects
-2. IndexSearcher - Service to search in the defined index
+1. *LuceneIndexService* - Service to index business objects
+2. *IndexSearcher* - Service to search in the defined index
 
 ### LuceneIndexService
 
@@ -93,6 +140,14 @@ If you have no such scenario, with a given or nearly static index, you can keep 
 It does not automatically refresh, when the index updates in the background. To get this latest state, you should retrieve a new IndexSearcher. This behavior should be known to users who already dealt with Lucene.
 
 The IndexSearcher is a service instance from the vanilla Lucene. So all searcher handling is the same like in Lucene.
+
+### IndexListener
+
+The index listener is an interface, that is used by the indexer per default. If one registers an implementation of this interface as service. This listener will be informed about new *IndexContext* objects that have been indexed.
+
+To enable a selective target binding of a listener to a *LuceneIndexService* you can define the service/configuration property *indexListener.target=(my=listenerImpl)* in the *LuceneIndexService* configuration.
+
+There is an already existing implementation for the suggester to by-pass all indexed contexts to this listener an forward them to the suggestion component.
 
 ## Gecko EMF Search Framework
 
@@ -177,9 +232,49 @@ If  you need a continuous data stream that need to be indexed there is a service
 }
 ```
 
-*You now need to register a *PushStream<YOURTYPE>* as service, that contains the service property *name=FooStream*. In addition to that you need the mapping information from the SuggestionDescriptor*. In the configuration it is wired using the target binding *descriptor.target=(name=FooDesc)*
+You now need to register a *PushStream<YOURTYPE>* as service, that contains the service property *name=FooStream*. In addition to that you need the mapping information from the SuggestionDescriptor*. In the configuration it is wired using the target binding *descriptor.target=(name=FooDesc)
 
 So you can put you business objects into the PushEventSource and the mapping into `SuggestionContext`happens in the implemenation.
+
+### IndexListener Based Suggest
+
+There is an simple implementation of a *IndexListener*, that gets all *IndexContext* objects from the *LuceneIndexService*. The implementation creates a *PushStream*, that can be linked to the *StreamSuggestionService*
+
+A configuration can look like this:
+
+```
+{
+  ":configurator:resource-version": 1,
+  	"DefaultLuceneIndex~demo": 
+	{
+		"id": "demo",
+		"directory.type": "ByteBuffer",
+		"indexListener.target": "(slName=demo)"
+	},
+	"SuggestionIndexListener~demo":
+	{
+		"slName": "demo"
+	}
+    "ObjectSuggestionDescriptor~demo": 
+	{
+		"name": "FooDesc"
+	},
+	"ObjectStreamSuggestionService~demo": 
+	{
+		"directory.type": "ByteBuffer",
+		"descriptor.target": "(name=FooDesc)",
+		"contextStream.target": "(sl.name=demo)",
+		"suggestionName": "testSuggest",
+		"suggestNumberResults": 5
+	}
+}
+```
+* **DefaultLuceneIndex~demo** is the configuration for in memory index
+* **SuggestionIndexListener~demo** is the IndexListener that is bound to the *DefaultLuceneIndex* via *"indexListener.target": "(slName=demo)"*.
+* **ObjectSuggestionDescriptor~demo** is the index descriptor for the suggestion, that defines, which field of the business objects are indexed for suggestion.
+* **ObjectStreamSuggestionService~demo** is the suggestion service configured as in-memeory. It is linked to its object descriptor using *"descriptor.target": "(name=FooDesc)"*. In addition to that the *PushStream* that was registered from *SuggestionIndexListner* is bound via *"contextStream.target": "(sl.name=demo)"*
+
+So,s all elements that are indexed in *DefaultLuceneIndex* are forwarded to the *SuggestionIndexListener*, who registered a *PushStream* service, that is bound to the *ObjectStreamSuggestionService*
 
 ## Gecko EMF Search Suggest
 
@@ -203,3 +298,8 @@ This works in the same way like the default implementation. You only have to pro
 	},
 }
 ```
+
+## Links
+
+* [Documentation](https://github.com/geckoprojects-org/org.gecko.search)
+* [Source Code](https://github.com/geckoprojects-org/org.gecko.search) (clone with `scm:git:git@github.com:geckoprojects-org/org.gecko.search.git`)
