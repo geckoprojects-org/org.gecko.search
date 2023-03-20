@@ -36,4 +36,3 @@ Provide-Capability: \
 
 -resourceonly: true
 -includeresource: resources
-Bundle-Version: ${project-version}

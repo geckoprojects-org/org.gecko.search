@@ -1,6 +1,5 @@
 Bundle-Name: Gecko Search bnd Library
 Bundle-Description: Dependencies for Gecko Search
-Bundle-Version: ${base-version}
 
 -resourceonly: true
 -sources: false
