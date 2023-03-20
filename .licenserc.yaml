@@ -43,6 +43,8 @@ header:
     - '**/*.aird'
     - '**/*.basic'
     - '**/.classpath'
+    - '**/*.txt'
+    - '**/*.json*'
     - 'LICENSE'
     - 'Jenkinsfile'
     - 'NOTICE'
