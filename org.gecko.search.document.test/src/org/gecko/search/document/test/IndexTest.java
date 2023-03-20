@@ -77,7 +77,7 @@ public class IndexTest {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "ByteBuffer")
 			})
-	public void basicTest(@InjectService ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException, InvocationTargetException {
+	public void basicTest(@InjectService(timeout = 1000l) ServiceAware<LuceneIndexService> indexAware, @InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -119,8 +119,8 @@ public class IndexTest {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "ByteBuffer")
 			})
-	public void basicTestMany(@InjectService() ServiceAware<LuceneIndexService> indexAware,
-			@InjectService() ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException, InvocationTargetException {
+	public void basicTestMany(@InjectService(timeout = 1000l) ServiceAware<LuceneIndexService> indexAware,
+			@InjectService(timeout = 1000l) ServiceAware<IndexSearcher> searcherAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();

@@ -88,9 +88,9 @@ public class IndexListenerTest {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "ByteBuffer")
 			})
-	public void basicTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
-			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
+	public void basicTestListener(@InjectService(timeout = 1000l) ServiceAware<LuceneIndexService> indexAware, 
+			@InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexSearcher> searcherAware,
+			@InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -156,9 +156,9 @@ public class IndexListenerTest {
 					@Property(key = "id", value = "test"),
 					@Property(key = "directory.type", value = "ByteBuffer")
 			})
-	public void noHandlingTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
-			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
+	public void noHandlingTestListener(@InjectService(timeout = 1000l) ServiceAware<LuceneIndexService> indexAware, 
+			@InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexSearcher> searcherAware,
+			@InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 		
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
@@ -236,9 +236,9 @@ public class IndexListenerTest {
 					@Property(key = "indexListener.target", value = "(type=test)"),
 					@Property(key = "directory.type", value = "ByteBuffer")
 			})
-	public void bindTargetTestListener(@InjectService ServiceAware<LuceneIndexService> indexAware, 
-			@InjectService(cardinality = 0) ServiceAware<IndexSearcher> searcherAware,
-			@InjectService(cardinality = 0) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
+	public void bindTargetTestListener(@InjectService(timeout = 1000l) ServiceAware<LuceneIndexService> indexAware, 
+			@InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexSearcher> searcherAware,
+			@InjectService(cardinality = 0, timeout = 1000l) ServiceAware<IndexListener> listenerAware) throws InterruptedException, IOException, InvocationTargetException {
 		
 		assertThat(indexAware).isNotNull();			
 		LuceneIndexService<ObjectContextObject> indexService = indexAware.getService();
