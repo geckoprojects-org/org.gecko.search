@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
-@Component(name = "DefaultLuceneIndex", service = LuceneIndexService.class, immediate = true, configurationPolicy = ConfigurationPolicy.REQUIRE, scope = ServiceScope.SINGLETON)
+@Component(name = "DefaultLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE, scope = ServiceScope.SINGLETON)
 public class DefaultLuceneIndex extends LuceneIndexImpl<ObjectContextObject> {
 
 	/* 

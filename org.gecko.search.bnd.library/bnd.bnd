@@ -5,7 +5,8 @@ Bundle-Description: Dependencies for Gecko Search
 -sources: false
 
 -includeresource: \
-	resources
+	resources,\
+	{library/workspace/gecko-search.mvn=resources/library/workspace/gecko-search.mvn}
 
 Provide-Capability: \
 	${gecko-base}

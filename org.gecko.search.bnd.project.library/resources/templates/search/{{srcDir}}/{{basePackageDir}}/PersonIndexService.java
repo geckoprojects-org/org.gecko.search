@@ -20,7 +20,6 @@ import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 
 import {{basePackageName}}.PersonIndexService;
 import {{basePackageName}}.helper.PersonIndexHelper;
@@ -29,7 +28,7 @@ import {{basePackageName}}.pojo.Person;
 /**
  * This is a sample Index Service to index objects.
  */
-@Component(service = PersonIndexService.class, scope = ServiceScope.SINGLETON)
+@Component(service = PersonIndexService.class, immediate = true)
 public class PersonIndexService {
 
 	@Reference(target = "(id=test)")

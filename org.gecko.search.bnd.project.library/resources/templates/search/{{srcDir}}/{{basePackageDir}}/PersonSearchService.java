@@ -42,12 +42,12 @@ import {{basePackageName}}.pojo.Person;
 /**
  * This is a sample Search Service to retrieve the objects from the index
  */
-@Component(name = "PersonSearchService", service = PersonSearchService.class)
+@Component(service = PersonSearchService.class, immediate = true)
 public class PersonSearchService {
 	
 	@Reference(target = "(id=test)")
 	private ComponentServiceObjects<IndexSearcher> searcherSO;
-
+	
 	/**
 	 * Executes a search by first name
 	 * @param firstName the first name to look for persons

@@ -6,3 +6,5 @@
         readOnly=true; \
         poll.time=-1; \
         name="Gecko Search"
+        
+-require-bnd: "(version>=6.3.1)"
