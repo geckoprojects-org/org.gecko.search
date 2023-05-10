@@ -18,7 +18,9 @@ for EMF additionally:
 * org.gecko.emf.search
 * org.gecko.emf.search.suggest -  - *optional* for EMF suggest support
 
-Finally the Lucene dependencies are needed as well
+Finally the Lucene dependencies are needed as well. 
+
+The implementation is based on Lucene 9.6.0 dependencies. The latest version is 1.2.x
 
 ## Lucene and OSGi
 
@@ -30,7 +32,7 @@ You can find the releases at Maven Central:
 <dependency>
     <groupId>org.geckoprojects.search</groupId>
     <artifactId>org.apache.lucene.core</artifactId>
-    <version>9.5.0</version>
+    <version>9.6.0</version>
 </dependency>
 ```
 
@@ -68,7 +70,7 @@ To enable library support for Gecko Search you need:
 <dependency>
     <groupId>org.geckoprojects.search</groupId>
     <artifactId>org.gecko.search.bnd.library</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 In the *build.bnd* you can enable the library using the instruction:
