@@ -32,7 +32,7 @@ You can find the releases at Maven Central:
 <dependency>
     <groupId>org.geckoprojects.search</groupId>
     <artifactId>org.apache.lucene.core</artifactId>
-    <version>9.6.0</version>
+    <version>9.7.0</version>
 </dependency>
 ```
 
