@@ -20,7 +20,7 @@ for EMF additionally:
 
 Finally the Lucene dependencies are needed as well. 
 
-The implementation is based on Lucene 9.6.0 dependencies. The latest version is 1.2.x
+The implementation is based on Lucene 9.7.0 dependencies. The latest version is 1.3.x
 
 ## Lucene and OSGi
 
@@ -70,7 +70,7 @@ To enable library support for Gecko Search you need:
 <dependency>
     <groupId>org.geckoprojects.search</groupId>
     <artifactId>org.gecko.search.bnd.library</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 In the *build.bnd* you can enable the library using the instruction:
