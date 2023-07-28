@@ -9,7 +9,8 @@
 	org.osgi.service.metatype;version=latest,\
 	org.osgi.service.metatype.annotations;version=latest,\
 	org.apache.lucene.core;version=snapshot,\
-	org.gecko.search;version=project
+	org.gecko.search;version=project,\
+	biz.aQute.bnd.annotation
 	
 Export-Package: \
 	org.gecko.search.document,\

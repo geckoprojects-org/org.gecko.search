@@ -4,8 +4,7 @@
 	org.osgi.util.promise;version=latest,\
 	org.apache.lucene.core;version=latest,\
 	org.gecko.search;version=snapshot,\
-	org.gecko.search.document;version=snapshot
-
-Export-Package: org.gecko.search.util
+	org.gecko.search.document;version=snapshot,\
+	osgi.annotation
 
 Bundle-Name: Gecko Search Utils

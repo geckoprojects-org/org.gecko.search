@@ -14,6 +14,7 @@
 package org.gecko.emf.search.impl;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.IndexSearcher;
 import org.gecko.emf.search.document.EObjectDocumentIndexObjectContext;
 import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
@@ -28,12 +29,15 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
+import aQute.bnd.annotation.service.ServiceCapability;
+
 /**
  * EMF implementation of the {@link LucenePushStreamIndexImpl}
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
 @Component(name = "EMFLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@ServiceCapability(IndexSearcher.class)
 public class EObjectLuceneIndex extends LuceneIndexImpl<EObjectDocumentIndexObjectContext> {
 
 	/* 
