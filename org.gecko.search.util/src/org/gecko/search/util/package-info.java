@@ -11,5 +11,8 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-@org.osgi.annotation.versioning.Version("1.0.0")
+@org.osgi.annotation.versioning.Version("1.0.1")
+@Export
 package org.gecko.search.util;
+
+import org.osgi.annotation.bundle.Export;
