@@ -16,6 +16,11 @@ mvn-base-version: ${versionmask;===s;${base-version}}
 lucene-version: 9.8.0
 opennlp-version: 2.3.0
 
+dimcBaselining: false
+mavenCentral: false
+
+#-baseline: org.gecko.*
+
 # Maven Central Group-Id
 -groupid: org.geckoprojects.search
 

@@ -14,6 +14,7 @@
 package org.gecko.search.document.impl;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.IndexSearcher;
 import org.gecko.search.IndexListener;
 import org.gecko.search.document.LuceneIndexService;
 import org.gecko.search.document.context.ObjectContextObject;
@@ -29,12 +30,15 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ServiceScope;
 
+import aQute.bnd.annotation.service.ServiceCapability;
+
 /**
  * Default implemenation of the Lucene index that can handle Object
  * @author Mark Hoffmann
  * @since 08.03.2023
  */
 @Component(name = "DefaultLuceneIndex", service = LuceneIndexService.class, configurationPolicy = ConfigurationPolicy.REQUIRE, scope = ServiceScope.SINGLETON)
+@ServiceCapability(IndexSearcher.class)
 public class DefaultLuceneIndex extends LuceneIndexImpl<ObjectContextObject> {
 
 	/* 
