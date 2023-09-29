@@ -39,7 +39,6 @@ org.apache.lucene:lucene-misc:${lucene-version}
 org.apache.lucene:lucene-misc:jar:sources:${lucene-version}
 org.apache.lucene:lucene-benchmark:${lucene-version}
 org.apache.lucene:lucene-benchmark:jar:sources:${lucene-version}
-org.apache.commons:commons-compress:1.23.0
 org.apache.lucene:lucene-monitor:${lucene-version}
 org.apache.lucene:lucene-monitor:jar:sources:${lucene-version}
 org.apache.lucene:lucene-expressions:${lucene-version}
@@ -58,11 +57,10 @@ org.apache.lucene:lucene-analysis-morfologik:jar:sources:${lucene-version}
 org.carrot2:morfologik-stemming:2.1.9
 org.carrot2:morfologik-fsa:2.1.9
 org.carrot2:morfologik-polish:2.1.9
-commons-codec:commons-codec:1.15
 org.apache.lucene:lucene-analysis-opennlp:${lucene-version}
 org.apache.lucene:lucene-analysis-opennlp:jar:sources:${lucene-version}
-org.apache.opennlp:opennlp-tools:2.2.0
-org.apache.opennlp:opennlp-tools:jar:sources:2.2.0
+org.apache.opennlp:opennlp-tools:${opennlp-version}
+org.apache.opennlp:opennlp-tools:jar:sources:${opennlp-version}
 org.apache.lucene:lucene-analysis-phonetic:${lucene-version}
 org.apache.lucene:lucene-analysis-phonetic:jar:sources:${lucene-version}
 
@@ -209,7 +207,7 @@ org.slf4j:slf4j-api:1.7.36
 org.freemarker:freemarker:2.3.32
 
 #Gecko
-org.geckoprojects.bnd:org.gecko.bnd.dimc.library:1.3.0
+org.geckoprojects.bnd:org.gecko.bnd.dimc.library:1.3.2-SNAPSHOT
 org.geckoprojects.bnd:org.gecko.bnd.jacoco.library:1.3.0
 org.geckoprojects.bnd:org.gecko.bnd.osgitest.library:1.3.0
 org.geckoprojects.emf:org.gecko.emf.osgi.api:4.5.0
@@ -220,3 +218,5 @@ org.geckoprojects.repository:org.gecko.emf.repository.api:9.2.2
 org.geckoprojects.repository:org.gecko.emf.repository.mongo:3.1.0
 org.gecko.addons:org.gecko.util.pushstream:4.0.0
 org.gecko.addons:org.gecko.util.common:1.1.0
+commons-codec:commons-codec:1.16.0
+org.apache.commons:commons-compress:1.24.0
