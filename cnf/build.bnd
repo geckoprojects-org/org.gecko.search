@@ -17,7 +17,7 @@ lucene-version: 9.8.0
 opennlp-version: 2.3.0
 
 dimcBaselining: false
-mavenCentral: false
+mavenCentral: true
 
 #-baseline: org.gecko.*
 
