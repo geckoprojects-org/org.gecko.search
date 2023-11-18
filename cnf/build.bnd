@@ -54,3 +54,5 @@ javac.target: 11
 		name = Temp; \
 		pretty = true; \
 		local = ${build}/cache/temp
+
+-jpms-module-info:
