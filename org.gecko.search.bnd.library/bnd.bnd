@@ -4,6 +4,9 @@ Bundle-Description: Dependencies for Gecko Search
 -resourceonly: true
 -sources: false
 
+-include: ${.}/buildpath.bnd
+mavendeps: ${sjoin;\n; ${template;-maven-dependencies;${@}}}
+
 -includeresource: \
 	resources,\
 	{library/workspace/gecko-search.mvn=resources/library/workspace/gecko-search.mvn}
