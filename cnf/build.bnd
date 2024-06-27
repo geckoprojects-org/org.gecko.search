@@ -11,10 +11,10 @@
 # Needed because we enabled library 'gecko-dimc'
 dimcBaselining: true
 github-project: org.gecko.search
-base-version: 1.4.0
+base-version: 1.4.1
 mvn-base-version: ${versionmask;===s;${base-version}}
-lucene-version: 9.8.0
-opennlp-version: 2.3.0
+lucene-version: 9.11.1
+opennlp-version: 2.3.3
 
 dimcBaselining: false
 mavenCentral: true
