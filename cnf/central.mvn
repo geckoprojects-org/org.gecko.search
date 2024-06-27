@@ -216,7 +216,7 @@ org.geckoprojects.emf:org.gecko.emf.osgi.extender:4.5.0
 org.geckoprojects.emf:org.gecko.emf.osgi.example.model.basic:4.5.0
 org.geckoprojects.repository:org.gecko.emf.repository.api:9.2.2
 org.geckoprojects.repository:org.gecko.emf.repository.mongo:3.1.0
-org.gecko.addons:org.gecko.util.pushstream:4.0.0
-org.gecko.addons:org.gecko.util.common:1.1.0
+#org.gecko.addons:org.gecko.util.pushstream:4.0.0
+#org.gecko.addons:org.gecko.util.common:1.1.0
 commons-codec:commons-codec:1.16.0
 org.apache.commons:commons-compress:1.24.0
