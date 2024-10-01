@@ -11,9 +11,9 @@
 # Needed because we enabled library 'gecko-dimc'
 dimcBaselining: true
 github-project: org.gecko.search
-base-version: 1.4.1
+base-version: 1.4.2
 mvn-base-version: ${versionmask;===s;${base-version}}
-lucene-version: 9.11.1
+lucene-version: 9.12.0
 opennlp-version: 2.3.3
 
 dimcBaselining: false
