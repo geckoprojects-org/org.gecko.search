@@ -10,7 +10,7 @@ Export-Package: org.gecko.search
 	org.osgi.service.component;version=latest,\
 	org.osgi.service.metatype.annotations;version=latest,\
 	org.osgi.service.component.annotations;version=latest,\
-	org.apache.lucene.core;version=snapshot
+	org.apache.lucene.core;version=latest
 	
 Bundle-Name: Gecko Search
 Bundle-Description: Gecko Lucene Search Framework for OSGi 
